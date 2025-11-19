@@ -15,6 +15,23 @@ class Mascota(models.Model):
         ('macho', 'Macho'),
         ('hembra', 'Hembra'),
     ]
+
+    # Razas (ejemplos, ampliar)
+    RAZAS_PERROS = [
+        ('mestizo', 'Mestizo'),
+        ('labrador', 'Labrador Retriever'),
+        ('pastor_aleman', 'Pastor Alemán'),
+        ('bulldog', 'Bulldog Inglés'),
+        ('beagle', 'Beagle'),
+        ('siames', 'Siamés'),
+        ('persa', 'Persa'),
+    ]
+
+    RAZAS_GATOS = [
+        ('mestizo', 'Mestizo'),
+        ('siames', 'Siamés'),
+        ('persa', 'Persa'),
+    ]
     
     # Tamaño
     TAMAÑO = [
@@ -24,7 +41,7 @@ class Mascota(models.Model):
         ('gigante', 'Gigante (+45kg)'),
     ]
     
-    # Carácter (opciones múltiples)
+    # Carácter (ejemplos, ampliar)
     CARACTER = [
         ('cariñoso', 'Cariñoso'),
         ('jugueton', 'Juguetón'),
@@ -44,50 +61,43 @@ class Mascota(models.Model):
         ('cualquier_especie', 'Puede convivir con cualquier animal'),
     ]
     
-    # Convivencia con niños
-    CONVIVENCIA_NINOS = [
-        ('si', 'Sí, puede convivir con niños'),
-        ('no', 'No, no puede convivir con niños'),
-    ]
-    
     # Datos básicos
-    nombre = models.CharField(max_length=100, default='Sin nombre', verbose_name="Nombre")
+    nombre = models.CharField(max_length=100, help_text="Introduzca el nombre del animal", verbose_name="Nombre")
+    foto = models.ImageField(upload_to='animal_pics/', blank=True, null=True)
     especie = models.CharField(max_length=10, choices=ESPECIES, default='gato', verbose_name="Especie")
+    raza_perro = models.CharField(max_length=150, choices=RAZAS, default='mestizo', verbose_name="Raza")
+    raza_gato = models.CharField(max_length=150, choices=RAZAS_GATOS, default='mestizo', verbose_name="Raza")
     genero = models.CharField(max_length=10, choices=GENERO, default='hembra', verbose_name="Género")
     edad = models.PositiveIntegerField(default=0, help_text="Edad en años", verbose_name="Edad")
     
     # Características físicas
     tamaño = models.CharField(max_length=15, choices=TAMAÑO, default='mediano', verbose_name="Tamaño")
-    peso = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, 
-                               help_text="Peso en kg (opcional)", verbose_name="Peso")
+    peso = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, help_text="Peso en kg (opcional)", verbose_name="Peso")
     color = models.CharField(max_length=100, default='marrón', verbose_name="Color")
     foto = models.ImageField(upload_to='mascotas/', verbose_name="Foto")
+
+    # Carácter
+    caracter = models.CharField(max_length=20, choices=CARACTER, default='cariñoso', verbose_name="Carácter")
     
+    # Convivencia
+    convivencia_animales = models.CharField(max_length=20, choices=CONVIVENCIA_ANIMALES, default='no', verbose_name="¿Puede convivir con otros animales?")
+    convivencia_ninos = models.BooleanField(default=False, verbose_name="¿Puede convivir con niños?")
+    
+    #estado de salud
+    desparasitado = models.BooleanField(default=False, help_text="¿Está desparasitado?")
+    esterilizado = models.BooleanField(default=False, help_text="¿Está esterilizado?")
+    con_microchip = models.BooleanField(default=False, help_text="¿Tiene microchip?")
+    vacunado = models.BooleanField(default=False, help_text="¿Está vacunado?")
+    
+
     # Necesidades especiales
     necesidades_especiales = models.BooleanField(default=False, verbose_name="¿Tiene necesidades especiales?")
-    descripcion_necesidades = models.TextField(blank=True, null=True, 
-                                               verbose_name="Descripción de necesidades especiales")
-    
-    # Convivencia con otros animales
-    convivencia_animales = models.CharField(max_length=20, choices=CONVIVENCIA_ANIMALES, default='no',
-                                           verbose_name="¿Puede convivir con otros animales?")
-    
-    # Convivencia con niños
-    convivencia_ninos = models.CharField(max_length=10, choices=CONVIVENCIA_NINOS, default='no',
-                                        verbose_name="¿Puede convivir con niños?")
-    
-    # Carácter (guardado como texto separado por comas)
-    caracter = models.CharField(max_length=200, default='cariñoso', verbose_name="Carácter",
-                               help_text="Características separadas por comas")
-    
-    # Información adicional
-    descripcion = models.TextField(blank=True, verbose_name="Descripción adicional")
-    ubicacion = models.CharField(max_length=100, default="Ciudad", verbose_name="Ubicación")
-    
-    # Relación con el usuario que sube la mascota
-    propietario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
-                                    verbose_name="Protectora")
-    
+    descripcion_necesidades = models.TextField(blank=True, null=True, verbose_name="Descripción de necesidades especiales")
+
+    #estado del perfil
+    adoptado = models.BooleanField(default=False)
+    oculto = models.BooleanField(default=False)
+
     # Fechas
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
