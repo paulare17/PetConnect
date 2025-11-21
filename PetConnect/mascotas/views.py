@@ -101,7 +101,7 @@ def subir_mascota(request):
                 caracter=caracter,
                 descripcion=descripcion,
                 ubicacion=ubicacion,
-                propietario=request.user
+                protectoraEncargada=request.user
             )
             
             return JsonResponse({
@@ -134,7 +134,7 @@ def listar_mascotas(request):
     Vista pública para que los adoptantes puedan ver todas las mascotas disponibles.
     Permite filtrar por especie, género, tamaño, ciudad y búsqueda por nombre.
     """
-    mascotas = Mascota.objects.all().select_related('propietario').order_by('-fecha_creacion')
+    mascotas = Mascota.objects.all().select_related('protectoraEncargada').order_by('-fecha_creacion')
     
     # Filtros opcionales
     especie = request.GET.get('especie')
@@ -180,8 +180,8 @@ def listar_mascotas(request):
             'convivencia_ninos': mascota.get_convivencia_ninos_display(),
             'descripcion': mascota.descripcion,
             'ubicacion': mascota.ubicacion,
-            'protectora': mascota.propietario.username,
-            'email_protectora': mascota.propietario.email,
+            'protectora': mascota.protectoraEncargada.username,
+            'email_protectora': mascota.protectoraEncargada.email,
             'fecha_publicacion': mascota.fecha_creacion.strftime('%d/%m/%Y')
         })
     
@@ -226,9 +226,9 @@ def detalle_mascota(request, mascota_id):
                 'descripcion': mascota.descripcion,
                 'ubicacion': mascota.ubicacion,
                 'protectora': {
-                    'nombre': mascota.propietario.username,
-                    'email': mascota.propietario.email,
-                    'ciudad': mascota.propietario.city
+                    'nombre': mascota.protectoraEncargada.username,
+                    'email': mascota.protectoraEncargada.email,
+                    'ciudad': mascota.protectoraEncargada.city
                 },
                 'fecha_publicacion': mascota.fecha_creacion.strftime('%d/%m/%Y')
             }
