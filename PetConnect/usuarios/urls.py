@@ -4,7 +4,7 @@ from .views import UsuarioViewSet, PerfilUsuarioViewSet, PerfilProtectoraViewSet
 
 
 router = DefaultRouter()
-router.register(r'', UsuarioViewSet)
+router.register(r'usuario', UsuarioViewSet)
 router.register(r'perfil-usuario', PerfilUsuarioViewSet)
 router.register(r'perfil-protectora', PerfilProtectoraViewSet)
 
