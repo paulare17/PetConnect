@@ -1,19 +1,16 @@
-from django.shortcuts import render
-
-
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from .models import Mascota
-from usuario.models import UserRole
+from .models import Usuario
 import json
 
 
 def es_protectora(user):
     """Verifica si el usuario tiene rol de protectora"""
-    return UserRole.objects.filter(
+    return Usuario.objects.filter(
         user_id=user, 
         role__role_name='Protectora'
     ).exists()
@@ -284,6 +281,7 @@ def mis_mascotas(request):
 @login_required
 def eliminar_mascota(request, mascota_id):
     """Permite a la protectora eliminar una mascota (por ejemplo, si ya fue adoptada)"""
+ 
     if request.method != 'DELETE' and request.method != 'POST':
         return JsonResponse({'error': 'Método no permitido'}, status=405)
     
@@ -302,4 +300,47 @@ def eliminar_mascota(request, mascota_id):
     return JsonResponse({
         'success': True,
         'message': f'{nombre_mascota} ha sido eliminado del listado'
+    })
+
+@login_required
+def modificar_mascota(request, mascota_id):
+    """Permite a la protectora modificar una mascota existente con un JSON de datos."""
+    
+    # 1. Verificación de Método HTTP
+    # Usamos PUT o PATCH, que son los verbos REST para modificar
+    if request.method not in ['PUT', 'PATCH']:
+        return JsonResponse({'error': 'Método no permitido. Usa PUT o PATCH'}, status=405)
+    
+    mascota = get_object_or_404(Mascota, id=mascota_id)
+    
+    # 2. Verificación de Permisos (Propietario)
+    if mascota.protectoraEncargada != request.user:
+        return JsonResponse({
+            'success': False,
+            'error': 'No tienes permiso para modificar esta mascota'
+        }, status=403)
+    
+    # 3. Lectura y parsing del JSON
+    try:
+        # Convierte el texto JSON crudo a un diccionario de Python
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Formato JSON inválido en la petición'}, status=400)
+    
+    # 4. Definición de Campos Bloqueados por Seguridad
+    # Estos campos NUNCA deben poder modificarse dinámicamente con datos del usuario.
+    CAMPOS_BLOQUEADOS = ['id', 'protectoraEncargada', 'fecha_creacion'] 
+    
+    # 5. Aplicación de la Modificación GENÉRICA y Segura
+    for key, value in data.items():
+        # Comprueba que el campo existe Y que NO es un campo bloqueado.
+        if hasattr(mascota, key) and key not in CAMPOS_BLOQUEADOS: 
+            setattr(mascota, key, value) # Aplica el valor dinámicamente
+    
+    # 6. Guardar los cambios y responder
+    mascota.save()
+    
+    return JsonResponse({
+        'success': True,
+        'message': f'{mascota.nombre} ha sido modificada con éxito.'
     })
