@@ -38,11 +38,37 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
+    'rest_framework',
+    'rest_framework_simplejwt',
     'mascotas',
     'usuarios'
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
+
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),    # Token expira en 1h
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),       # Refresh en 1 dia
+    'ROTATE_REFRESH_TOKENS': True,
+}
+
+AUTH_USER_MODEL = 'usuario.Usuario'
+
+LOGIN_URL = '/usuario/login'
+LOGIN_REDIRECT_URL = '/usuario/dashboard'
+LOGOUT_REDIRECT_URL = '/usuario/login'
+
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware', 
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -71,6 +97,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'PetConnect.wsgi.application'
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000"
+]
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
@@ -123,3 +152,6 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR/ 'media'
