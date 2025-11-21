@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Usuario, PerfilUsuario, PerfilProtectora
+import re
 
 
 class UsuarioSerializer(serializers.ModelSerializer):
