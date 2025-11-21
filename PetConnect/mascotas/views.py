@@ -290,7 +290,7 @@ def eliminar_mascota(request, mascota_id):
     mascota = get_object_or_404(Mascota, id=mascota_id)
     
     # Verificar que el usuario sea el propietario
-    if mascota.propietario != request.user:
+    if mascota.protectoraEncargada != request.user:
         return JsonResponse({
             'success': False,
             'error': 'No tienes permiso para eliminar esta mascota'
