@@ -1,7 +1,7 @@
 from django.db import models
 from django.db import models
 from django.conf import settings
-from PetConnect.usuarios.models import PerfilProtectora
+from usuarios.models import PerfilProtectora
 
 class Mascota(models.Model):
     # Especies
