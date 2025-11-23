@@ -1,4 +1,4 @@
-from django.core.mail import send_mass_mail
+from django.core.mail import send_mail
 from django.contrib.auth.models import User
 
 def notificar_por_rol(rol, asunto, mensaje):

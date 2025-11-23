@@ -4,7 +4,7 @@ from django.core.mail import send_mail
 def notificar_por_rol(rol, asunto, mensaje):
     destinatarios = Usuario.objects.filter(role=rol).values_list('email', flat=True)
     if destinatarios:
-        send_mail(asunto, mensaje, 'noreply@petconnect.com', list(destinatarios))
+        send_mail(asunto, mensaje, 'petconnect.noreply@gmail.com', list(destinatarios))
 
 #revisar lo de "hola protectora"
 def notificar_nueva_solicitud_adopcion(mascota, adoptante, usuario):
@@ -22,7 +22,7 @@ def notificar_nueva_solicitud_adopcion(mascota, adoptante, usuario):
     
     ❤️ PetConnect Team
     """
-    send_mail(asunto, mensaje, 'noreply@petconnect.com', [mascota.protectora.email])
+    send_mail(asunto, mensaje, 'petconnect.noreply@gmail.com', [mascota.protectora.email])
 
 def notificar_mascota_compatible(usuario, mascota):
     asunto = "🎯 ¡Encontramos una mascota compatible contigo!"
@@ -42,4 +42,4 @@ def notificar_mascota_compatible(usuario, mascota):
     ❤️ PetConnect Team
     """
     # Enviar solo a este usuario específico
-    send_mail(asunto, mensaje, 'noreply@petconnect.com', [usuario.email])
+    send_mail(asunto, mensaje, 'petconnect.noreply@gmail.com', [usuario.email])
