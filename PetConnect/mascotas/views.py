@@ -4,6 +4,7 @@ from django.db.models import Q
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
+from rest_framework.exceptions import PermissionDenied
 
 from .models import Mascota
 from usuarios.models import Usuario
@@ -11,11 +12,11 @@ from .serializers import MascotaSerializer
 
 
 def es_protectora(user):
-    """Verifica si el usuario tiene rol de protectora"""
-    return Usuario.objects.filter(
-        user_id=user, 
-        role__role_name='Protectora'
-    ).exists()
+    """Verifica si el usuario té rol 'protectora'."""
+    try:
+        return getattr(user, 'role', None) == 'protectora'
+    except Exception:
+        return False
 
 
 # @login_required
@@ -305,8 +306,11 @@ def es_protectora(user):
 
 
 def es_protectora_user(user):
-    """Comprova si l'usuari té rol 'Protectora' — reutilitzable."""
-    return Usuario.objects.filter(user_id=user, role__role_name='Protectora').exists()
+    """Comprova si l'usuari té rol 'protectora' — reutilitzable."""
+    try:
+        return getattr(user, 'role', None) == 'protectora'
+    except Exception:
+        return False
 
 
 class IsProtectora(permissions.BasePermission):
@@ -315,6 +319,9 @@ class IsProtectora(permissions.BasePermission):
     Ús: @permission_classes([IsAuthenticated, IsProtectora]) o a ViewSet.
     """
     def has_permission(self, request, view):
+        # Permet lectura pública; només requereix ser 'protectora' per operacions d'escriptura
+        if request.method in permissions.SAFE_METHODS:
+            return True
         return bool(request.user and request.user.is_authenticated and es_protectora_user(request.user))
 
 
@@ -405,6 +412,10 @@ class MascotaViewSet(viewsets.ModelViewSet):
         """
         Assigna propietari si existeix el camp al model; en cas contrari, crea normal.
         """
+        # Només permitim crear mascotes si l'usuari és una protectora
+        if not (self.request.user and getattr(self.request.user, 'role', None) == 'protectora'):
+            raise PermissionDenied('Solo las protectoras pueden crear mascotas.')
+
         if _model_has_field(Mascota, 'propietario'):
             serializer.save(propietario=self.request.user)
         else:

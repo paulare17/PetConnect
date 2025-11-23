@@ -42,7 +42,16 @@ class PerfilUsuarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = PerfilUsuario
         fields = '__all__'
-        read_only_fields = ('usuario',)
+        read_only_fields = ('usuario','role')
+        
+    def create(self, validated_data):
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            raise serializers.ValidationError("Autenticació requerida.")
+        if request.user.role != 'usuario':
+            raise serializers.ValidationError("Només usuaris amb rol 'usuario' poden crear aquest perfil.")
+        # assignar el perfil al usuari autenticat
+        return PerfilUsuario.objects.create(usuario=request.user, role=request.user.role, **validated_data)
 
 class PerfilProtectoraSerializer(serializers.ModelSerializer):
     """Serializer para perfil de protectora"""
@@ -51,7 +60,15 @@ class PerfilProtectoraSerializer(serializers.ModelSerializer):
     class Meta:
         model = PerfilProtectora
         fields = '__all__'
-        read_only_fields = ('usuario',)
+        read_only_fields = ('usuario','role')
+        
+    def create(self, validated_data):
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            raise serializers.ValidationError("Autenticació requerida.")
+        if request.user.role != 'protectora':
+            raise serializers.ValidationError("Només usuaris amb rol 'protectora' poden crear aquest perfil.")
+        return PerfilProtectora.objects.create(usuario=request.user, role=request.user.role, **validated_data)
     
     def validate_nucleo_zoologico(self, value):
         if value and not re.match(r'^ES\d{2}\d{3}C\d{6}$', value):

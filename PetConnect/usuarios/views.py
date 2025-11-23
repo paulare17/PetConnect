@@ -13,11 +13,24 @@ from .serializers import (
     PerfilProtectoraSerializer,
     LoginSerializer
 )
+from .permissions import (
+    UsuarioPermissions,
+    IsUsuario,
+    IsProtectora,
+    get_queryset_by_role,
+)
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     """ViewSet para gestión de usuarios"""
     queryset = Usuario.objects.all()
     serializer_class = UsuarioSerializer
+
+    def get_queryset(self):
+        """Filtrar usuarios según el rol del request.user usando la utilidad centralizada."""
+        user = self.request.user
+        if not user or not user.is_authenticated:
+            return Usuario.objects.none()
+        return get_queryset_by_role(user, Usuario)
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -81,29 +94,56 @@ class PerfilUsuarioViewSet(viewsets.ModelViewSet):
     """ViewSet para perfiles de usuario"""
     queryset = PerfilUsuario.objects.all()
     serializer_class = PerfilUsuarioSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, UsuarioPermissions]
 
     def get_queryset(self):
-        """Cada usuario solo ve su propio perfil"""
-        return PerfilUsuario.objects.filter(usuario=self.request.user)
+        """Filtrar perfiles de usuario según rol.
+        - admin: todos
+        - usuario: solo su perfil
+        - protectora: todos (para consulta)
+        """
+        user = self.request.user
+        if not user or not user.is_authenticated:
+            return PerfilUsuario.objects.none()
+        if user.role == 'admin':
+            return PerfilUsuario.objects.all()
+        if user.role == 'usuario':
+            return PerfilUsuario.objects.filter(usuario=user)
+        if user.role == 'protectora':
+            return PerfilUsuario.objects.all()
+        return PerfilUsuario.objects.none()
 
     def perform_create(self, serializer):
-        """Asociar el perfil al usuario actual"""
-        serializer.save(usuario=self.request.user)
+        """Forzar la asociación al request.user y guardar role sincronizado."""
+        serializer.save(usuario=self.request.user, role=self.request.user.role)
 
 class PerfilProtectoraViewSet(viewsets.ModelViewSet):
     """ViewSet para perfiles de protectora"""
     queryset = PerfilProtectora.objects.all()
     serializer_class = PerfilProtectoraSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, UsuarioPermissions]
 
     def get_queryset(self):
-        """Solo protectoras pueden acceder a estos perfiles"""
-        if self.request.user.role == 'protectora':
-            return PerfilProtectora.objects.filter(usuario=self.request.user)
+        """Filtrar perfiles de protectora según rol.
+        - admin: todos
+        - protectora: su propio perfil
+        - usuario: puede ver todas las protectoras (lista)
+        """
+        user = self.request.user
+        if not user or not user.is_authenticated:
+            return PerfilProtectora.objects.none()
+        if user.role == 'admin':
+            return PerfilProtectora.objects.all()
+        if user.role == 'protectora':
+            return PerfilProtectora.objects.filter(usuario=user)
+        if user.role == 'usuario':
+            return PerfilProtectora.objects.all()
         return PerfilProtectora.objects.none()
 
     def perform_create(self, serializer):
-        """Asociar el perfil al usuario actual"""
+        """Forzar la asociación al request.user y role."""
         if self.request.user.role == 'protectora':
-            serializer.save(usuario=self.request.user)
+            serializer.save(usuario=self.request.user, role=self.request.user.role)
+        else:
+            # Seguridad adicional: impedir creación por otros roles
+            raise PermissionError('Sólo usuarios con rol protectora pueden crear este perfil.')
