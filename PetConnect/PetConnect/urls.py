@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
+
 from usuarios.views import UsuarioViewSet, PerfilUsuarioViewSet, PerfilProtectoraViewSet
 from mascotas.views import MascotaViewSet
 
@@ -16,4 +17,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # Prefix opcional, per exemple '/api/' → /api/usuario/, /api/mascota/, ...
     path('api/', include(router.urls)),
+   
 ]

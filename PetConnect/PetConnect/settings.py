@@ -60,7 +60,6 @@ from datetime import timedelta
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),    # Token expira en 1h
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),       # Refresh en 1 dia
-    'ROTATE_REFRESH_TOKENS': True,
 }
 
 AUTH_USER_MODEL = 'usuarios.Usuario'

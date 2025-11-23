@@ -2,9 +2,9 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.exceptions import PermissionDenied
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.exceptions import TokenError
 from .models import Usuario, PerfilUsuario, PerfilProtectora
 from .serializers import (
     UsuarioSerializer,
@@ -70,19 +70,11 @@ class UsuarioViewSet(viewsets.ModelViewSet):
     def logout(self, request):
         """
         Espera: {'refresh': '<refresh_token>'}
-        Blacklist del refresh token (requereix rest_framework_simplejwt.token_blacklist a INSTALLED_APPS)
+        Nota: no s'utilitza blacklist en aquest projecte. Per a un "logout" simplement escarrega el client dels tokens
+        (borrar `access`/`refresh` localment). Si en el futur activem blacklist, implementarem revocació al servidor.
         """
-        refresh_token = request.data.get('refresh')
-        if not refresh_token:
-            return Response({'error': 'Refresh token required.'}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            token = RefreshToken(refresh_token)
-            token.blacklist()
-            return Response({'detail': 'Logged out successfully.'}, status=status.HTTP_200_OK)
-        except TokenError:
-            return Response({'error': 'Invalid token.'}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        # No fem cap acció de revocació al servidor; el client ha d'eliminar els tokens localment.
+        return Response({'detail': 'Logged out (client must discard tokens).'}, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def profile(self, request):
@@ -146,4 +138,4 @@ class PerfilProtectoraViewSet(viewsets.ModelViewSet):
             serializer.save(usuario=self.request.user, role=self.request.user.role)
         else:
             # Seguridad adicional: impedir creación por otros roles
-            raise PermissionError('Sólo usuarios con rol protectora pueden crear este perfil.')
+            raise PermissionDenied('Sólo usuarios con rol protectora pueden crear este perfil.')
