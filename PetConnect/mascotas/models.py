@@ -102,6 +102,13 @@ class Mascota(models.Model):
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
     
+    #vinculación con protectora
+    protectora = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='mascotas'
+    )
+    
     def __str__(self):
         return f"{self.nombre} ({self.especie})"
     

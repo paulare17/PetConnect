@@ -62,9 +62,9 @@ SIMPLE_JWT = {
 
 AUTH_USER_MODEL = 'usuarios.Usuario'
 
-LOGIN_URL = '/usuario/login'
-LOGIN_REDIRECT_URL = '/usuario/dashboard'
-LOGOUT_REDIRECT_URL = '/usuario/login'
+LOGIN_URL = '/usuarios/login'
+LOGIN_REDIRECT_URL = '/usuarios/dashboard'
+LOGOUT_REDIRECT_URL = '/usuarios/login'
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware', 
