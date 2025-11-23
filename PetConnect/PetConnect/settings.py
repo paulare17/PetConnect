@@ -60,7 +60,7 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,
 }
 
-AUTH_USER_MODEL = 'usuario.Usuario'
+AUTH_USER_MODEL = 'usuarios.Usuario'
 
 LOGIN_URL = '/usuario/login'
 LOGIN_REDIRECT_URL = '/usuario/dashboard'
