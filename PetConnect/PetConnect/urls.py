@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from usuario.views import UsuarioViewSet, PerfilUsuarioViewSet, PerfilProtectoraViewSet
+from usuarios.views import UsuarioViewSet, PerfilUsuarioViewSet, PerfilProtectoraViewSet
 
 router = DefaultRouter()
 router.register(r'users', UsuarioViewSet)
