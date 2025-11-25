@@ -14,6 +14,8 @@ import MenuItem from "@mui/material/MenuItem";
 import PetsIcon from "@mui/icons-material/Pets";
 import {colors} from '../../constants/colors.jsx'
 import { useNavigate } from "react-router-dom";
+import { useAuthContext } from '../../context/AuthProvider';
+
 
 const pages = ["Sobre nosaltres", "Perduts", "Contacte", "Adopta"];
 const settings = ["Perfil", "Inici", "Sortir"];
@@ -23,6 +25,7 @@ function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const navigate = useNavigate()
+  const { user, logout } = useAuthContext();
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -39,6 +42,25 @@ function ResponsiveAppBar() {
     setAnchorElUser(null);
   };
 
+  const handleUserMenuAction = (setting) => {
+    handleCloseUserMenu();
+    if (setting === "Perfil") {
+      if (user?.role === "protectora") navigate("/perfil-protectora");
+      else navigate("/perfil-usuari");
+    } else if (setting === "Inici") {
+      navigate("/");
+    } else if (setting === "Sortir") {
+      logout();
+      navigate("/");
+    }
+  };
+
+  const renderUserMenuItems = () =>
+    settings.map((setting) => (
+      <MenuItem key={setting} onClick={() => handleUserMenuAction(setting)}>
+        <Typography sx={{ textAlign: "center" }}>{setting}</Typography>
+      </MenuItem>
+    ));
   return (
     <AppBar
       position="static"
@@ -241,7 +263,10 @@ function ResponsiveAppBar() {
            {/* Secció dreta: Botó registre + Avatar */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           </Box>
-          <Box sx={{ flexGrow: 0 }}>
+
+          {user && (
+
+            <Box sx={{ flexGrow: 0 }}>
 
             {/* això quan tinguem el django fem q només es vegi si has entrat */}
                 {/* Menu del avatar */}
@@ -265,21 +290,27 @@ function ResponsiveAppBar() {
               }}
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
-            >
+              >
               {settings.map((setting) => (
                 <MenuItem key={setting} onClick={() => {
                   handleCloseUserMenu
-                  if (setting === "Perfil") navigate("/perfil-usuari");
+                  if (setting === "Perfil") 
+                    if (user.role ==="protectora")
+                      navigate("/perfil-usuari")
+                    if (user.role ==="usuario")
+                       navigate("/perfil-protectora")
                 }
-                }
-                >
+              }
+              >
                   <Typography sx={{ textAlign: "center" }}>
                     {setting}
                   </Typography>
                 </MenuItem>
               ))}
+              {renderUserMenuItems()}
             </Menu>
           </Box>
+      )}
         </Toolbar>
       </Container>
     </AppBar>

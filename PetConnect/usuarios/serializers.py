@@ -7,7 +7,8 @@ class UsuarioSerializer(serializers.ModelSerializer):
     """Serializer básico para Usuario"""
     class Meta:
         model = Usuario
-        fields = ('id', 'username', 'email', 'role', 'date_joined')
+        # Evitar retornar camps sensibles com l'email en respostes públiques
+        fields = ('id', 'username', 'role', 'date_joined')
         read_only_fields = ('id', 'date_joined')
 
 class UsuarioCreateSerializer(serializers.ModelSerializer):

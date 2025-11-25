@@ -10,7 +10,7 @@ import { colors } from "../../constants/colors.jsx";
 import { IconButton } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { useNavigate } from "react-router-dom";
-
+import api from "../../api/client";
 
 export default function FormDialog() {
   const [open, setOpen] = React.useState(true); // Sempre obert quan es carrega el component
@@ -23,13 +23,35 @@ export default function FormDialog() {
     navigate('/');
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const formJson = Object.fromEntries(formData.entries());
-    const email = formJson.email;
-    console.log(email);
-    handleClose();
+    const payload = {
+      username: formData.get("user"),
+      email: formData.get("email"),
+      password: formData.get("password"),
+      city: formData.get("ciutat"),
+      // si vols, afegeix rol des del form; aquí posem 'usuario' per defecte
+      role: "usuario",
+    };
+
+    try {
+      const res = await api.post("/usuarios/", payload);
+      // El backend retorna access/refresh/user; guardem-los per fer login automàtic
+      if (res?.data?.access) {
+        localStorage.setItem("access", res.data.access);
+        localStorage.setItem("refresh", res.data.refresh);
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+      }
+      handleClose();
+    } catch (err) {
+      console.error("Error creant usuari:", err);
+      const msg =
+        err?.response?.data?.detail ||
+        JSON.stringify(err?.response?.data) ||
+        "Error creant usuari";
+      alert(msg);
+    }
   };
   const handleGetLocation = () => {
     if (navigator.geolocation) {

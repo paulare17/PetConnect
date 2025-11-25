@@ -7,6 +7,7 @@ import Landpage from "./components/Landpage/Landpage";
 import FormRol from "./components/Forms/FormRol";
 import FormDialog from "./components/Forms/FormDialog";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthProvider";
 import ViewLogin from "./components/Login/ViewLogin";
 import FormProtectora from "./components/Forms/FormProtectora";
 import FormUsuari from "./components/Forms/FormUsuari";
@@ -25,24 +26,23 @@ function App() {
 
 
   return (
-
-      <div
-        style={{
-          width: "100%",
-          minHeight: "100vh",
-          display: "flex",
-          overflow: "auto",
-          flexDirection: "column",
-        }}
-      >
-        <Navbar />
-        <Routes>
+      <AuthProvider>
+        <div
+          style={{
+            width: "100%",
+            minHeight: "100vh",
+            display: "flex",
+            overflow: "auto",
+            flexDirection: "column",
+          }}
+        >
+          <Navbar />
+          <Routes>
           <Route path="/" element={
-            <>
+        
           <Landpage/>
             
-           
-          </>
+          
           }
            />
           <Route
@@ -56,18 +56,19 @@ function App() {
           />
            <Route path="/rol" element={<FormRol />} />
            <Route path="/formulari-acces" element={<ViewLogin />} />
-           <Route path="/formulari-protectora" element={<FormProtectora/>}/>
+           <Route path="/formulari-protectora" element={<FormProtectora/> }/>
            <Route path="/formulari-usuari" element={<FormUsuari/>}/>
            <Route path="/afegir-animal" element={<AddAnimalForm/>}/>
            <Route path="/perfil-usuari" element={<ProfilePageUser/>}/>
            <Route path="/perfil-protectora" element={<ProfilePageProtectora/>}/>
 
            
-        </Routes>
-        
-        <Footer />
-        {/* <FooterLandpage></FooterLandpage> */}
-      </div>
+          </Routes>
+
+          <Footer />
+          {/* <FooterLandpage></FooterLandpage> */}
+        </div>
+      </AuthProvider>
 
   );
 }
