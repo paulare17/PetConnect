@@ -313,30 +313,32 @@ def es_protectora_user(user):
         return False
 
 
-class IsProtectora(permissions.BasePermission):
+class IsProtectoraOrReadOnly(permissions.BasePermission):
     """
-    Permís que exigeix usuari autenticat amb rol Protectora.
-    Ús: @permission_classes([IsAuthenticated, IsProtectora]) o a ViewSet.
+    Permís que requereix ser protectora per crear/editar.
+    La lectura es controla per altres permisos (IsAuthenticated).
     """
     def has_permission(self, request, view):
-        # Permet lectura pública; només requereix ser 'protectora' per operacions d'escriptura
-        if request.method in permissions.SAFE_METHODS:
-            return True
-        return bool(request.user and request.user.is_authenticated and es_protectora_user(request.user))
+        # Si és operació d'escriptura, requereix ser protectora
+        if request.method not in permissions.SAFE_METHODS:
+            return bool(request.user and request.user.is_authenticated and es_protectora_user(request.user))
+        # Per lectura, permet (es controlat per IsAuthenticated al ViewSet)
+        return True
 
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
     """
-    Permís: lectura per a tothom, escripció només pel propietari (si el model té 'propietario').
+    Permís: lectura per usuaris autenticats, escriptura només pel propietari (protectora).
     """
     def has_object_permission(self, request, view, obj):
+        # Lectura: permetre (ja controlat per IsAuthenticated al ViewSet)
         if request.method in permissions.SAFE_METHODS:
             return True
-        # comprovar camp 'propietario' de forma defensiva
+        # Escriptura: només la protectora propietària
         model_fields = [f.name for f in obj._meta.get_fields()]
-        if 'propietario' in model_fields:
-            return getattr(obj, 'propietario') == request.user
-        # si no hi ha propietario, deneguem escriptura per seguretat
+        if 'protectora' in model_fields:
+            return getattr(obj, 'protectora') == request.user
+        # si no hi ha protectora, deneguem escriptura per seguretat
         return False
 
 
@@ -345,21 +347,21 @@ def _model_has_field(model_class, field_name):
 
 
 @api_view(['POST'])
-@permission_classes([permissions.IsAuthenticated, IsProtectora])
+@permission_classes([permissions.IsAuthenticated, IsProtectoraOrReadOnly])
 def subir_mascota(request):
     """
     API endpoint per pujar una mascota (multipart/form-data).
     Utilitza el serializer per validar i crear l'objecte.
-    Assigna propietario=request.user si el model té aquest camp.
+    Assigna protectora=request.user si el model té aquest camp.
     Retorna 201 amb les dades si va bé, 400 en cas d'errors de validació.
     """
     serializer = MascotaSerializer(data=request.data, context={'request': request})
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # Assignar propietari només si el model defineix aquest camp
-    if _model_has_field(Mascota, 'propietario'):
-        instance = serializer.save(propietario=request.user)
+    # Assignar protectora només si el model defineix aquest camp
+    if _model_has_field(Mascota, 'protectora'):
+        instance = serializer.save(protectora=request.user)
     else:
         instance = serializer.save()
 
@@ -369,12 +371,25 @@ def subir_mascota(request):
 class MascotaViewSet(viewsets.ModelViewSet):
     """
     ModelViewSet DRF per a Mascota.
-    - list / retrieve / create / update / partial_update / destroy automàtics
-    - Afegit action 'mis_mascotas' per obtenir les mascotes de l'usuari autenticat
+    - GET (list/retrieve): Només usuaris autenticats
+    - POST (create): Només protectores autenticades
+    - PUT/PATCH/DELETE: Només la protectora propietària
+    - Action 'mis_mascotas': Protectora autenticada veu les seves mascotes
     """
-    queryset = Mascota.objects.all()
+    queryset = Mascota.objects.filter(oculto=False, adoptado=False).order_by('-fecha_creacion')
     serializer_class = MascotaSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    
+    def get_permissions(self):
+        """Permisos dinàmics segons l'acció"""
+        if self.action in ['list', 'retrieve']:
+            # Lectura només per usuaris autenticats
+            return [permissions.IsAuthenticated()]
+        elif self.action == 'create':
+            # Crear: només protectores autenticades
+            return [permissions.IsAuthenticated(), IsProtectoraOrReadOnly()]
+        else:
+            # Editar/Eliminar: només propietari
+            return [permissions.IsAuthenticated(), IsOwnerOrReadOnly()]
 
     def get_queryset(self):
         """
@@ -410,14 +425,14 @@ class MascotaViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         """
-        Assigna propietari si existeix el camp al model; en cas contrari, crea normal.
+        Assigna protectora si existeix el camp al model; en cas contrari, crea normal.
         """
         # Només permitim crear mascotes si l'usuari és una protectora
         if not (self.request.user and getattr(self.request.user, 'role', None) == 'protectora'):
             raise PermissionDenied('Solo las protectoras pueden crear mascotas.')
 
-        if _model_has_field(Mascota, 'propietario'):
-            serializer.save(propietario=self.request.user)
+        if _model_has_field(Mascota, 'protectora'):
+            serializer.save(protectora=self.request.user)
         else:
             serializer.save()
 
@@ -425,12 +440,12 @@ class MascotaViewSet(viewsets.ModelViewSet):
     def mis_mascotas(self, request):
         """
         /api/mascota/mis_mascotas/ → retorna les mascotes propietat de l'usuari autenticat.
-        Només funciona si el model té el camp 'propietario'.
+        Només funciona si el model té el camp 'protectora'.
         """
-        if not _model_has_field(Mascota, 'propietario'):
-            return Response({'detail': 'Campo propietario no definido en el modelo.'}, status=status.HTTP_400_BAD_REQUEST)
+        if not _model_has_field(Mascota, 'protectora'):
+            return Response({'detail': 'Campo protectora no definido en el modelo.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        mascotas = self.queryset.filter(propietario=request.user)
+        mascotas = self.queryset.filter(protectora=request.user)
         page = self.paginate_queryset(mascotas)
         if page is not None:
             serializer = self.get_serializer(page, many=True)

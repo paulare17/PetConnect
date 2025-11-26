@@ -49,5 +49,20 @@ export default function useAuth() {
         setUser(null);
     };
 
-    return { user, login, logout, getMe };
+    // Helper functions per comprovar rols
+    const isProtectora = () => user?.role === 'protectora';
+    const isUsuario = () => user?.role === 'usuario';
+    const isAdmin = () => user?.role === 'admin';
+    const isAuthenticated = () => !!user;
+
+    return { 
+        user, 
+        login, 
+        logout, 
+        getMe,
+        isProtectora,
+        isUsuario,
+        isAdmin,
+        isAuthenticated
+    };
 }

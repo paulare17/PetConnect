@@ -13,12 +13,14 @@ import {
 import { Visibility, VisibilityOff, Email, Lock } from '@mui/icons-material';
 import {colors } from '../../constants/colors.jsx';
 import { useNavigate } from "react-router-dom";
+import { useAuthContext } from '../../context/AuthProvider';
 
 
 export default function ViewLogin() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const { login } = useAuthContext();
   const [formData, setFormData] = useState({
-    email: '',
+    username: '',
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -39,21 +41,19 @@ export default function ViewLogin() {
     setLoading(true);
 
     // Validació bàsica
-    if (!formData.email || !formData.password) {
+    if (!formData.username || !formData.password) {
       setError('Tots els camps són obligatoris');
       setLoading(false);
       return;
     }
 
     try {
-      // Aquí aniria la lògica d'autenticació
       console.log('Dades d\'accés:', formData);
-      // Simulem una petició
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Redirigir o actualitzar estat d'autenticació
-      alert('Accés correcte!');
-    } catch {
+      await login(formData);
+      // Redirigir a la pàgina principal després del login exitós
+      navigate('/');
+    } catch (error) {
+      console.error('Error en el login:', error);
       setError('Error en l\'autenticació. Comprova les teves credencials.');
     } finally {
       setLoading(false);
@@ -105,12 +105,12 @@ export default function ViewLogin() {
               margin="normal"
               required
               fullWidth
-              id="email"
-              label="Correu electrònic"
-              name="email"
-              autoComplete="email"
+              id="username"
+              label="Nom d'usuari"
+              name="username"
+              autoComplete="username"
               autoFocus
-              value={formData.email}
+              value={formData.username}
               onChange={handleInputChange}
               InputProps={{
                 startAdornment: (

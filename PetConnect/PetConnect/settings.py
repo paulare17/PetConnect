@@ -98,8 +98,31 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'PetConnect.wsgi.application'
 
+# CORS Configuration per al frontend (Vite)
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173"
+    "http://localhost:5173",  # Vite dev server
+    "http://127.0.0.1:5173",  # Alternativa localhost
+]
+
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
 ]
 
 # Database
@@ -156,6 +179,7 @@ STATIC_ROOT = Path(os.environ.get('STATIC_ROOT', BASE_DIR / 'staticfiles'))
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR/ 'media'
+MEDIA_ROOT = BASE_DIR / 'media'
 
+# Permet enviar cookies/credentials amb CORS
 CORS_ALLOW_CREDENTIALS = True

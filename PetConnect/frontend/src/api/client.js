@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_BASE = import.meta.env.REACT_APP_API_URL || 'http://localhost:8000/api';
+// Vite usa VITE_ com a prefix, no REACT_APP_
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 const api = axios.create({
   baseURL: API_BASE,

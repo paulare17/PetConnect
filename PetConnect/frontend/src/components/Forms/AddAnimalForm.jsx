@@ -16,9 +16,12 @@ import {
   FormGroup,
   Grid,
   Divider,
+  Alert,
+  CircularProgress,
 } from "@mui/material";
 import CardAnimal from "../dashboard/CardAnimal";
 import { colors } from "../../constants/colors.jsx";
+import api from "../../api/client";
 
 const AddAnimalForm = () => {
   const initialFormData = {
@@ -66,29 +69,38 @@ const AddAnimalForm = () => {
     setStatus(null);
 
     try {
-      const res = await fetch("http://localhost:8000/api/animals/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+      // Crear FormData per pujar imatge
+      const formDataToSend = new FormData();
+      
+      // Afegir tots els camps del formulari
+      Object.keys(formData).forEach(key => {
+        if (key === 'caracter') {
+          // Caracter és un array, enviar-lo com a string amb comes
+          formDataToSend.append(key, formData[key].join(','));
+        } else if (key === 'foto' && formData[key]) {
+          // Si hi ha foto (File object)
+          formDataToSend.append(key, formData[key]);
+        } else {
+          formDataToSend.append(key, formData[key]);
+        }
       });
 
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`Server error: ${res.status} ${text}`);
-      }
+      // Usar axios amb l'API client (afegeix token automàticament)
+      const res = await api.post("/mascota/", formDataToSend, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
 
-      const data = await res.json();
-      console.log("Form saved:", data);
-      setStatus({ type: "success", message: "Animal desat correctament." });
-      // opcional: si vols netejar el formulari després d'enviar
+      console.log("Mascota creada:", res.data);
+      setStatus({ type: "success", message: "Mascota creada correctament!" });
       setFormData(initialFormData);
     } catch (err) {
-      console.error(err);
+      console.error("Error creant mascota:", err);
+      const errorMsg = err.response?.data?.detail || err.response?.data || err.message || "Error creant mascota.";
       setStatus({
         type: "error",
-        message: err.message || "Error enviant dades.",
+        message: typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg),
       });
     } finally {
       setSubmitting(false);

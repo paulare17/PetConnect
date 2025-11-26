@@ -2,6 +2,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.exceptions import PermissionDenied
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Usuario, PerfilUsuario, PerfilProtectora
@@ -98,10 +99,11 @@ class BasePerfilViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         if user.role == 'admin':
-            return self.queryset_model.objects.all()
+            return self.queryset.all()
         elif user.role == self.allowed_role:
-            return self.queryset_model.objects.filter(usuario=user)
-        return self.queryset_model.objects.all()
+            return self.queryset.filter(usuario=user)
+        # Usuarios pueden ver perfiles de protectoras y viceversa
+        return self.queryset.all()
 
     def perform_create(self, serializer):
         """Solo usuarios del rol específico pueden crear su perfil"""
@@ -110,11 +112,11 @@ class BasePerfilViewSet(viewsets.ModelViewSet):
         serializer.save(usuario=self.request.user, role=self.request.user.role)
 
 class PerfilUsuarioViewSet(BasePerfilViewSet):
+    queryset = PerfilUsuario.objects.all()
     serializer_class = PerfilUsuarioSerializer
-    queryset_model = PerfilUsuario
     allowed_role = 'usuario'
 
 class PerfilProtectoraViewSet(BasePerfilViewSet):
+    queryset = PerfilProtectora.objects.all()
     serializer_class = PerfilProtectoraSerializer
-    queryset_model = PerfilProtectora
     allowed_role = 'protectora'
