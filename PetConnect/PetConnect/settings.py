@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'mascotas',
     'usuarios',
-    'favoritos',
 ]
 
 REST_FRAMEWORK = {
