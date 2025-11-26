@@ -2,8 +2,10 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.exceptions import PermissionDenied # <- [ADICIÓN]
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
+
 from .models import Usuario, PerfilUsuario, PerfilProtectora
 from .serializers import (
     UsuarioSerializer,
@@ -12,6 +14,10 @@ from .serializers import (
     PerfilProtectoraSerializer,
     LoginSerializer
 )
+
+# ---------------------------------------------
+# ViewSet para Gestión de Usuarios y Autenticación
+# ---------------------------------------------
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     """ViewSet para gestión de usuarios con JWT"""
@@ -82,39 +88,73 @@ class UsuarioViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
     def logout(self, request):
         """
-        Logout - cliente debe eliminar tokens.
-        Para revocación real, necesitarías blacklist.
+        Logout - el cliente debe eliminar los tokens.
         """
         return Response(
             {'detail': 'Sesión cerrada. Elimina los tokens del cliente.'}, 
             status=status.HTTP_200_OK
         )
 
-# ViewSets unificados para perfiles
+# ---------------------------------------------
+# ViewSets para Perfiles (Usuario y Protectora)
+# ---------------------------------------------
+
 class BasePerfilViewSet(viewsets.ModelViewSet):
-    """ViewSet base para perfiles con autenticación JWT"""
+    """
+    ViewSet base para perfiles.
+    Requiere que las subclases definan queryset_model, serializer_class y allowed_role.
+    """
     permission_classes = [IsAuthenticated]
     
+    queryset = None 
+
     def get_queryset(self):
+        """
+        Filtrado: Admin ve todo; usuarios con el rol adecuado ven su perfil; 
+        otros roles o usuarios sin rol no ven nada.
+        """
         user = self.request.user
+        
+        if not user.is_authenticated:
+            return self.queryset_model.objects.none()
+
         if user.role == 'admin':
             return self.queryset_model.objects.all()
-        elif user.role == self.allowed_role:
+        
+        # Filtra solo si el usuario tiene el rol permitido para este perfil
+        if user.role == self.allowed_role:
             return self.queryset_model.objects.filter(usuario=user)
-        return self.queryset_model.objects.all()
+        
+        # Si el usuario está autenticado pero no tiene el rol permitido
+        return self.queryset_model.objects.none()
 
     def perform_create(self, serializer):
-        """Solo usuarios del rol específico pueden crear su perfil"""
-        if self.request.user.role != self.allowed_role:
-            raise PermissionDenied('No tienes permisos para crear este perfil')
-        serializer.save(usuario=self.request.user, role=self.request.user.role)
+        """
+        Solo usuarios con el rol específico pueden crear un perfil. 
+        Evita que se creen perfiles duplicados.
+        """
+        user = self.request.user
+        
+        # Asegura que el usuario tenga un rol asignado y que sea el correcto.
+        if user.role != self.allowed_role:
+            raise PermissionDenied(f'Solo usuarios con el rol "{self.allowed_role}" pueden crear este perfil.')
+        
+        # Evitar duplicados (un usuario solo debe tener un perfil de este tipo)
+        if self.queryset_model.objects.filter(usuario=user).exists():
+             raise PermissionDenied('Ya tienes un perfil creado para esta cuenta.')
+            
+        serializer.save(usuario=user)
+
 
 class PerfilUsuarioViewSet(BasePerfilViewSet):
+    queryset_model = PerfilUsuario 
+    queryset = PerfilUsuario.objects.all() 
     serializer_class = PerfilUsuarioSerializer
-    queryset_model = PerfilUsuario
     allowed_role = 'usuario'
 
+
 class PerfilProtectoraViewSet(BasePerfilViewSet):
-    serializer_class = PerfilProtectoraSerializer
     queryset_model = PerfilProtectora
+    queryset = PerfilProtectora.objects.all() 
+    serializer_class = PerfilProtectoraSerializer
     allowed_role = 'protectora'
