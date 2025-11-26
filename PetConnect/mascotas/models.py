@@ -71,9 +71,7 @@ class Mascota(models.Model):
     edad = models.PositiveIntegerField(default=0, help_text="Edad en años", verbose_name="Edad")
     # protectoraEncargada = models.ForeignKey(PerfilProtectora, on_delete=models.CASCADE, related_name='mascotas', verbose_name="Protectora Encargada")
     
-    # Características físicas
-    tamaño = models.CharField(max_length=15, choices=TAMAÑO, default='mediano', verbose_name="Tamaño")
-    peso = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, help_text="Peso en kg (opcional)", verbose_name="Peso")
+    # otras características físicas
     color = models.CharField(max_length=100, default='marrón', verbose_name="Color")
     foto = models.ImageField(upload_to='mascotas/', verbose_name="Foto")
 
