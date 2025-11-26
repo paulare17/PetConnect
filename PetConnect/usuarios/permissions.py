@@ -23,45 +23,47 @@ class UsuarioPermissions(BasePermission):
     
     def has_object_permission(self, request, view, obj):
         user = request.user
-        
+
+        # soportar que obj sigui un perfil amb .usuario
+        target = getattr(obj, 'usuario', obj)
+
         # Admin puede hacer todo
-        if user.role == 'admin':
+        if getattr(user, 'role', None) == 'admin':
             return True
-        
+
         # Para ver perfiles (GET)
         if request.method in ['GET', 'HEAD', 'OPTIONS']:
             # Usuarios solo pueden ver:
-            if user.role == 'usuario':
+            if getattr(user, 'role', None) == 'usuario':
                 # - Su propio perfil
-                if obj == user:
+                if target == user:
                     return True
                 # - Perfiles de protectoras
-                if obj.role == 'protectora':
+                if getattr(target, 'role', None) == 'protectora':
                     return True
                 # - NO otros usuarios
                 return False
-            
+
             # Protectoras pueden ver:
-            elif user.role == 'protectora':
+            elif getattr(user, 'role', None) == 'protectora':
                 # - Su propio perfil
-                if obj == user:
+                if target == user:
                     return True
                 # - Otras protectoras
-                if obj.role == 'protectora':
+                if getattr(target, 'role', None) == 'protectora':
                     return True
                 # - Usuarios (para adopciones)
-                if obj.role == 'usuario':
+                if getattr(target, 'role', None) == 'usuario':
                     return True
-                # - NO admins (excepto el suyo propio si fuera admin)
+                # - NO admins
                 return False
-        
+
         # Para editar/eliminar (PUT, PATCH, DELETE)
-        else:
-            # Admin puede editar cualquiera
-            if user.role == 'admin':
-                return True
-            # Todos los demás solo pueden editarse a sí mismos
-            return obj == user
+        # Admin puede editar cualquiera
+        if getattr(user, 'role', None) == 'admin':
+            return True
+        # Todos los demás solo pueden editarse a sí mismos
+        return target == user
 
 class IsAdmin(BasePermission):
     """Permiso solo para administradores"""
@@ -90,9 +92,9 @@ class IsOwnerOrReadOnly(BasePermission):
         # Permisos de lectura para cualquier request
         if request.method in ['GET', 'HEAD', 'OPTIONS']:
             return True
-        
         # Permisos de escritura solo para el propietario del objeto
-        return obj.usuario == request.user
+        owner = getattr(obj, 'usuario', getattr(obj, 'owner', None))
+        return owner == request.user
 
 # Funciones de utilidad para filtrar queryset según rol
 def get_queryset_by_role(user, model):

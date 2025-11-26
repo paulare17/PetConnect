@@ -1,16 +1,12 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import UsuarioViewSet, PerfilUsuarioViewSet, PerfilProtectoraViewSet
-
-
-router = DefaultRouter()
-router.register(r'usuario', UsuarioViewSet)
-router.register(r'perfil-usuario', PerfilUsuarioViewSet)
-router.register(r'perfil-protectora', PerfilProtectoraViewSet)
+from . import views
 
 urlpatterns = [
-    path("", include(router.urls))
- ]
+    # Rutes específiques no basades en ViewSets, si n'hi ha.
+    # Exemple:
+    # path('custom-login/', views.custom_login, name='custom-login'),
+]
 
 
 

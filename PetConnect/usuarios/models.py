@@ -1,26 +1,24 @@
 from django.db import models
-
 # Create your models here.
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from multiselectfield import MultiSelectField
 # Hace falta instalar django-multiselectfield para poder seleccionar múltiples opciones en un campo
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
-class Usuario(AbstractUser):
 
-    # AbstractUser ya incluye id, password y username (pero username lo dejo)
-    # REGISTRO RÁPIDO
-    # user_id = models.AutoField(primary_key=True)
-    # password = models.CharField(max_length=128)
-    username = models.CharField(max_length=150, unique=True)
-    email = models.EmailField(unique=True)
-    # city = models.CharField(max_length=100)
-
-    ROLE_CHOICES = [
+ROLE_CHOICES = [
         ('admin', 'Admin'),
         ('usuario', 'Usuario'),
         ('protectora', 'Protectora')
     ]
+
+class Usuario(AbstractUser):
+
+    username = models.CharField(max_length=150, unique=True)
+    email = models.EmailField(unique=True)
+    city = models.CharField(max_length=100, default="Barcelona")
     
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='usuario')
     USERNAME_FIELD = 'username'
@@ -32,6 +30,7 @@ class Usuario(AbstractUser):
     
 class PerfilUsuario(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name='perfil_usuario')
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='usuario', editable=False)
 
     # Contacto / ubicación
     telefono = models.CharField(max_length=15, blank=True, null=True)
@@ -127,7 +126,7 @@ class PerfilUsuario(models.Model):
 
 class PerfilProtectora(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name='perfil_protectora')
-    
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='protectora', editable=False)
     # Información básica
     nombre_protectora = models.CharField(max_length=200, blank=True, null=True)
     cif = models.CharField(max_length=20, unique=True, blank=True, null=True)
@@ -196,4 +195,27 @@ class PerfilProtectora(models.Model):
         
         
 
+@receiver(post_save, sender=Usuario)
+def create_or_sync_profile(sender, instance, created, **kwargs):
+    """
+    Crear el perfil adequat en crear l'usuari i sincronitzar 'role' en actualitzacions.
+    """
+    # Crear el perfil corresponent al role en la creació
+    if created:
+        if instance.role == 'protectora':
+            PerfilProtectora.objects.get_or_create(usuario=instance, defaults={'role': instance.role})
+        else:
+            PerfilUsuario.objects.get_or_create(usuario=instance, defaults={'role': instance.role})
+        return
 
+    # Sync roles si ja existeixen perfils
+    if hasattr(instance, 'perfil_usuario'):
+        p = instance.perfil_usuario
+        if p.role != instance.role:
+            p.role = instance.role
+            p.save(update_fields=['role'])
+    if hasattr(instance, 'perfil_protectora'):
+        p = instance.perfil_protectora
+        if p.role != instance.role:
+            p.role = instance.role
+            p.save(update_fields=['role'])

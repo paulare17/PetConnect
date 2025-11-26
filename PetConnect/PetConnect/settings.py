@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -40,6 +41,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
+    'django_filters',
     'mascotas',
     'usuarios'
 ]
@@ -60,11 +62,11 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,
 }
 
-AUTH_USER_MODEL = 'usuario.Usuario'
+AUTH_USER_MODEL = 'usuarios.Usuario'
 
-LOGIN_URL = '/usuario/login'
-LOGIN_REDIRECT_URL = '/usuario/dashboard'
-LOGOUT_REDIRECT_URL = '/usuario/login'
+LOGIN_URL = '/usuarios/login'
+LOGIN_REDIRECT_URL = '/usuarios/dashboard'
+LOGOUT_REDIRECT_URL = '/usuarios/login'
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware', 
@@ -155,3 +157,22 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR/ 'media'
+
+# Default from email (can be overridden via env var)
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'petconnect.noreply@gmail.com')
+
+# Email backend selection:
+# - By default use console backend (prints emails to terminal) for development.
+# - To enable real SMTP sending set the environment variable USE_SMTP=1 and provide
+#   EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD, and optionally
+#   EMAIL_USE_TLS/EMAIL_USE_SSL.
+if os.environ.get('USE_SMTP') == '1':
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.example.com')
+    EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
+    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+    EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', '1') in ('1', 'true', 'True')
+    EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', '0') in ('1', 'true', 'True')
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

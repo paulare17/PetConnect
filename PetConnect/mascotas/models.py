@@ -1,7 +1,7 @@
 from django.db import models
-
 from django.db import models
 from django.conf import settings
+from usuarios.models import PerfilProtectora
 
 class Mascota(models.Model):
     # Especies
@@ -69,10 +69,9 @@ class Mascota(models.Model):
     raza_gato = models.CharField(max_length=150, choices=RAZAS_GATOS, default='mestizo', verbose_name="Raza")
     genero = models.CharField(max_length=10, choices=GENERO, default='hembra', verbose_name="Género")
     edad = models.PositiveIntegerField(default=0, help_text="Edad en años", verbose_name="Edad")
+    # protectoraEncargada = models.ForeignKey(PerfilProtectora, on_delete=models.CASCADE, related_name='mascotas', verbose_name="Protectora Encargada")
     
-    # Características físicas
-    tamaño = models.CharField(max_length=15, choices=TAMAÑO, default='mediano', verbose_name="Tamaño")
-    peso = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, help_text="Peso en kg (opcional)", verbose_name="Peso")
+    # otras características físicas
     color = models.CharField(max_length=100, default='marrón', verbose_name="Color")
     foto = models.ImageField(upload_to='mascotas/', verbose_name="Foto")
 
@@ -101,6 +100,13 @@ class Mascota(models.Model):
     # Fechas
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
+    
+    #vinculación con protectora
+    protectora = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='mascotas'
+    )
     
     def __str__(self):
         return f"{self.nombre} ({self.especie})"

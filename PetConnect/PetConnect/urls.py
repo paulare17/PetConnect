@@ -1,16 +1,21 @@
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from usuario.views import UsuarioViewSet, PerfilUsuarioViewSet, PerfilProtectoraViewSet
+
+from usuarios.views import UsuarioViewSet, PerfilUsuarioViewSet, PerfilProtectoraViewSet
+from mascotas.views import MascotaViewSet
 
 router = DefaultRouter()
-router.register(r'users', UsuarioViewSet)
-router.register(r'user-profiles', PerfilUsuarioViewSet)
-router.register(r'protectora-profiles', PerfilProtectoraViewSet)
-
+# Registra aquí tots els viewsets de totes les apps
+router.register(r'usuario', UsuarioViewSet, basename='usuario')
+router.register(r'perfil-usuario', PerfilUsuarioViewSet, basename='perfil-usuario')
+router.register(r'perfil-protectora', PerfilProtectoraViewSet, basename='perfil-protectora')
+router.register(r'mascotas', MascotaViewSet, basename='mascota')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('usuario/', include('usuario.urls')),
-    path('mascotas/', include('mascotas.urls')), 
+    # Prefix opcional, per exemple '/api/' → /api/usuario/, /api/mascota/, ...
+    path('api/', include(router.urls)),
+    # Mantener las URLs normales de la app 'mascotas'
+    path('mascotas/', include('mascotas.urls')),
 ]
