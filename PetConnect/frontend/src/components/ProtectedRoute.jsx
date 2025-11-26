@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { useAuthContext } from '../context/AuthProvider';
-import ROLES from '../constants/roles';
+import { ROLES } from '../constants/roles';
 
 /**
  * Component per protegir rutes que requereixen autenticació

@@ -6,18 +6,21 @@ import Navbar from "./components/Navbar/Navbar";
 import Landpage from "./components/Landpage/Landpage";
 import FormRol from "./components/Forms/FormRol";
 import FormDialog from "./components/Forms/FormDialog";
+import FormDialogProtectora from "./components/Forms/FormDialogProtectora";
 import { Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthProvider";
 import ViewLogin from "./components/Login/ViewLogin";
 import FormProtectora from "./components/Forms/FormProtectora";
 import FormUsuari from "./components/Forms/FormUsuari";
 import AddAnimalForm from "./components/Forms/AddAnimalForm";
-import ProfilePageUser from "./components/pages/ProfilePageUser";
+import UserProfile from "./components/pages/UserProfile";
 import ProfilePageProtectora from "./components/pages/ProfilePageProtectora";
 import Footer from "./components/Footer/Footer";
 import FooterLandpage from "./components/Footer/FooterLandpage.jsx";
 import ProtectedRoute, { ProtectoraRoute, UsuarioRoute } from "./components/ProtectedRoute";
 import PetList from "./components/dashboard/PetList";
+import IniciUsuari from "./components/Inici/IniciUsuari";
+import ProfileMascota from "./components/pages/ProfileMascota.jsx";
 
 function App() {
   // const location = useLocation();
@@ -48,6 +51,12 @@ function App() {
             } />
             <Route path="/rol" element={<FormRol />} />
             <Route path="/formulari-acces" element={<ViewLogin />} />
+            <Route path="/login-protectora" element={
+              <>
+                <ViewLogin />
+                <FormDialogProtectora />
+              </>
+            } />
 
             {/* Rutes de registre (públiques però segons rol) */}
             <Route path="/formulari-protectora" element={<FormProtectora />} />
@@ -68,14 +77,19 @@ function App() {
             {/* Rutes protegides - Només usuaris */}
             <Route path="/perfil-usuari" element={
               <UsuarioRoute>
-                <ProfilePageUser />
+                <UserProfile />
+              </UsuarioRoute>
+            } />
+            <Route path="/inici-usuari" element={
+              <UsuarioRoute>
+                <IniciUsuari />
               </UsuarioRoute>
             } />
 
-            {/* Ruta protegida - Qualsevol autenticat pot veure mascotes */}
-            <Route path="/mascotes" element={
+            {/* Ruta protegida - Perfil d'una mascota per id */}
+            <Route path="/mascotes/:id" element={
               <ProtectedRoute>
-                <PetList />
+                <ProfileMascota/>
               </ProtectedRoute>
             } />
           </Routes>

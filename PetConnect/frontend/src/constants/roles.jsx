@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 /**
  * Constants per als rols d'usuari
  * Han de coincidir amb els ROLE_CHOICES del backend (usuarios/models.py)

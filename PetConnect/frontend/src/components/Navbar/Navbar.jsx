@@ -13,7 +13,7 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import PetsIcon from "@mui/icons-material/Pets";
 import {colors} from '../../constants/colors.jsx'
-import ROLES from '../../constants/roles.jsx';
+import { ROLES } from '../../constants/roles.jsx';
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from '../../context/AuthProvider';
 

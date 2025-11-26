@@ -1,3 +1,7 @@
+// Això no serà necessari perq filtrarem d'una altra manera però aqui ho deixo
+
+
+
 import React, { useState } from 'react';
 import { 
   Box, 

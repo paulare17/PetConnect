@@ -5,6 +5,7 @@ export const colors = {
   blue: "#66c5bd",
   darkBlue: "#29afa4ff",
   lightBlue: "#bfe0ddff",
+  backgroundBlue: "#e0f2f1", // Fons clar blau per protectores
   yellow: "#f6ce5b",
   purple: "#bcbefa",
   lightColor: "#f8f9fa",
