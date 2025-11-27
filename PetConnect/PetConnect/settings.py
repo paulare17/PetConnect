@@ -19,12 +19,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / 'PetConnect.env')
 
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY =  os.environ.get('DJANGO_SECRET_KEY', 'dev-secret')
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
-
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost').split(',')
 
 # Application definition
@@ -39,6 +35,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
+    'django_filters',
     'django_filters',
     'mascotas',
     'usuarios'
@@ -55,7 +52,8 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),    # Token expira en 1h
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),       # Refresh en 1 dia
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),       
+    'ROTATE_REFRESH_TOKENS': True,
 }
 
 AUTH_USER_MODEL = 'usuarios.Usuario'
@@ -97,31 +95,19 @@ WSGI_APPLICATION = 'PetConnect.wsgi.application'
 
 # CORS Configuration per al frontend (Vite)
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # Vite dev server
-    "http://127.0.0.1:5173",  # Alternativa localhost
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
 ]
-
 CORS_ALLOW_METHODS = [
-    'DELETE',
-    'GET',
-    'OPTIONS',
-    'PATCH',
-    'POST',
-    'PUT',
+    'DELETE', 'GET', 'OPTIONS', 'PATCH', 'POST', 'PUT',
 ]
-
 CORS_ALLOW_HEADERS = [
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
+    'accept', 'accept-encoding', 'authorization', 'content-type', 'dnt', 'origin', 'user-agent', 'x-csrftoken', 'x-requested-with',
 ]
+CORS_ALLOW_CREDENTIALS = True
 
+# Database
+# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
     'default': {
@@ -174,7 +160,23 @@ STATIC_ROOT = Path(os.environ.get('STATIC_ROOT', BASE_DIR / 'staticfiles'))
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = BASE_DIR/ 'media'
 
-# Permet enviar cookies/credentials amb CORS
-CORS_ALLOW_CREDENTIALS = True
+# Default from email (can be overridden via env var)
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'petconnect.noreply@gmail.com')
+
+# Email backend selection:
+# - By default use console backend (prints emails to terminal) for development.
+# - To enable real SMTP sending set the environment variable USE_SMTP=1 and provide
+#   EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD, and optionally
+#   EMAIL_USE_TLS/EMAIL_USE_SSL.
+if os.environ.get('USE_SMTP') == '1':
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.example.com')
+    EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
+    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+    EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', '1') in ('1', 'true', 'True')
+    EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', '0') in ('1', 'true', 'True')
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

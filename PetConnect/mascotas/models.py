@@ -63,7 +63,7 @@ class Mascota(models.Model):
     
     # Datos básicos
     nombre = models.CharField(max_length=100, help_text="Introduzca el nombre del animal", verbose_name="Nombre")
-    # foto = models.ImageField(upload_to='animal_pics/', blank=True, null=True)
+    #foto = models.ImageField(upload_to='animal_pics/', blank=True, null=True)
     especie = models.CharField(max_length=10, choices=ESPECIES, default='gato', verbose_name="Especie")
     raza_perro = models.CharField(max_length=150, choices=RAZAS_PERROS, default='mestizo', verbose_name="Raza")
     raza_gato = models.CharField(max_length=150, choices=RAZAS_GATOS, default='mestizo', verbose_name="Raza")
@@ -71,8 +71,8 @@ class Mascota(models.Model):
     edad = models.PositiveIntegerField(default=0, help_text="Edad en años", verbose_name="Edad")
     # protectoraEncargada = models.ForeignKey(PerfilProtectora, on_delete=models.CASCADE, related_name='mascotas', verbose_name="Protectora Encargada")
     
-    # Características físicas
-    tamaño = models.CharField(max_length=15, choices=TAMAÑO, default='mediano', verbose_name="Tamaño")
+    # características físicas
+    tamaño = models.CharField(max_length=20, choices=TAMAÑO, default='mediano', verbose_name="Tamaño")
     color = models.CharField(max_length=100, default='marrón', verbose_name="Color")
     foto = models.ImageField(upload_to='mascotas/', verbose_name="Foto")
 

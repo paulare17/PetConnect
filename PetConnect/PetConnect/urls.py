@@ -10,6 +10,7 @@ from mascotas.views import MascotaViewSet
 router = DefaultRouter()
 # Registra aquí tots els viewsets de totes les apps
 router.register(r'usuarios', UsuarioViewSet, basename='usuario')
+router.register(r'usuarios', UsuarioViewSet, basename='usuario')
 router.register(r'perfil-usuario', PerfilUsuarioViewSet, basename='perfil-usuario')
 router.register(r'perfil-protectora', PerfilProtectoraViewSet, basename='perfil-protectora')
 router.register(r'mascota', MascotaViewSet, basename='mascota')
