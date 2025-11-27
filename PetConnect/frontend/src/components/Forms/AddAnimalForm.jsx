@@ -19,11 +19,12 @@ import {
   Alert,
   CircularProgress,
 } from "@mui/material";
-import CardAnimal from "../dashboard/CardAnimal";
+import CardAnimal from "../home/CardAnimal.jsx";
 import { colors } from "../../constants/colors.jsx";
 import api from "../../api/client";
 
 const AddAnimalForm = () => {
+    const [previewUrl, setPreviewUrl] = useState("");
   const initialFormData = {
     nombre: "",
     especie: "gato",
@@ -139,7 +140,7 @@ const AddAnimalForm = () => {
               display: "flex",
               justifyContent: "center",
               alignItems: "flex-start",
-              maxHeight: "540px", 
+              maxHeight: "600px", 
               overflowY: "auto", // ⬅️ CANVI: scroll només aquí
               paddingRight: 1,
             }}
@@ -240,13 +241,32 @@ const AddAnimalForm = () => {
                     />
                   </Grid>
                   <Grid size={{ xs: 12 }}>
-                    <TextField
-                      fullWidth
-                      name="foto"
-                      label="Foto (URL)"
-                      value={formData.foto}
-                      onChange={handleInputChange}
-                    />
+                      <Button
+                        variant="outlined"
+                        component="label"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                      >
+                        Pujar foto
+                        <input
+                          type="file"
+                          accept="image/*"
+                          name="foto"
+                          hidden
+                          onChange={e => {
+                            const file = e.target.files[0];
+                            setFormData(prev => ({
+                              ...prev,
+                              foto: file || ""
+                            }));
+                            if (file) {
+                              setPreviewUrl(URL.createObjectURL(file));
+                            } else {
+                              setPreviewUrl("");
+                            }
+                          }}
+                        />
+                      </Button>
                   </Grid>
                   <Grid size={{ xs: 12 }}>
                     <FormControlLabel
@@ -429,7 +449,10 @@ const AddAnimalForm = () => {
                 <Typography variant="h5" sx={{ mb: 2 , maxHeight: "550px",}}>
                   Com queda el teu anunci:
                 </Typography>
-                <CardAnimal itemData={[formData]} />
+                <CardAnimal animal={{
+                  ...formData,
+                  foto: previewUrl || (typeof formData.foto === "string" ? formData.foto : "")
+                }} isFavorito={false} onToggleFavorito={() => {}} />
               </CardContent>
             </Card>
           </Box>

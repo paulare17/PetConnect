@@ -26,6 +26,8 @@ import MaleIcon from '@mui/icons-material/Male';
 import FemaleIcon from '@mui/icons-material/Female';
 import { colors } from '../../constants/colors';
 import api from '../../api/client';
+import CardAnimal from '../home/CardAnimal';
+import Pagination from '@mui/material/Pagination';
 
 // Opcions de filtre segons el model Mascota
 const FILTROS = {
@@ -58,6 +60,9 @@ function IniciUsuari() {
     genero: 'todos',
     tamaño: 'todos',
   });
+  const [page, setPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const itemsPerPage = 20;
 
   // Funció per canviar els filtres
   const handleFilterChange = (name, value) => {
@@ -74,22 +79,18 @@ function IniciUsuari() {
 
     // Construir la URL amb paràmetres de consulta
     const params = new URLSearchParams();
-    
-    if (filtros.especie !== 'todos') {
-      params.append('especie', filtros.especie);
-    }
-    if (filtros.genero !== 'todos') {
-      params.append('genero', filtros.genero);
-    }
-    if (filtros.tamaño !== 'todos') {
-      params.append('tamaño', filtros.tamaño);
-    }
+    if (filtros.especie !== 'todos') params.append('especie', filtros.especie);
+    if (filtros.genero !== 'todos') params.append('genero', filtros.genero);
+    if (filtros.tamaño !== 'todos') params.append('tamaño', filtros.tamaño);
+    // Afegim la paginació
+    params.append('limit', itemsPerPage);
+    params.append('offset', (page - 1) * itemsPerPage);
 
     // Cridar l'API
     api.get(`/mascota/?${params.toString()}`)
       .then(response => {
-        // El backend ja filtra els NO adoptats i NO ocults
-        setAnimales(response.data);
+        setAnimales(response.data.results || response.data);
+        setTotalCount(response.data.count || (response.data.results ? response.data.results.length : response.data.length));
         setLoading(false);
       })
       .catch(err => {
@@ -97,7 +98,7 @@ function IniciUsuari() {
         setError('Error al carregar el catàleg. Verifica el servidor de Django i l\'API.');
         setLoading(false);
       });
-  }, [filtros]);
+  }, [filtros, page]);
 
   // Gestió de favorits
   const toggleFavorito = (id) => {
@@ -277,17 +278,43 @@ function IniciUsuari() {
 
         {/* Galeria d'animals */}
         {animales.length > 0 ? (
-          <Grid container spacing={3}>
-            {animales.map((animal) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={animal.id}>
-                <AnimalCard
-                  animal={animal}
-                  isFavorito={favoritos.includes(animal.id)}
-                  onToggleFavorito={() => toggleFavorito(animal.id)}
-                />
-              </Grid>
-            ))}
-          </Grid>
+          <>
+            <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3 } }}>
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: {
+                    xs: 'repeat(1, 1fr)',
+                    sm: 'repeat(2, 1fr)',
+                    md: 'repeat(3, 1fr)',
+                    lg: 'repeat(4, 1fr)'
+                  },
+                  gap: { xs: 2, sm: 3 },
+                  mx: 'auto'
+                }}
+              >
+                {animales.map((animal) => (
+                  <Box key={animal.id} sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <CardAnimal
+                      animal={animal}
+                      isFavorito={favoritos.includes(animal.id)}
+                      onToggleFavorito={() => toggleFavorito(animal.id)}
+                      sx={{ width: { xs: '100%', sm: 300, md: 300 }, maxWidth: 300, }}
+                    />
+                  </Box>
+                ))}
+              </Box>
+            </Container>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+              <Pagination
+                count={Math.ceil(totalCount / itemsPerPage)}
+                page={page}
+                onChange={(e, value) => setPage(value)}
+                color="primary"
+                size="large"
+              />
+            </Box>
+          </>
         ) : (
           <Box sx={{ textAlign: 'center', mt: 6 }}>
             <PetsIcon sx={{ fontSize: 80, color: colors.purple, mb: 2 }} />
@@ -303,145 +330,5 @@ function IniciUsuari() {
     </Box>
   );
 }
-
-// Component per mostrar cada animal (Targeta)
-const AnimalCard = ({ animal, isFavorito, onToggleFavorito }) => {
-  const cardColor = animal.especie === 'perro' ? colors.backgroundOrange : colors.backgroundBlue;
-  const iconColor = animal.especie === 'perro' ? colors.darkOrange : colors.darkBlue;
-  
-  // Imatge placeholder si no hi ha foto
-  const imageSrc = animal.foto || 'https://via.placeholder.com/300x200?text=Sense+imatge';
-
-  // Obtenir la raça correcta segons l'espècie
-  const raza = animal.especie === 'perro' ? animal.raza_perro : animal.raza_gato;
-  
-  return (
-    <Card
-      sx={{
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        transition: 'transform 0.3s, box-shadow 0.3s',
-        '&:hover': {
-          transform: 'translateY(-8px)',
-          boxShadow: 6,
-        },
-        borderRadius: 2,
-        overflow: 'hidden',
-      }}
-    >
-      {/* Imatge */}
-      <Box sx={{ position: 'relative' }}>
-        <CardMedia
-          component="img"
-          height="220"
-          image={imageSrc}
-          alt={animal.nombre}
-          sx={{ objectFit: 'cover' }}
-        />
-        {/* Botó favorit */}
-        <IconButton
-          onClick={onToggleFavorito}
-          sx={{
-            position: 'absolute',
-            top: 8,
-            right: 8,
-            backgroundColor: 'white',
-            '&:hover': {
-              backgroundColor: 'white',
-            },
-          }}
-        >
-          {isFavorito ? (
-            <FavoriteIcon sx={{ color: 'red' }} />
-          ) : (
-            <FavoriteBorderIcon sx={{ color: colors.orange }} />
-          )}
-        </IconButton>
-        
-        {/* Chip d'espècie */}
-        <Chip
-          icon={<PetsIcon />}
-          label={animal.especie === 'perro' ? 'Gos' : 'Gat'}
-          sx={{
-            position: 'absolute',
-            bottom: 8,
-            left: 8,
-            backgroundColor: iconColor,
-            color: 'white',
-            fontWeight: 'bold',
-          }}
-        />
-      </Box>
-
-      {/* Contingut */}
-      <CardContent
-        sx={{
-          flexGrow: 1,
-          backgroundColor: cardColor,
-        }}
-      >
-        <Typography
-          variant="h6"
-          component="h2"
-          sx={{
-            fontWeight: 'bold',
-            color: colors.black,
-            mb: 1,
-            textAlign: 'center',
-          }}
-        >
-          {animal.nombre}
-        </Typography>
-
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
-          {animal.genero === 'macho' ? (
-            <MaleIcon sx={{ color: colors.blue, mr: 0.5 }} />
-          ) : (
-            <FemaleIcon sx={{ color: 'pink', mr: 0.5 }} />
-          )}
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            {raza || 'Raça no especificada'}
-          </Typography>
-        </Box>
-
-        <Box sx={{ mt: 2 }}>
-          <Typography variant="body2" sx={{ mb: 0.5 }}>
-            <strong>Edat:</strong> {animal.edad} any{animal.edad !== 1 ? 's' : ''}
-          </Typography>
-          <Typography variant="body2" sx={{ mb: 0.5 }}>
-            <strong>Sexe:</strong> {animal.genero === 'macho' ? 'Mascle' : 'Femella'}
-          </Typography>
-          <Typography variant="body2" sx={{ mb: 0.5 }}>
-            <strong>Mida:</strong> {animal.tamaño || 'No especificat'}
-          </Typography>
-          {animal.peso && (
-            <Typography variant="body2" sx={{ mb: 0.5 }}>
-              <strong>Pes:</strong> {animal.peso} kg
-            </Typography>
-          )}
-        </Box>
-      </CardContent>
-
-      {/* Accions */}
-      <CardActions sx={{ backgroundColor: cardColor, justifyContent: 'center', pb: 2 }}>
-        <Button
-          variant="contained"
-          sx={{
-            backgroundColor: colors.orange,
-            color: 'white',
-            fontWeight: 'bold',
-            '&:hover': {
-              backgroundColor: colors.darkOrange,
-            },
-            px: 4,
-          }}
-        >
-          Més Info
-        </Button>
-      </CardActions>
-    </Card>
-  );
-};
 
 export default IniciUsuari;

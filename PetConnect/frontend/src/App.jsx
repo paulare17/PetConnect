@@ -18,8 +18,9 @@ import ProfilePageProtectora from "./components/pages/ProfilePageProtectora";
 import Footer from "./components/Footer/Footer";
 import FooterLandpage from "./components/Footer/FooterLandpage.jsx";
 import ProtectedRoute, { ProtectoraRoute, UsuarioRoute } from "./components/ProtectedRoute";
-import PetList from "./components/dashboard/PetList";
+import PetList from "./components/home/PetList.jsx";
 import IniciUsuari from "./components/Inici/IniciUsuari";
+import IniciProtectora from "./components/Inici/IniciProtectora";
 import ProfileMascota from "./components/pages/ProfileMascota.jsx";
 
 function App() {
@@ -73,6 +74,11 @@ function App() {
                 <ProfilePageProtectora />
               </ProtectoraRoute>
             } />
+            <Route path="/inici-protectora" element={
+              <ProtectoraRoute>
+                <IniciProtectora />
+              </ProtectoraRoute>
+            } />
 
             {/* Rutes protegides - Només usuaris */}
             <Route path="/perfil-usuari" element={
@@ -80,7 +86,7 @@ function App() {
                 <UserProfile />
               </UsuarioRoute>
             } />
-            <Route path="/inici-usuari" element={
+            <Route path="/inici-usuari-galeria" element={
               <UsuarioRoute>
                 <IniciUsuari />
               </UsuarioRoute>

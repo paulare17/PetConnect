@@ -16,7 +16,7 @@ import {
   InputLabel,
   Button
 } from '@mui/material';
-import CardAnimal from '../dashboard/CardAnimal';
+import CardAnimal from './CardAnimal.jsx';
 import useMascotas from '../../hooks/useMascotas';
 
 /**

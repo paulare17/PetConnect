@@ -57,6 +57,17 @@ function ResponsiveAppBar() {
     }
   };
 
+  // Handler per a les pages
+  const handlePageAction = (page) => {
+    handleCloseNavMenu();
+    if (page === "Adopta") {
+      navigate("/inici-usuari-galeria");
+    } else {
+      //  afegir més rutes aquí 
+      navigate("/");
+    }
+  };
+
   const renderUserMenuItems = () =>
     settings.map((setting) => (
       <MenuItem key={setting} onClick={() => handleUserMenuAction(setting)}>
@@ -134,7 +145,7 @@ function ResponsiveAppBar() {
               },
             }}
             >
-            AdoptApp
+            PetConnect
           </Typography>
             </Box>
 
@@ -228,7 +239,7 @@ function ResponsiveAppBar() {
               fontSize: { xs: "2rem", sm: "2.2rem" },
             }}
           >
-            AdoptApp
+            PetConnect
           </Typography>
 
             </Box>
@@ -245,7 +256,7 @@ function ResponsiveAppBar() {
             {pages.map((page) => (
               <Button
                 key={page}
-                onClick={handleCloseNavMenu}
+                onClick={() => handlePageAction(page)}
                 sx={{
                   my: 2,
                   mx:1,

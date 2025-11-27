@@ -18,8 +18,6 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import FamilyRestroomIcon from "@mui/icons-material/FamilyRestroom";
 import HomeIcon from "@mui/icons-material/Home";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
-import ChildCareIcon from "@mui/icons-material/ChildCare";
-import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
 import DescriptionIcon from "@mui/icons-material/Description";

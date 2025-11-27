@@ -49,9 +49,13 @@ export default function ViewLogin() {
 
     try {
       console.log('Dades d\'accés:', formData);
-      await login(formData);
-      // Redirigir a la pàgina principal després del login exitós
-      navigate('/');
+      const loginResult = await login(formData);
+      // Redirigir segons el rol
+      if (loginResult.user?.role === 'usuario') {
+        navigate('/inici-usuari-galeria');
+      } if (loginResult.user?.role === 'protectora') {
+        navigate('/inici-protectora');
+      }
     } catch (error) {
       console.error('Error en el login:', error);
       setError('Error en l\'autenticació. Comprova les teves credencials.');
