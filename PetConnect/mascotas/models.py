@@ -121,3 +121,48 @@ class Mascota(models.Model):
         verbose_name = "Mascota"
         verbose_name_plural = "Mascotas"
         ordering = ['-fecha_creacion']
+        
+        
+
+# Clase para registrar las interacciones de swipe (like/dislike)
+
+class Interaccion(models.Model):
+    LIKE = 'L'
+    DISLIKE = 'D'
+    
+    CHOICES = [
+        (LIKE, 'Me interesa'),
+        (DISLIKE, 'No me interesa'),
+    ]
+
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.CASCADE, 
+        related_name='interacciones_realizadas',
+        help_text="Usuario adoptante que realiza la acción."
+    )
+    
+    mascota = models.ForeignKey(
+        Mascota, 
+        on_delete=models.CASCADE, 
+        related_name='interacciones_recibidas'
+    )
+    
+    accion = models.CharField(
+        max_length=1, 
+        choices=CHOICES, 
+        verbose_name="Acción (L/D)"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        # Crucial para evitar que un usuario haga swipe dos veces en la misma mascota
+        unique_together = ('usuario', 'mascota') 
+        db_table = 'interacciones_swipe'
+        verbose_name = "Interacción de Swipe"
+        verbose_name_plural = "Interacciones de Swipes"
+
+    def __str__(self):
+        accion_display = dict(self.CHOICES).get(self.accion, self.accion)
+        return f"{self.usuario.username} - {accion_display} -> {self.mascota.nombre}"
