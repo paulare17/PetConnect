@@ -3,7 +3,6 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.exceptions import PermissionDenied
-from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Usuario, PerfilUsuario, PerfilProtectora
 from .serializers import (
@@ -59,12 +58,16 @@ class UsuarioViewSet(viewsets.ModelViewSet):
     def login(self, request):
         """Login con email/username y password"""
         serializer = LoginSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
         
-        user = authenticate(
-            username=serializer.validated_data['username'],
-            password=serializer.validated_data['password']
-        )
+        if not serializer.is_valid():
+            # Retorna els errors de validació amb detall
+            return Response(
+                serializer.errors, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # L'usuari ja ha estat validat pel serializer
+        user = serializer.validated_data.get('user')
         
         if not user:
             return Response(
