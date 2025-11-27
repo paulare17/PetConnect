@@ -5,22 +5,33 @@ from .models import Chat
 
 @receiver(post_save, sender=Interaccion)
 def crear_chat_automatico(sender, instance, created, **kwargs):
+    """
+    Se ejecuta después de que se guarda un objeto Interaccion.
+    Crea un objeto Chat si la acción fue 'Like' (L).
+    """
     
+    # 1. Verificar que la interacción sea nueva y sea un LIKE.
     if created and instance.accion == Interaccion.LIKE:
         
-        # 1. Obtenemos el usuario de la protectora usando la cadena de FKs
-        try:
-            # Mascota -> PerfilProtectora -> Usuario
-            usuario_protectora = instance.mascota.protectoraEncargada.usuario 
-        except AttributeError:
-            print("ERROR: La mascota no tiene una protectora asignada o el PerfilProtectora no tiene el campo 'usuario'.")
-            return
+        # Obtenemos la instancia de PerfilProtectora. 
+        # Puede ser None si el campo es NULL.
+        protectora_encargada = instance.mascota.protectoraEncargada
 
-        # 2. Creamos el chat
-        Chat.objects.get_or_create(
-            mascota=instance.mascota,
-            adoptante=instance.usuario,
-            defaults={
-                'protectora': usuario_protectora
-            }
-        )
+        # 2. Solo procede si la mascota tiene una Protectora válida asignada (no es None)
+        if protectora_encargada:
+            
+            # Obtenemos el objeto User vinculado al perfil de la protectora.
+            usuario_protectora = protectora_encargada.usuario 
+            
+            # 3. Creamos el chat (si ya existe para esa mascota/adoptante, lo recupera)
+            Chat.objects.get_or_create(
+                mascota=instance.mascota,
+                adoptante=instance.usuario,
+                defaults={
+                    'protectora': usuario_protectora
+                }
+            )
+            
+        else:
+            # Opcional: Mensaje para indicar por qué no se creó el chat
+            print(f"ALERTA: Mascota ID {instance.mascota.pk} no tiene Protectora asignada. Chat no creado.")

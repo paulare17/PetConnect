@@ -68,8 +68,10 @@ class Mascota(models.Model):
     raza_gato = models.CharField(max_length=150, choices=RAZAS_GATOS, default='mestizo', verbose_name="Raza")
     genero = models.CharField(max_length=10, choices=GENERO, default='hembra', verbose_name="Género")
     edad = models.PositiveIntegerField(default=0, help_text="Edad en años", verbose_name="Edad")
-    protectoraEncargada = models.ForeignKey(PerfilProtectora, on_delete=models.CASCADE, related_name='mascotas', verbose_name="Protectora Encargada")
-    
+    # protectoraEncargada = models.ForeignKey(PerfilProtectora, on_delete=models.CASCADE, related_name='mascotas', verbose_name="Protectora Encargada", default=1)
+    protectoraEncargada = models.ForeignKey(PerfilProtectora, on_delete=models.SET_NULL, related_name='mascotas', null=True, blank=True, verbose_name="Protectora Encargada")
+   
+
     # Características físicas
     tamaño = models.CharField(max_length=15, choices=TAMAÑO, default='mediano', verbose_name="Tamaño")
     peso = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, help_text="Peso en kg (opcional)", verbose_name="Peso")
