@@ -12,22 +12,18 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+load_dotenv(BASE_DIR / 'PetConnect.env')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-orr2pbe(wu@5nzp+$uoyz2&s1a%6wb*7n$g1#-x2z1jbak)rk2'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
+SECRET_KEY =  os.environ.get('DJANGO_SECRET_KEY', 'dev-secret')
+DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost').split(',')
 
 # Application definition
 
@@ -58,14 +54,14 @@ REST_FRAMEWORK = {
 from datetime import timedelta
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),    # Token expira en 1h
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),       # Refresh en 1 dia
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),       
     'ROTATE_REFRESH_TOKENS': True,
 }
 
 AUTH_USER_MODEL = 'usuarios.Usuario'
 
 LOGIN_URL = '/usuarios/login'
-LOGIN_REDIRECT_URL = '/usuarios/dashboard'
+LOGIN_REDIRECT_URL = '/usuarios/home'
 LOGOUT_REDIRECT_URL = '/usuarios/login'
 
 MIDDLEWARE = [
@@ -100,8 +96,16 @@ TEMPLATES = [
 WSGI_APPLICATION = 'PetConnect.wsgi.application'
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000"
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
 ]
+CORS_ALLOW_METHODS = [
+    'DELETE', 'GET', 'OPTIONS', 'PATCH', 'POST', 'PUT',
+]
+CORS_ALLOW_HEADERS = [
+    'accept', 'accept-encoding', 'authorization', 'content-type', 'dnt', 'origin', 'user-agent', 'x-csrftoken', 'x-requested-with',
+]
+CORS_ALLOW_CREDENTIALS = True
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
@@ -149,6 +153,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = Path(os.environ.get('STATIC_ROOT', BASE_DIR / 'staticfiles'))
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
