@@ -12,14 +12,12 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / 'PetConnect.env')
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY =  os.environ.get('DJANGO_SECRET_KEY', 'dev-secret')
@@ -28,7 +26,6 @@ SECRET_KEY =  os.environ.get('DJANGO_SECRET_KEY', 'dev-secret')
 DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost').split(',')
-
 
 # Application definition
 
@@ -42,6 +39,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
+    'django_filters',
     'mascotas',
     'usuarios'
 ]
@@ -55,7 +53,6 @@ REST_FRAMEWORK = {
     ],
 }
 
-from datetime import timedelta
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),    # Token expira en 1h
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),       # Refresh en 1 dia
@@ -125,8 +122,6 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
     'default': {
