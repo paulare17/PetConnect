@@ -1,7 +1,7 @@
-from django.urls import path
-from . import views
+# from django.urls import path
+# from . import views
 
-app_name = 'mascotas'
+# app_name = 'mascotas'
 
 urlpatterns = [
     # Las siguientes rutas están comentadas porque las vistas no existen o no se usan actualmente:
