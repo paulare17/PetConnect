@@ -62,19 +62,16 @@ class Mascota(models.Model):
     
     # Datos básicos
     nombre = models.CharField(max_length=100, help_text="Introduzca el nombre del animal", verbose_name="Nombre")
-    # foto = models.ImageField(upload_to='animal_pics/', blank=True, null=True)
+    #foto = models.ImageField(upload_to='animal_pics/', blank=True, null=True)
     especie = models.CharField(max_length=10, choices=ESPECIES, default='gato', verbose_name="Especie")
     raza_perro = models.CharField(max_length=150, choices=RAZAS_PERROS, default='mestizo', verbose_name="Raza")
     raza_gato = models.CharField(max_length=150, choices=RAZAS_GATOS, default='mestizo', verbose_name="Raza")
     genero = models.CharField(max_length=10, choices=GENERO, default='hembra', verbose_name="Género")
     edad = models.PositiveIntegerField(default=0, help_text="Edad en años", verbose_name="Edad")
-    # protectoraEncargada = models.ForeignKey(PerfilProtectora, on_delete=models.CASCADE, related_name='mascotas', verbose_name="Protectora Encargada", default=1)
-    protectoraEncargada = models.ForeignKey(PerfilProtectora, on_delete=models.SET_NULL, related_name='mascotas', null=True, blank=True, verbose_name="Protectora Encargada")
-   
-
-    # Características físicas
-    tamaño = models.CharField(max_length=15, choices=TAMAÑO, default='mediano', verbose_name="Tamaño")
-    peso = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, help_text="Peso en kg (opcional)", verbose_name="Peso")
+    # protectoraEncargada = models.ForeignKey(PerfilProtectora, on_delete=models.CASCADE, related_name='mascotas', verbose_name="Protectora Encargada")
+    
+    # características físicas
+    tamaño = models.CharField(max_length=20, choices=TAMAÑO, default='mediano', verbose_name="Tamaño")
     color = models.CharField(max_length=100, default='marrón', verbose_name="Color")
     foto = models.ImageField(upload_to='mascotas/', verbose_name="Foto") # Se sobreescribe la definición anterior linea 65. Esto es problemático y puede causar errores en la base de datos o en la lógica de Django
 

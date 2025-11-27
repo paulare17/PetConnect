@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_BASE = import.meta.env.REACT_APP_API_URL || 'http://localhost:8000/api';
+// Vite usa VITE_ com a prefix, no REACT_APP_
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 const api = axios.create({
   baseURL: API_BASE,
@@ -50,5 +51,82 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// ============================================
+// API Functions
+// ============================================
+
+// Autenticació
+export const login = (credentials) => api.post('/usuarios/login/', credentials);
+export const register = (userData) => api.post('/usuarios/', userData);
+
+// Usuari actual
+export const getCurrentUser = () => api.get('/usuarios/me/');
+
+// Perfil Usuari
+export const getUserProfile = () => api.get('/perfil-usuario/');
+export const createUserProfile = (profileData) => {
+  const formData = new FormData();
+  Object.keys(profileData).forEach(key => {
+    if (profileData[key] !== null && profileData[key] !== undefined) {
+      if (Array.isArray(profileData[key])) {
+        formData.append(key, JSON.stringify(profileData[key]));
+      } else {
+        formData.append(key, profileData[key]);
+      }
+    }
+  });
+  return api.post('/perfil-usuario/', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+};
+export const updateUserProfile = (id, profileData) => {
+  const formData = new FormData();
+  Object.keys(profileData).forEach(key => {
+    if (profileData[key] !== null && profileData[key] !== undefined) {
+      if (Array.isArray(profileData[key])) {
+        formData.append(key, JSON.stringify(profileData[key]));
+      } else {
+        formData.append(key, profileData[key]);
+      }
+    }
+  });
+  return api.patch(`/perfil-usuario/${id}/`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+};
+
+// Perfil Protectora
+export const getProtectoraProfile = () => api.get('/perfil-protectora/');
+export const createProtectoraProfile = (profileData) => {
+  const formData = new FormData();
+  Object.keys(profileData).forEach(key => {
+    if (profileData[key] !== null && profileData[key] !== undefined) {
+      if (Array.isArray(profileData[key])) {
+        formData.append(key, JSON.stringify(profileData[key]));
+      } else {
+        formData.append(key, profileData[key]);
+      }
+    }
+  });
+  return api.post('/perfil-protectora/', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+};
+export const updateProtectoraProfile = (id, profileData) => {
+  const formData = new FormData();
+  Object.keys(profileData).forEach(key => {
+    if (profileData[key] !== null && profileData[key] !== undefined) {
+      if (Array.isArray(profileData[key])) {
+        formData.append(key, JSON.stringify(profileData[key]));
+      } else {
+        formData.append(key, profileData[key]);
+      }
+    }
+  });
+  return api.patch(`/perfil-protectora/${id}/`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+};
 
 export default api;

@@ -11,11 +11,14 @@ import { IconButton } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/client";
+import { ROLES } from "../../constants/roles.jsx";
+import { useAuthContext } from "../../context/AuthProvider.jsx";
 
 export default function FormDialog() {
   const [open, setOpen] = React.useState(true); // Sempre obert quan es carrega el component
   const [ubicacion, setUbicacion] = React.useState("");
   const navigate = useNavigate();
+  const { getMe } = useAuthContext();
 
   const handleClose = () => {
     setOpen(false);
@@ -31,8 +34,8 @@ export default function FormDialog() {
       email: formData.get("email"),
       password: formData.get("password"),
       city: formData.get("ciutat"),
-      // si vols, afegeix rol des del form; aquí posem 'usuario' per defecte
-      role: "usuario",
+      // Rol per defecte: usuari (adoptant)
+      role: ROLES.USUARIO,
     };
 
     try {
@@ -42,6 +45,8 @@ export default function FormDialog() {
         localStorage.setItem("access", res.data.access);
         localStorage.setItem("refresh", res.data.refresh);
         localStorage.setItem("user", JSON.stringify(res.data.user));
+        // Actualitzar l'estat del context
+        await getMe();
       }
       handleClose();
     } catch (err) {

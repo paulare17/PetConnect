@@ -13,12 +13,14 @@ import {
 import { Visibility, VisibilityOff, Email, Lock } from '@mui/icons-material';
 import {colors } from '../../constants/colors.jsx';
 import { useNavigate } from "react-router-dom";
+import { useAuthContext } from '../../context/AuthProvider';
 
 
 export default function ViewLogin() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const { login } = useAuthContext();
   const [formData, setFormData] = useState({
-    email: '',
+    username: '',
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -39,21 +41,23 @@ export default function ViewLogin() {
     setLoading(true);
 
     // Validació bàsica
-    if (!formData.email || !formData.password) {
+    if (!formData.username || !formData.password) {
       setError('Tots els camps són obligatoris');
       setLoading(false);
       return;
     }
 
     try {
-      // Aquí aniria la lògica d'autenticació
       console.log('Dades d\'accés:', formData);
-      // Simulem una petició
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Redirigir o actualitzar estat d'autenticació
-      alert('Accés correcte!');
-    } catch {
+      const loginResult = await login(formData);
+      // Redirigir segons el rol
+      if (loginResult.user?.role === 'usuario') {
+        navigate('/inici-usuari-galeria');
+      } if (loginResult.user?.role === 'protectora') {
+        navigate('/inici-protectora');
+      }
+    } catch (error) {
+      console.error('Error en el login:', error);
       setError('Error en l\'autenticació. Comprova les teves credencials.');
     } finally {
       setLoading(false);
@@ -105,12 +109,12 @@ export default function ViewLogin() {
               margin="normal"
               required
               fullWidth
-              id="email"
-              label="Correu electrònic"
-              name="email"
-              autoComplete="email"
+              id="username"
+              label="Nom d'usuari"
+              name="username"
+              autoComplete="username"
               autoFocus
-              value={formData.email}
+              value={formData.username}
               onChange={handleInputChange}
               InputProps={{
                 startAdornment: (
@@ -176,6 +180,30 @@ export default function ViewLogin() {
               }}
             >
               {loading ? 'Accedint...' : 'Iniciar Sessió'}
+            </Button>
+
+            <Button
+              fullWidth
+              variant="outlined"
+              disabled={loading}
+              onClick={() => navigate('/login-protectora')}
+              sx={{ 
+                mb: 2, 
+                py: 1,
+                px: 4,
+                borderRadius: 5,
+                fontSize: '0.95rem',
+                textTransform: 'none',
+                color: colors.yellow,
+                borderColor: colors.yellow,
+                "&:hover": {
+                  borderColor: colors.purple,
+                  bgcolor: 'rgba(246, 206, 91, 0.1)',
+                  transform: "translateY(-2px)",
+                },
+              }}
+            >
+              Sóc una protectora
             </Button>
 
             <Box sx={{ textAlign: 'center', mt: 2 }}>

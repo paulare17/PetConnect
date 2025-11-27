@@ -23,7 +23,7 @@ from . import views
 
 # ELIMINAMOS el router.register(r'mascota', ...) aquí.
 
-app_name = 'mascotas'
+# app_name = 'mascotas'
 
 urlpatterns = [
     # Estas rutas se montarán BAJO el prefijo 'api/' del archivo principal.

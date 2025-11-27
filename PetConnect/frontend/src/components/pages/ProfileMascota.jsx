@@ -1,0 +1,208 @@
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import {
+  Box,
+  Container,
+  Typography,
+  Chip,
+  Grid,
+  Paper,
+  Avatar,
+  Divider,
+  Button,
+  CircularProgress,
+  Alert,
+  Card,
+  CardMedia,
+  IconButton,
+} from '@mui/material';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import PetsIcon from '@mui/icons-material/Pets';
+import MaleIcon from '@mui/icons-material/Male';
+import FemaleIcon from '@mui/icons-material/Female';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import { colors } from '../../constants/colors';
+import api from '../../api/client';
+
+function ProfileAnimal() {
+  const { id } = useParams();
+  const [animal, setAnimal] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [favorit, setFavorit] = useState(false);
+  const [altres, setAltres] = useState([]);
+  const [galeriaIndex, setGaleriaIndex] = useState(0);
+
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    api.get(`/mascota/${id}/`)
+      .then(res => {
+        setAnimal(res.data);
+        setLoading(false);
+      })
+      .catch(err => {
+        setError('No s\'ha pogut carregar el perfil de l\'animal.');
+        setLoading(false);
+      });
+    // Carrega altres animals per la galeria
+    api.get(`/mascota/`)
+      .then(res => {
+        setAltres(res.data.filter(a => a.id !== Number(id)).slice(0, 10));
+      });
+  }, [id]);
+
+  if (loading) {
+    return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}><CircularProgress sx={{ color: colors.orange }} size={60} /></Box>;
+  }
+  if (error) {
+    return <Container sx={{ mt: 4 }}><Alert severity="error">{error}</Alert></Container>;
+  }
+  if (!animal) return null;
+
+  // Imatge principal
+  const imageSrc = animal.foto || 'https://via.placeholder.com/400x300?text=Sense+imatge';
+  const cardColor = animal.especie === 'perro' ? colors.backgroundOrange : colors.backgroundBlue;
+  const iconColor = animal.especie === 'perro' ? colors.darkOrange : colors.darkBlue;
+  const raza = animal.especie === 'perro' ? animal.raza_perro : animal.raza_gato;
+
+  return (
+    <Box sx={{ background: colors.backgroundOrange, minHeight: '100vh', py: 6 }}>
+      <Container maxWidth="md">
+        <Paper elevation={4} sx={{ p: 4, borderRadius: 5, background: colors.lightColor, maxWidth: 900, mx: 'auto', position: 'relative' }}>
+          {/* Cor de favorit */}
+          <IconButton
+            onClick={() => setFavorit(f => !f)}
+            sx={{ position: 'absolute', top: 32, right: 32, zIndex: 2, background: 'none' }}
+          >
+            {favorit ? <FavoriteIcon sx={{ color: 'red', fontSize: 36 }} /> : <FavoriteBorderIcon sx={{ color: colors.orange, fontSize: 36 }} />}
+          </IconButton>
+          {/* Capçalera amb imatge i nom */}
+          <Grid container spacing={4} alignItems="center">
+            <Grid item xs={12} md={5}>
+              <Card sx={{ boxShadow: 3, borderRadius: 3, background: 'white', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <CardMedia
+                  component="img"
+                  image={imageSrc}
+                  alt={animal.nombre}
+                  sx={{ objectFit: 'cover', width: '100%', height: 220, borderRadius: 3, mt: 2, mb: 2 }}
+                />
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={7}>
+              <Typography variant="h2" sx={{ fontWeight: 'bold', color: colors.black, mb: 2 }}>
+                {animal.nombre}
+              </Typography>
+              {/* Quadre lila per característiques destacades */}
+              <Box sx={{ border: `2px solid ${colors.purple}`, borderRadius: 2, p: 2, mb: 2, background: '#f6f6ff' }}>
+                <Typography variant="body1" sx={{ mb: 1 }}><strong>{raza || 'Raça no especificada'}</strong></Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+                  {animal.genero === 'macho' ? <MaleIcon sx={{ color: colors.blue }} /> : <FemaleIcon sx={{ color: 'pink' }} />}
+                  <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                    {animal.genero === 'macho' ? 'Mascle' : 'Femella'}
+                  </Typography>
+                  <Divider orientation="vertical" flexItem />
+                  <Typography variant="body1">
+                    <strong>Edat:</strong> {animal.edad} any{animal.edad !== 1 ? 's' : ''}
+                  </Typography>
+                  <Divider orientation="vertical" flexItem />
+                  <Typography variant="body1">
+                    <strong>Mida:</strong> {animal.tamaño || 'No especificat'}
+                  </Typography>
+                  {animal.peso && <><Divider orientation="vertical" flexItem /><Typography variant="body1"><strong>Pes:</strong> {animal.peso} kg</Typography></>}
+                </Box>
+                <Chip
+                  label={animal.adoptado ? 'ADOPTAT' : 'DISPONIBLE'}
+                  sx={{ backgroundColor: animal.adoptado ? colors.purple : colors.orange, color: 'white', fontWeight: 'bold', mt: 1 }}
+                />
+              </Box>
+            </Grid>
+          </Grid>
+
+          {/* Descripció llarga estil blog */}
+          <Box sx={{ mt: 4, mb: 2 }}>
+            <Typography variant="body1" sx={{ color: colors.black, fontSize: '1.1rem', mb: 2 }}>
+              {animal.descripcion || 'Sense descripció.'}
+            </Typography>
+            <Divider sx={{ my: 2 }} />
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <Typography variant="body2" sx={{ mb: 1 }}><strong>Color:</strong> {animal.color}</Typography>
+                <Typography variant="body2" sx={{ mb: 1 }}><strong>Caràcter:</strong> {animal.caracter}</Typography>
+                <Typography variant="body2" sx={{ mb: 1 }}><strong>Convivència amb animals:</strong> {animal.convivencia_animales}</Typography>
+                <Typography variant="body2" sx={{ mb: 1 }}><strong>Convivència amb nens:</strong> {animal.convivencia_ninos ? 'Sí' : 'No'}</Typography>
+                <Typography variant="body2" sx={{ mb: 1 }}><strong>Desparasitat:</strong> {animal.desparasitado ? 'Sí' : 'No'}</Typography>
+                <Typography variant="body2" sx={{ mb: 1 }}><strong>Esterilitzat:</strong> {animal.esterilizado ? 'Sí' : 'No'}</Typography>
+                <Typography variant="body2" sx={{ mb: 1 }}><strong>Microxip:</strong> {animal.con_microchip ? 'Sí' : 'No'}</Typography>
+                <Typography variant="body2" sx={{ mb: 1 }}><strong>Vacunat:</strong> {animal.vacunado ? 'Sí' : 'No'}</Typography>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Typography variant="body2" sx={{ mb: 1 }}><strong>Necessitats especials:</strong> {animal.necesidades_especiales ? 'Sí' : 'No'}</Typography>
+                {animal.necesidades_especiales && (
+                  <Typography variant="body2" sx={{ mb: 1 }}><strong>Descripció necessitats:</strong> {animal.descripcion_necesidades}</Typography>
+                )}
+                <Typography variant="body2" sx={{ mb: 1 }}><strong>Ubicació:</strong> {animal.ubicacion}</Typography>
+                {/* Espai per galeria d'imatges addicionals */}
+              </Grid>
+            </Grid>
+          </Box>
+
+          {/* Dades de la protectora */}
+          {animal.protectora && (
+            <Box sx={{ mt: 4 }}>
+              <Typography variant="h6" sx={{ color: colors.orange, fontWeight: 'bold', mb: 1 }}>
+                Protectora encarregada
+              </Typography>
+              <Typography variant="body2"><strong>Nom:</strong> {animal.protectora.nombre || animal.protectora}</Typography>
+              {animal.protectora.email && <Typography variant="body2"><strong>Email:</strong> {animal.protectora.email}</Typography>}
+              {animal.protectora.ciudad && <Typography variant="body2"><strong>Ciutat:</strong> {animal.protectora.ciudad}</Typography>}
+            </Box>
+          )}
+
+          <Box sx={{ textAlign: 'center', mt: 6 }}>
+            <Button variant="contained" sx={{ backgroundColor: colors.orange, color: 'white', fontWeight: 'bold', px: 6, py: 2, fontSize: '1.2rem', '&:hover': { backgroundColor: colors.darkOrange } }}>
+              Sol·licita Adopció
+            </Button>
+          </Box>
+        </Paper>
+
+        {/* Galeria d'altres animals (slider/carousel) */}
+        <Box sx={{ mt: 6, mb: 2 }}>
+          <Typography variant="h5" sx={{ color: colors.orange, fontWeight: 'bold', mb: 2, textAlign: 'center' }}>
+            Altres animals disponibles
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+            <IconButton onClick={() => setGaleriaIndex(i => Math.max(i - 1, 0))} disabled={galeriaIndex === 0}>
+              <ArrowBackIosIcon />
+            </IconButton>
+            {altres.slice(galeriaIndex, galeriaIndex + 4).map(a => (
+              <Card key={a.id} sx={{ width: 180, background: colors.yellow, borderRadius: 3, boxShadow: 2, mx: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', p: 2 }}>
+                <CardMedia
+                  component="img"
+                  image={a.foto || 'https://via.placeholder.com/120x100?text=Sense+imatge'}
+                  alt={a.nombre}
+                  sx={{ objectFit: 'cover', width: 120, height: 100, borderRadius: 2, mb: 1 }}
+                />
+                <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: colors.black }}>
+                  {a.nombre}
+                </Typography>
+                <Typography variant="body2" sx={{ color: colors.black }}>
+                  {a.raza_perro || a.raza_gato || 'Raça'}
+                </Typography>
+                <Chip icon={<PetsIcon />} label={a.especie === 'perro' ? 'Gos' : 'Gat'} sx={{ backgroundColor: colors.orange, color: 'white', fontWeight: 'bold', mt: 1 }} />
+                <IconButton sx={{ mt: 1 }}><FavoriteBorderIcon sx={{ color: 'red' }} /></IconButton>
+              </Card>
+            ))}
+            <IconButton onClick={() => setGaleriaIndex(i => Math.min(i + 1, Math.max(altres.length - 4, 0)))} disabled={galeriaIndex >= Math.max(altres.length - 4, 0)}>
+              <ArrowForwardIosIcon />
+            </IconButton>
+          </Box>
+        </Box>
+      </Container>
+    </Box>
+  );
+}
+
+export default ProfileAnimal;

@@ -1,2 +1,36 @@
 __pycache__/
 *.pyc
+
+# Virtual environment
+.venv/
+
+# SQLite DB (local dev)
+db.sqlite3
+
+# Media uploads
+media/
+
+# VS Code workspace settings
+.vscode/
+
+# Byte-compiled / optimized / DLL files
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Pytest cache
+.pytest_cache/
+
+# Environments
+env/
+venv/
+
+# macOS
+.DS_Store
+
+# Logs
+*.log

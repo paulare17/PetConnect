@@ -7,9 +7,11 @@ class UsuarioSerializer(serializers.ModelSerializer):
     """Serializer básico para Usuario"""
     class Meta:
         model = Usuario
-        # Evitar retornar camps sensibles com l'email en respostes públiques
-        fields = ('id', 'username', 'role', 'date_joined')
+        fields = ('id', 'username', 'email', 'role', 'city', 'date_joined')
         read_only_fields = ('id', 'date_joined')
+        extra_kwargs = {
+            'email': {'required': False}  # No obligatorio en actualizaciones
+        }
 
 class UsuarioCreateSerializer(serializers.ModelSerializer):
     """Para crear nuevos usuarios"""
@@ -39,11 +41,13 @@ class UsuarioCreateSerializer(serializers.ModelSerializer):
 class PerfilUsuarioSerializer(serializers.ModelSerializer):
     """Serializer para perfil de usuario"""
     usuario = serializers.StringRelatedField(read_only=True)
+    usuario_id = serializers.IntegerField(source='usuario.id', read_only=True)
+    username = serializers.CharField(source='usuario.username', read_only=True)
     
     class Meta:
         model = PerfilUsuario
         fields = '__all__'
-        read_only_fields = ('usuario','role')
+        read_only_fields = ('usuario', 'usuario_id', 'username', 'role')
         
     def create(self, validated_data):
         request = self.context.get('request')
@@ -57,11 +61,13 @@ class PerfilUsuarioSerializer(serializers.ModelSerializer):
 class PerfilProtectoraSerializer(serializers.ModelSerializer):
     """Serializer para perfil de protectora"""
     usuario = serializers.StringRelatedField(read_only=True)
+    usuario_id = serializers.IntegerField(source='usuario.id', read_only=True)
+    username = serializers.CharField(source='usuario.username', read_only=True)
     
     class Meta:
         model = PerfilProtectora
         fields = '__all__'
-        read_only_fields = ('usuario','role')
+        read_only_fields = ('usuario', 'usuario_id', 'username', 'role')
         
     def create(self, validated_data):
         request = self.context.get('request')

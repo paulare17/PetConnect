@@ -33,11 +33,17 @@ import {
 import { colors } from "../../constants/colors.jsx";
 import { useNavigate } from "react-router-dom";
 import { tipusAnimalsOptions, serveisOptions } from "../../constants/options.jsx";
+import api from "../../api/client";
+import { ROLES } from "../../constants/roles.jsx";
+import { useAuthContext } from "../../context/AuthProvider.jsx";
 
 export default function FormProtectora() {
   const navigate = useNavigate();
+  const { getMe } = useAuthContext();
   const [formData, setFormData] = useState({
     // Informació bàsica
+    username: "",
+    password: "",
     nombreProtectora: "",
     email: "",
     telefon: "",
@@ -128,6 +134,14 @@ export default function FormProtectora() {
   const validateForm = () => {
     const newErrors = {};
 
+    if (!formData.username.trim())
+      newErrors.username = "Nom d'usuari obligatori";
+    if (formData.username.length < 3)
+      newErrors.username = "Mínim 3 caràcters";
+    if (!formData.password.trim())
+      newErrors.password = "Contrasenya obligatòria";
+    if (formData.password.length < 8)
+      newErrors.password = "Mínim 8 caràcters";
     if (!formData.nombreProtectora.trim())
       newErrors.nombreProtectora = "Nom de la protectora obligatori";
     if (!formData.email.trim()) newErrors.email = "Email obligatori";
@@ -157,15 +171,87 @@ export default function FormProtectora() {
     }
 
     try {
-      // Simulem l'enviament
-      console.log("Dades de la protectora:", formData);
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // Preparar payload amb tots els camps del formulari
+      const payload = {
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+        role: ROLES.PROTECTORA,
+        city: formData.ciutat,
+        // Dades específiques de la protectora
+        protectora_data: {
+          nombreProtectora: formData.nombreProtectora,
+          telefon: formData.telefon,
+          telefonEmergencia: formData.telefonEmergencia,
+          webSite: formData.webSite,
+          cif: formData.cif,
+          numRegistroAsociacion: formData.numRegistroAsociacion,
+          tipoEntidadJuridica: formData.tipoEntidadJuridica,
+          carrer: formData.carrer,
+          ciutat: formData.ciutat,
+          codiPostal: formData.codiPostal,
+          provincia: formData.provincia,
+          direccionJuridica: formData.direccionJuridica,
+          calleJuridica: formData.calleJuridica,
+          numeroJuridica: formData.numeroJuridica,
+          poblacionJuridica: formData.poblacionJuridica,
+          codigoPostalJuridica: formData.codigoPostalJuridica,
+          direccionRefugio: formData.direccionRefugio,
+          calleRefugio: formData.calleRefugio,
+          numeroRefugio: formData.numeroRefugio,
+          poblacionRefugio: formData.poblacionRefugio,
+          codigoPostalRefugio: formData.codigoPostalRefugio,
+          horario_lunes_apertura: formData.horario_lunes_apertura,
+          horario_lunes_cierre: formData.horario_lunes_cierre,
+          horario_martes_apertura: formData.horario_martes_apertura,
+          horario_martes_cierre: formData.horario_martes_cierre,
+          horario_miercoles_apertura: formData.horario_miercoles_apertura,
+          horario_miercoles_cierre: formData.horario_miercoles_cierre,
+          horario_jueves_apertura: formData.horario_jueves_apertura,
+          horario_jueves_cierre: formData.horario_jueves_cierre,
+          horario_viernes_apertura: formData.horario_viernes_apertura,
+          horario_viernes_cierre: formData.horario_viernes_cierre,
+          horario_sabado_apertura: formData.horario_sabado_apertura,
+          horario_sabado_cierre: formData.horario_sabado_cierre,
+          horario_domingo_apertura: formData.horario_domingo_apertura,
+          horario_domingo_cierre: formData.horario_domingo_cierre,
+          tipusAnimals: formData.tipusAnimals,
+          capacitatMaxima: formData.capacitatMaxima,
+          anyFundacio: formData.anyFundacio,
+          nucleoZoologico: formData.nucleoZoologico,
+          ambitoGeografico: formData.ambitoGeografico,
+          tipo_animal: formData.tipo_animal,
+          descripcio: formData.descripcio,
+          serveisOferts: formData.serveisOferts,
+          requisitoAdopcio: formData.requisitoAdopcio,
+          procesAdopcio: formData.procesAdopcio,
+          facebook: formData.facebook,
+          instagram: formData.instagram,
+          twitter: formData.twitter,
+        },
+      };
+
+      console.log("Enviant dades al backend:", payload);
+      const res = await api.post("/usuarios/", payload);
+
+      // El backend retorna access/refresh/user; guardem-los per fer login automàtic
+      if (res?.data?.access) {
+        localStorage.setItem("access", res.data.access);
+        localStorage.setItem("refresh", res.data.refresh);
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+        // Actualitzar l'estat del context
+        await getMe();
+      }
 
       alert("Perfil de protectora creat correctament!");
       navigate("/");
     } catch (error) {
-      console.error("Error:", error);
-      alert("Error en crear el perfil. Intenta-ho de nou.");
+      console.error("Error creant protectora:", error);
+      const msg =
+        error?.response?.data?.detail ||
+        JSON.stringify(error?.response?.data) ||
+        "Error en crear el perfil. Intenta-ho de nou.";
+      alert(msg);
     } finally {
       setLoading(false);
     }
@@ -227,6 +313,47 @@ export default function FormProtectora() {
             </Typography>
 
             <Grid container spacing={3} sx={{ mb: 4 }}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  required
+                  fullWidth
+                  name="username"
+                  label="Nom d'usuari"
+                  value={formData.username}
+                  onChange={handleInputChange}
+                  error={!!errors.username}
+                  helperText={errors.username || "Aquest serà el teu nom d'usuari per accedir"}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Group sx={{ color: colors.orange }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  required
+                  fullWidth
+                  name="password"
+                  label="Contrasenya"
+                  type="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  error={!!errors.password}
+                  helperText={errors.password || "Mínim 8 caràcters"}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <ContactPhone sx={{ color: colors.orange }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+
               <Grid size={{ xs: 12, sm: 12 }}>
                 <TextField
                   required

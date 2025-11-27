@@ -7,6 +7,7 @@ import {
   Button,
   Typography,
   Alert,
+  AlertTitle,
   InputAdornment,
   Select,
   MenuItem,
@@ -33,6 +34,7 @@ import {
 } from "@mui/icons-material";
 import { colors } from "../../constants/colors.jsx";
 import { useNavigate } from "react-router-dom";
+import { createUserProfile } from "../../api/client";
 import {
   generoOptions,
   especieOptions,
@@ -43,9 +45,9 @@ import {
   tipoViviendaOptions,
 } from "../../constants/options";
 
-export default function FormUsuari() {
+export default function FormUsuari({ onProfileCreated, existingProfile }) {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(existingProfile || {
     // Informació bàsica
     telefono: "",
     barrio: "",
@@ -70,6 +72,7 @@ export default function FormUsuari() {
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -122,6 +125,7 @@ export default function FormUsuari() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setApiError(null);
 
     if (!validateForm()) {
       setLoading(false);
@@ -129,15 +133,42 @@ export default function FormUsuari() {
     }
 
     try {
-      // Simulem l'enviament
-      console.log("Dades de l'usuari:", formData);
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // Preparar les dades per enviar
+      const dataToSend = { ...formData };
+      
+      // Convertir arrays a strings separats per comes si cal (segons el backend)
+      if (Array.isArray(dataToSend.preferencias_tamano)) {
+        dataToSend.preferencias_tamano = dataToSend.preferencias_tamano.join(',');
+      }
+      if (Array.isArray(dataToSend.preferencias_edad)) {
+        dataToSend.preferencias_edad = dataToSend.preferencias_edad.join(',');
+      }
+      if (Array.isArray(dataToSend.preferencias_sexo)) {
+        dataToSend.preferencias_sexo = dataToSend.preferencias_sexo.join(',');
+      }
 
-      alert("Perfil d'usuari creat correctament!");
-      navigate("/");
+      let response;
+      if (existingProfile && existingProfile.id) {
+        // Actualitzar perfil existent
+        const { updateUserProfile } = await import("../../api/client");
+        response = await updateUserProfile(existingProfile.id, dataToSend);
+        console.log("Perfil actualitzat:", response.data);
+      } else {
+        // Crear perfil nou
+        response = await createUserProfile(dataToSend);
+        console.log("Perfil creat:", response.data);
+      }
+      
+      // Notificar al component pare que s'ha creat el perfil
+      if (onProfileCreated) {
+        onProfileCreated();
+      }
     } catch (error) {
-      console.error("Error:", error);
-      alert("Error en crear el perfil. Intenta-ho de nou.");
+      console.error("Error en crear el perfil:", error);
+      const errorMsg = error.response?.data?.detail || 
+                       error.response?.data?.message || 
+                       "Error en crear el perfil. Intenta-ho de nou.";
+      setApiError(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -188,6 +219,21 @@ export default function FormUsuari() {
           </Typography>
 
           <Box component="form" onSubmit={handleSubmit}>
+            {/* Alert informatiu si és la primera vegada */}
+            {existingProfile && !existingProfile.telefono && (
+              <Alert severity="warning" sx={{ mb: 3 }}>
+                <AlertTitle>Completa tu perfil</AlertTitle>
+                Aún no has completado tu perfil. Necesitamos esta información para poder
+                recomendarte las mascotas más adecuadas para ti. <strong>¡Tómate un momento para rellenar el formulario!</strong>
+              </Alert>
+            )}
+
+            {apiError && (
+              <Alert severity="error" sx={{ mb: 3 }}>
+                {apiError}
+              </Alert>
+            )}
+
             {/* Informació Personal */}
             <Typography
               variant="h6"
@@ -609,7 +655,7 @@ export default function FormUsuari() {
                   transition: "all 0.3s ease-in-out",
                 }}
               >
-                {loading ? "Creant perfil..." : "Crear Perfil d'Usuari"}
+                {loading ? "Actualitzant perfil..." : "Actualitza Perfil d'Usuari"}
               </Button>
             </Box>
           </Box>

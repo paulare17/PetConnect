@@ -13,6 +13,7 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import PetsIcon from "@mui/icons-material/Pets";
 import {colors} from '../../constants/colors.jsx'
+import { ROLES } from '../../constants/roles.jsx';
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from '../../context/AuthProvider';
 
@@ -45,12 +46,24 @@ function ResponsiveAppBar() {
   const handleUserMenuAction = (setting) => {
     handleCloseUserMenu();
     if (setting === "Perfil") {
-      if (user?.role === "protectora") navigate("/perfil-protectora");
-      else navigate("/perfil-usuari");
+      if (user?.role === ROLES.PROTECTORA) navigate("/perfil-protectora");
+      else if (user?.role === ROLES.USUARIO) navigate("/perfil-usuari");
+      else if (user?.role === ROLES.ADMIN) navigate("/admin");
     } else if (setting === "Inici") {
       navigate("/");
     } else if (setting === "Sortir") {
       logout();
+      navigate("/");
+    }
+  };
+
+  // Handler per a les pages
+  const handlePageAction = (page) => {
+    handleCloseNavMenu();
+    if (page === "Adopta") {
+      navigate("/inici-usuari-galeria");
+    } else {
+      //  afegir més rutes aquí 
       navigate("/");
     }
   };
@@ -132,7 +145,7 @@ function ResponsiveAppBar() {
               },
             }}
             >
-            AdoptApp
+            PetConnect
           </Typography>
             </Box>
 
@@ -226,7 +239,7 @@ function ResponsiveAppBar() {
               fontSize: { xs: "2rem", sm: "2.2rem" },
             }}
           >
-            AdoptApp
+            PetConnect
           </Typography>
 
             </Box>
@@ -243,7 +256,7 @@ function ResponsiveAppBar() {
             {pages.map((page) => (
               <Button
                 key={page}
-                onClick={handleCloseNavMenu}
+                onClick={() => handlePageAction(page)}
                 sx={{
                   my: 2,
                   mx:1,
@@ -291,22 +304,6 @@ function ResponsiveAppBar() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
               >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={() => {
-                  handleCloseUserMenu
-                  if (setting === "Perfil") 
-                    if (user.role ==="protectora")
-                      navigate("/perfil-usuari")
-                    if (user.role ==="usuario")
-                       navigate("/perfil-protectora")
-                }
-              }
-              >
-                  <Typography sx={{ textAlign: "center" }}>
-                    {setting}
-                  </Typography>
-                </MenuItem>
-              ))}
               {renderUserMenuItems()}
             </Menu>
           </Box>
