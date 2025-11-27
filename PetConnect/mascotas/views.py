@@ -63,12 +63,8 @@ def swipe_action(request):
         mascota_id = request.data.get('animal_id') or request.data.get('mascota_id')
         action_str = request.data.get('action', '').lower()
         
-        # Convertir 'like'/'dislike' a 'L'/'D'
-        if action_str == 'like':
-            action_val = Interaccion.LIKE
-        elif action_str == 'dislike':
-            action_val = Interaccion.DISLIKE
-        else:
+      # Validar acción
+        if action_str not in ['like', 'dislike']:
             return Response({'detail': 'Acció no vàlida. Utilitzi "like" o "dislike".'}, status=status.HTTP_400_BAD_REQUEST)
 
         mascota = get_object_or_404(Mascota, id=mascota_id)
@@ -77,10 +73,10 @@ def swipe_action(request):
         interaccion, created = Interaccion.objects.update_or_create(
             usuario=user,
             mascota=mascota,
-            defaults={'accion': action_val}
+            defaults={'accion': action_str}
         )
         
-        is_like = (action_val == Interaccion.LIKE)
+        is_like = (action_str == 'like')
         
         return Response(
             {'status': 'ok', 'is_like': is_like, 'message': 'Interacció registrada amb èxit.'}, 
