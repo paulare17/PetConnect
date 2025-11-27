@@ -5,7 +5,7 @@ from django.conf.urls.static import static
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from usuarios.views import UsuarioViewSet, PerfilUsuarioViewSet, PerfilProtectoraViewSet
-from mascotas.views import MascotaViewSet
+from mascotas.views import MascotaViewSet, get_next_card, swipe_action
 
 router = DefaultRouter()
 # Registra aquí tots els viewsets de totes les apps
@@ -20,6 +20,9 @@ urlpatterns = [
     path('api/', include(router.urls)),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    # Rutes de PetTinder
+    path('api/pettinder/next/', get_next_card, name='pettinder-next'),
+    path('api/pettinder/action/', swipe_action, name='pettinder-action'),
 ]
 
 # Servir arxius media en desenvolupament (fotos de mascotes)
