@@ -213,18 +213,30 @@ def get_next_card(request):
 @permission_classes([permissions.IsAuthenticated])
 def swipe_action(request):
     """
-    [POST] /api/swipe/action/
+    [POST] /api/swipe/action/ o /api/tinderpet/action/
     Registra la acción (Like 'L' o Dislike 'D') de un usuario sobre una mascota.
     Si es LIKE, crea automáticamente un chat entre el adoptante y la protectora.
-    Espera JSON: { "mascota_id": 123, "action": "L" }
+    Espera JSON: { "mascota_id": 123, "action": "L" } o { "animal_id": 123, "action": "like" }
     """
     user = request.user
     try:
-        mascota_id = request.data.get('mascota_id')
-        action_val = request.data.get('action') 
+        # Compatibilidad: aceptar tanto 'mascota_id' como 'animal_id'
+        mascota_id = request.data.get('mascota_id') or request.data.get('animal_id')
+        action_val = request.data.get('action')
+        
+        # Normalizar la acción: 'like'/'dislike' (frontend) -> 'L'/'D' (backend)
+        if action_val:
+            action_val = action_val.upper()
+            if action_val == 'LIKE':
+                action_val = 'L'
+            elif action_val == 'DISLIKE':
+                action_val = 'D'
+        
+        if not mascota_id:
+            return Response({'detail': 'Se requiere mascota_id o animal_id.'}, status=status.HTTP_400_BAD_REQUEST)
         
         if action_val not in [Interaccion.LIKE, Interaccion.DISLIKE]:
-            return Response({'detail': 'Acción no válida. Use "L" o "D".'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail': 'Acción no válida. Use "L"/"like" o "D"/"dislike".'}, status=status.HTTP_400_BAD_REQUEST)
 
         mascota = get_object_or_404(Mascota, id=mascota_id)
 
