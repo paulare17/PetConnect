@@ -9,17 +9,15 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
-from pathlib import Path
 import os
+from pathlib import Path
 from dotenv import load_dotenv
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / 'PetConnect.env')
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 SECRET_KEY =  os.environ.get('DJANGO_SECRET_KEY', 'dev-secret')
 DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
@@ -39,7 +37,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'django_filters',
     'mascotas',
-    'usuarios'
+    'usuarios',
+    'chat',
 ]
 
 REST_FRAMEWORK = {
@@ -51,7 +50,6 @@ REST_FRAMEWORK = {
     ],
 }
 
-from datetime import timedelta
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),    # Token expira en 1h
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),       
@@ -95,6 +93,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'PetConnect.wsgi.application'
 
+# CORS Configuration per al frontend (Vite)
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",

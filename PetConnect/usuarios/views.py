@@ -2,9 +2,10 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.exceptions import PermissionDenied
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.exceptions import TokenError
+
 from .models import Usuario, PerfilUsuario, PerfilProtectora
 from .serializers import (
     UsuarioSerializer,
@@ -13,137 +14,147 @@ from .serializers import (
     PerfilProtectoraSerializer,
     LoginSerializer
 )
-from .permissions import (
-    UsuarioPermissions,
-    IsUsuario,
-    IsProtectora,
-    get_queryset_by_role,
-)
+
+# ---------------------------------------------
+# ViewSet para Gestión de Usuarios y Autenticación
+# ---------------------------------------------
 
 class UsuarioViewSet(viewsets.ModelViewSet):
-    """ViewSet para gestión de usuarios"""
+    """ViewSet para gestión de usuarios con JWT"""
     queryset = Usuario.objects.all()
-    serializer_class = UsuarioSerializer
-
+    
     def get_queryset(self):
-        """Filtrar usuarios según el rol del request.user usando la utilidad centralizada."""
-        user = self.request.user
-        if not user or not user.is_authenticated:
+        """Filtrado por rol - admin ve todo, otros solo su usuario"""
+        if not self.request.user.is_authenticated:
             return Usuario.objects.none()
-        return get_queryset_by_role(user, Usuario)
+        
+        if self.request.user.role == 'admin':
+            return Usuario.objects.all()
+        return Usuario.objects.filter(id=self.request.user.id)
 
     def get_serializer_class(self):
-        if self.action == 'create':
-            return UsuarioCreateSerializer
-        return UsuarioSerializer
+        return UsuarioCreateSerializer if self.action == 'create' else UsuarioSerializer
 
     def get_permissions(self):
-        # create y login són accessibles sense autenticar; la resta requereix autenticació
         if self.action in ['create', 'login']:
             return [AllowAny()]
         return [IsAuthenticated()]
 
+    def _get_token_response(self, user):
+        """Genera respuesta estandarizada con tokens JWT"""
+        refresh = RefreshToken.for_user(user)
+        return {
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
+            'user': UsuarioSerializer(user, context={'request': self.request}).data
+        }
+
+    def create(self, request, *args, **kwargs):
+        """Registro de usuario con retorno inmediato de tokens"""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        
+        return Response(
+            self._get_token_response(user), 
+            status=status.HTTP_201_CREATED
+        )
+
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def login(self, request):
+        """Login con email/username y password"""
         serializer = LoginSerializer(data=request.data)
-        if serializer.is_valid():
-            username = serializer.validated_data['username']
-            password = serializer.validated_data['password']
-
-            user = authenticate(username=username, password=password)
-            if user:
-                refresh = RefreshToken.for_user(user)
-                return Response({
-                    'access': str(refresh.access_token),
-                    'refresh': str(refresh),
-                    'user': UsuarioSerializer(user).data
-                })
-
+        serializer.is_valid(raise_exception=True)
+        
+        user = authenticate(
+            username=serializer.validated_data['username'],
+            password=serializer.validated_data['password']
+        )
+        
+        if not user:
             return Response(
-                {'error': 'Credenciales inválidas'},
+                {'error': 'Credenciales inválidas'}, 
                 status=status.HTTP_401_UNAUTHORIZED
             )
+            
+        return Response(self._get_token_response(user))
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def me(self, request):
+        """Obtener datos del usuario actual"""
+        serializer = self.get_serializer(request.user)
+        return Response(serializer.data)
 
     @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
     def logout(self, request):
         """
-        Espera: {'refresh': '<refresh_token>'}
-        Blacklist del refresh token (requereix rest_framework_simplejwt.token_blacklist a INSTALLED_APPS)
+        Logout - el cliente debe eliminar los tokens.
         """
-        refresh_token = request.data.get('refresh')
-        if not refresh_token:
-            return Response({'error': 'Refresh token required.'}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            token = RefreshToken(refresh_token)
-            token.blacklist()
-            return Response({'detail': 'Logged out successfully.'}, status=status.HTTP_200_OK)
-        except TokenError:
-            return Response({'error': 'Invalid token.'}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {'detail': 'Sesión cerrada. Elimina los tokens del cliente.'}, 
+            status=status.HTTP_200_OK
+        )
 
-    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
-    def profile(self, request):
-        """Obtener perfil del usuario actual"""
-        serializer = UsuarioSerializer(request.user)
-        return Response(serializer.data)
+# ---------------------------------------------
+# ViewSets para Perfiles (Usuario y Protectora)
+# ---------------------------------------------
 
-class PerfilUsuarioViewSet(viewsets.ModelViewSet):
-    """ViewSet para perfiles de usuario"""
-    queryset = PerfilUsuario.objects.all()
+class BasePerfilViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet base para perfiles.
+    Requiere que las subclases definan queryset_model, serializer_class y allowed_role.
+    """
+    permission_classes = [IsAuthenticated]
+    
+    queryset = None 
+
+    def get_queryset(self):
+        """
+        Filtrado: Admin ve todo; usuarios con el rol adecuado ven su perfil; 
+        otros roles o usuarios sin rol no ven nada.
+        """
+        user = self.request.user
+        
+        if not user.is_authenticated:
+            return self.queryset_model.objects.none()
+
+        if user.role == 'admin':
+            return self.queryset_model.objects.all()
+        
+        # Filtra solo si el usuario tiene el rol permitido para este perfil
+        if user.role == self.allowed_role:
+            return self.queryset_model.objects.filter(usuario=user)
+        
+        # Si el usuario está autenticado pero no tiene el rol permitido
+        return self.queryset_model.objects.none()
+
+    def perform_create(self, serializer):
+        """
+        Solo usuarios con el rol específico pueden crear un perfil. 
+        Evita que se creen perfiles duplicados.
+        """
+        user = self.request.user
+        
+        # Asegura que el usuario tenga un rol asignado y que sea el correcto.
+        if user.role != self.allowed_role:
+            raise PermissionDenied(f'Solo usuarios con el rol "{self.allowed_role}" pueden crear este perfil.')
+        
+        # Evitar duplicados (un usuario solo debe tener un perfil de este tipo)
+        if self.queryset_model.objects.filter(usuario=user).exists():
+             raise PermissionDenied('Ya tienes un perfil creado para esta cuenta.')
+            
+        serializer.save(usuario=user)
+
+
+class PerfilUsuarioViewSet(BasePerfilViewSet):
+    queryset_model = PerfilUsuario 
+    queryset = PerfilUsuario.objects.all() 
     serializer_class = PerfilUsuarioSerializer
-    permission_classes = [IsAuthenticated, UsuarioPermissions]
+    allowed_role = 'usuario'
 
-    def get_queryset(self):
-        """Filtrar perfiles de usuario según rol.
-        - admin: todos
-        - usuario: solo su perfil
-        - protectora: todos (para consulta)
-        """
-        user = self.request.user
-        if not user or not user.is_authenticated:
-            return PerfilUsuario.objects.none()
-        if user.role == 'admin':
-            return PerfilUsuario.objects.all()
-        if user.role == 'usuario':
-            return PerfilUsuario.objects.filter(usuario=user)
-        if user.role == 'protectora':
-            return PerfilUsuario.objects.all()
-        return PerfilUsuario.objects.none()
 
-    def perform_create(self, serializer):
-        """Forzar la asociación al request.user y guardar role sincronizado."""
-        serializer.save(usuario=self.request.user, role=self.request.user.role)
-
-class PerfilProtectoraViewSet(viewsets.ModelViewSet):
-    """ViewSet para perfiles de protectora"""
-    queryset = PerfilProtectora.objects.all()
+class PerfilProtectoraViewSet(BasePerfilViewSet):
+    queryset_model = PerfilProtectora
+    queryset = PerfilProtectora.objects.all() 
     serializer_class = PerfilProtectoraSerializer
-    permission_classes = [IsAuthenticated, UsuarioPermissions]
-
-    def get_queryset(self):
-        """Filtrar perfiles de protectora según rol.
-        - admin: todos
-        - protectora: su propio perfil
-        - usuario: puede ver todas las protectoras (lista)
-        """
-        user = self.request.user
-        if not user or not user.is_authenticated:
-            return PerfilProtectora.objects.none()
-        if user.role == 'admin':
-            return PerfilProtectora.objects.all()
-        if user.role == 'protectora':
-            return PerfilProtectora.objects.filter(usuario=user)
-        if user.role == 'usuario':
-            return PerfilProtectora.objects.all()
-        return PerfilProtectora.objects.none()
-
-    def perform_create(self, serializer):
-        """Forzar la asociación al request.user y role."""
-        if self.request.user.role == 'protectora':
-            serializer.save(usuario=self.request.user, role=self.request.user.role)
-        else:
-            # Seguridad adicional: impedir creación por otros roles
-            raise PermissionError('Sólo usuarios con rol protectora pueden crear este perfil.')
+    allowed_role = 'protectora'
