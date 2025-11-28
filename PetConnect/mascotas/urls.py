@@ -28,8 +28,8 @@ from . import views
 urlpatterns = [
     # Estas rutas se montarán BAJO el prefijo 'api/' del archivo principal.
     
-    # Rutas de Swipe/Feed/Upload
+    # Rutas de Swipe/Feed
     path('feed/next-card/', views.get_next_card, name='api_get_next_card'), 
     path('swipe/action/', views.swipe_action, name='api_swipe_action'),     
-    path('upload/', views.subir_mascota, name='api_subir_mascota'),
+    # path('upload/', views.subir_mascota, name='api_subir_mascota'),  # Comentado porque la función no existe
 ]

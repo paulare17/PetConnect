@@ -13,6 +13,13 @@ class Chat(models.Model):
         unique_together = ('mascota', 'adoptante')
         verbose_name = "Sala de Chat"
         verbose_name_plural = "Salas de Chat"
+    
+    def tiene_mensajes(self):
+        """Retorna True si el chat tiene al menos un mensaje."""
+        return self.mensajes.exists()
+    
+    def __str__(self):
+        return f"Chat: {self.adoptante.username} - {self.mascota.nombre} ({self.protectora.username})"
 
 class Mensaje(models.Model):
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name='mensajes')

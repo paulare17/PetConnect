@@ -27,15 +27,27 @@ class ChatViewSet(viewsets.GenericViewSet):
 
     def get_queryset(self):
         """
-        Retorna solo los chats en los que el usuario autenticado participa 
-        (como adoptante o como protectora).
+        Retorna solo los chats en los que el usuario autenticado participa.
+        - Adoptante: ve todos sus chats (incluso sin mensajes)
+        - Protectora: solo ve chats que tienen al menos un mensaje
         """
         user = self.request.user
         
-        # Filtra chats donde el usuario es el adoptante O el usuario vinculado a la protectora
-        return self.queryset.filter(
-            Q(adoptante=user) | Q(protectora__usuario=user) 
-        ).order_by('-id')
+        # Filtrar chats donde el usuario participa
+        chats = self.queryset.filter(
+            Q(adoptante=user) | Q(protectora=user) 
+        )
+        
+        # Si el usuario es protectora, filtrar solo chats con mensajes
+        # Verificar si el usuario tiene perfil de protectora
+        from usuarios.models import PerfilProtectora
+        es_protectora = PerfilProtectora.objects.filter(usuario=user).exists()
+        
+        if es_protectora:
+            # Solo mostrar chats que tienen mensajes
+            chats = chats.filter(mensajes__isnull=False).distinct()
+        
+        return chats.order_by('-fecha_creacion')
 
     # 1. LISTAR CHATS (Bandeja de entrada)
     # GET /api/chat/chats/
@@ -54,13 +66,50 @@ class ChatViewSet(viewsets.GenericViewSet):
         chat = get_object_or_404(self.get_queryset(), pk=pk)
         
         # Obtenemos todos los mensajes y los ordenamos por antigüedad
-        mensajes = chat.mensajes.all().order_by('timestamp')
+        mensajes = chat.mensajes.all().order_by('fecha_envio')
         
         # Usamos MensajeSerializer
         serializer = MensajeSerializer(mensajes, many=True, context={'request': request})
         return Response(serializer.data)
 
-    # 3. ENVIAR MENSAJE
+    # 3. OBTENER O CREAR CHAT PARA UNA MASCOTA
+    # POST /api/chat/chats/obtener_o_crear/
+    @action(detail=False, methods=['post'])
+    def obtener_o_crear(self, request):
+        """ 
+        Obtiene o crea un chat entre el usuario autenticado y la protectora de una mascota.
+        Espera: { "mascota_id": 123 }
+        Retorna: El chat existente o recién creado.
+        """
+        from mascotas.models import Mascota
+        
+        mascota_id = request.data.get('mascota_id')
+        if not mascota_id:
+            return Response(
+                {'detail': 'Se requiere mascota_id.'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        mascota = get_object_or_404(Mascota, id=mascota_id)
+        user = request.user
+        
+        # Crear o recuperar el chat
+        chat, created = Chat.objects.get_or_create(
+            mascota=mascota,
+            adoptante=user,
+            defaults={'protectora': mascota.protectora, 'activo': True}
+        )
+        
+        serializer = self.get_serializer(chat)
+        return Response(
+            {
+                'chat': serializer.data,
+                'created': created
+            },
+            status=status.HTTP_201_CREATED if created else status.HTTP_200_OK
+        )
+
+    # 4. ENVIAR MENSAJE
     # POST /api/chat/chats/{pk}/enviar_mensaje/
     @action(detail=True, methods=['post'], serializer_class=MensajeSerializer)
     def enviar_mensaje(self, request, pk=None):
@@ -72,7 +121,7 @@ class ChatViewSet(viewsets.GenericViewSet):
         
         # 2. Verificar que el usuario sea un participante válido
         es_adoptante = chat.adoptante == user
-        es_protectora = chat.protectora.usuario == user # Asume PerfilProtectora.usuario
+        es_protectora = chat.protectora == user
         
         if not (es_adoptante or es_protectora):
             raise PermissionDenied("Solo los participantes del chat (adoptante o protectora) pueden enviar mensajes.")
@@ -81,8 +130,8 @@ class ChatViewSet(viewsets.GenericViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        # 4. Guardar el nuevo mensaje (asignando el chat y el emisor)
-        mensaje = serializer.save(chat=chat, emisor=user)
+        # 4. Guardar el nuevo mensaje (asignando el chat y el remitente)
+        mensaje = serializer.save(chat=chat, remitente=user)
         
         # 5. Retornar el mensaje creado (usando el serializer original para incluir el username)
         return Response(MensajeSerializer(mensaje).data, status=status.HTTP_201_CREATED)

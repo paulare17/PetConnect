@@ -156,7 +156,7 @@ from django.shortcuts import get_object_or_404
 
 # Importaciones de DRF
 from rest_framework import viewsets, permissions, status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.pagination import PageNumberPagination
@@ -215,6 +215,7 @@ def swipe_action(request):
     """
     [POST] /api/swipe/action/
     Registra la acción (Like 'L' o Dislike 'D') de un usuario sobre una mascota.
+    Si es LIKE, crea automáticamente un chat entre el adoptante y la protectora.
     Espera JSON: { "mascota_id": 123, "action": "L" }
     """
     user = request.user
@@ -235,9 +236,25 @@ def swipe_action(request):
         )
         
         is_like = (action_val == Interaccion.LIKE)
+        chat_id = None
+        
+        # Si es LIKE, crear o recuperar el chat automáticamente
+        if is_like:
+            from chat.models import Chat
+            chat, chat_created = Chat.objects.get_or_create(
+                mascota=mascota,
+                adoptante=user,
+                defaults={'protectora': mascota.protectora, 'activo': True}
+            )
+            chat_id = chat.id
         
         return Response(
-            {'status': 'ok', 'is_like': is_like, 'message': 'Interacción registrada con éxito.'}, 
+            {
+                'status': 'ok', 
+                'is_like': is_like, 
+                'chat_id': chat_id,
+                'message': 'Interacción registrada con éxito.' + (' Chat creado.' if is_like and chat_created else '')
+            }, 
             status=status.HTTP_201_CREATED if created else status.HTTP_200_OK
         )
 
