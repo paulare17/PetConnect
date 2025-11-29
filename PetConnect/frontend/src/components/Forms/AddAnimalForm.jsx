@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./no-scroll-form.css";
 import {
   Box,
@@ -28,21 +28,26 @@ const AddAnimalForm = () => {
   const initialFormData = {
     nombre: "",
     especie: "gato",
-    raza_perro: "mestizo",
-    raza_gato: "mestizo",
+    raza: "",
+    raza_perro: "",
+    raza_gato: "",
     genero: "hembra",
-    edad: 0,
-    tamaño: "mediano",
-    peso: "",
-    color: "marrón",
+    edad: "",
+    tamaño: "",
+    color: "",
     foto: "",
+    caracter: "",
+    convivencia_animales: "",
+    convivencia_ninos: "",
+    desparasitado: false,
+    esterilizado: false,
+    con_microchip: false,
+    vacunado: false,
     necesidades_especiales: false,
     descripcion_necesidades: "",
-    convivencia_animales: "no",
-    convivencia_ninos: false,
-    caracter: [],
     descripcion: "",
-    ubicacion: "Ciudad",
+    adoptado: false,
+    oculto: false,
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -50,20 +55,46 @@ const AddAnimalForm = () => {
   const [generatingDescription, setGeneratingDescription] = useState(false);
   const [status, setStatus] = useState(null); // {type: 'success'|'error', message: ''}
 
+  // Sincronizar raza cuando cambia la especie
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      raza: ''
+    }));
+  }, [formData.especie]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    
+    // Si cambia la especie, resetear la raza
+    if (name === 'especie') {
+      setFormData((prev) => ({
+        ...prev,
+        especie: value,
+        raza: 'mestizo',
+        raza_perro: value === 'perro' ? 'mestizo' : prev.raza_perro,
+        raza_gato: value === 'gato' ? 'mestizo' : prev.raza_gato,
+      }));
+    } else if (name === 'raza') {
+      // Sincronizar raza con el campo correcto según especie
+      setFormData((prev) => ({
+        ...prev,
+        raza: value,
+        raza_perro: prev.especie === 'perro' ? value : prev.raza_perro,
+        raza_gato: prev.especie === 'gato' ? value : prev.raza_gato,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
-  const handleCheckboxChange = (name, value) => {
+  const handleCaracterChange = (value) => {
     setFormData((prev) => ({
       ...prev,
-      [name]: prev[name].includes(value)
-        ? prev[name].filter((item) => item !== value)
-        : [...prev[name], value],
+      caracter: value,
     }));
   };
 
@@ -76,13 +107,13 @@ const AddAnimalForm = () => {
       const dataForIA = {
         nombre: formData.nombre || "Mascota",
         especie: formData.especie,
-        raza_perro: formData.especie === 'perro' ? formData.raza_perro : undefined,
-        raza_gato: formData.especie === 'gato' ? formData.raza_gato : undefined,
-        edad: formData.edad,
+        raza_perro: formData.especie === 'perro' ? formData.raza : undefined,
+        raza_gato: formData.especie === 'gato' ? formData.raza : undefined,
+        edad: parseInt(formData.edad) || 1,
         genero: formData.genero,
         tamaño: formData.tamaño,
-        caracter: formData.caracter.length > 0 ? formData.caracter[0] : 'cariñoso',
-        convivencia_ninos: formData.convivencia_ninos,
+        caracter: formData.caracter || 'cariñoso',
+        convivencia_ninos: formData.convivencia_ninos === "" ? undefined : formData.convivencia_ninos,
         convivencia_animales: formData.convivencia_animales,
         descripcion_necesidades: formData.descripcion_necesidades
       };
@@ -127,13 +158,7 @@ const AddAnimalForm = () => {
       
       // Afegir tots els camps del formulari
       Object.keys(formData).forEach(key => {
-        if (key === 'caracter') {
-          // Caracter: el modelo espera un solo valor, usar el primero si hay múltiples
-          const caracterValue = Array.isArray(formData[key]) && formData[key].length > 0 
-            ? formData[key][0] 
-            : (formData[key] || 'cariñoso');
-          formDataToSend.append(key, caracterValue);
-        } else if (key === 'foto' && formData[key]) {
+        if (key === 'foto' && formData[key]) {
           // Si hi ha foto (File object)
           formDataToSend.append(key, formData[key]);
         } else {
@@ -240,6 +265,28 @@ const AddAnimalForm = () => {
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <FormControl fullWidth>
+                      <InputLabel>Raça</InputLabel>
+                      <Select
+                        name="raza"
+                        value={formData.raza}
+                        onChange={handleInputChange}
+                      >
+                        {formData.especie === 'perro' ? [
+                            <MenuItem key="mestizo" value="mestizo">Mestizo</MenuItem>,
+                            <MenuItem key="labrador" value="labrador">Labrador Retriever</MenuItem>,
+                            <MenuItem key="pastor_aleman" value="pastor_aleman">Pastor Alemán</MenuItem>,
+                            <MenuItem key="bulldog" value="bulldog">Bulldog Inglés</MenuItem>,
+                            <MenuItem key="beagle" value="beagle">Beagle</MenuItem>
+                        ] : [
+                            <MenuItem key="mestizo" value="mestizo">Mestizo</MenuItem>,
+                            <MenuItem key="siames" value="siames">Siamés</MenuItem>,
+                            <MenuItem key="persa" value="persa">Persa</MenuItem>
+                        ]}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <FormControl fullWidth>
                       <InputLabel>Gènere</InputLabel>
                       <Select
                         name="genero"
@@ -277,23 +324,25 @@ const AddAnimalForm = () => {
                     </FormControl>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField
-                      fullWidth
-                      name="peso"
-                      label="Pes (kg)"
-                      type="number"
-                      value={formData.peso}
-                      onChange={handleInputChange}
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField
-                      fullWidth
-                      name="color"
-                      label="Color"
-                      value={formData.color}
-                      onChange={handleInputChange}
-                    />
+                    <FormControl fullWidth>
+                      <InputLabel>Color</InputLabel>
+                      <Select
+                        name="color"
+                        value={formData.color}
+                        onChange={handleInputChange}
+                      >
+                        <MenuItem value="negro">Negro</MenuItem>
+                        <MenuItem value="blanco">Blanco</MenuItem>
+                        <MenuItem value="marrón">Marrón</MenuItem>
+                        <MenuItem value="gris">Gris</MenuItem>
+                        <MenuItem value="naranja">Naranja/Atigrado</MenuItem>
+                        <MenuItem value="dorado">Dorado</MenuItem>
+                        <MenuItem value="crema">Crema</MenuItem>
+                        <MenuItem value="bicolor">Bicolor</MenuItem>
+                        <MenuItem value="tricolor">Tricolor</MenuItem>
+                        <MenuItem value="manchado">Manchado</MenuItem>
+                      </Select>
+                    </FormControl>
                   </Grid>
                   <Grid size={{ xs: 12 }}>
                       <Button
@@ -376,10 +425,7 @@ const AddAnimalForm = () => {
                       <Select
                         name="convivencia_ninos"
                         value={formData.convivencia_ninos}
-                        onChange={(e) => setFormData(prev => ({
-                          ...prev,
-                          convivencia_ninos: e.target.value === 'true' || e.target.value === true
-                        }))}
+                        onChange={handleInputChange}
                       >
                         <MenuItem value={true}>Sí</MenuItem>
                         <MenuItem value={false}>No</MenuItem>
@@ -387,36 +433,86 @@ const AddAnimalForm = () => {
                     </FormControl>
                   </Grid>
                   <Grid size={{ xs: 12 }}>
-                    <Typography variant="body2" sx={{ mb: 1 }}>
-                      Caràcter:
+                    <FormControl fullWidth>
+                      <InputLabel>Caràcter principal</InputLabel>
+                      <Select
+                        name="caracter"
+                        value={formData.caracter}
+                        onChange={handleInputChange}
+                      >
+                        <MenuItem value="cariñoso">Cariñoso</MenuItem>
+                        <MenuItem value="jugueton">Juguetón</MenuItem>
+                        <MenuItem value="tranquilo">Tranquilo</MenuItem>
+                        <MenuItem value="activo">Activo</MenuItem>
+                        <MenuItem value="sociable">Sociable</MenuItem>
+                        <MenuItem value="independiente">Independiente</MenuItem>
+                        <MenuItem value="protector">Protector</MenuItem>
+                        <MenuItem value="timido">Tímido</MenuItem>
+                        <MenuItem value="obediente">Obediente</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid size={{ xs: 12 }}>
+                    <Typography variant="body2" sx={{ mb: 1, fontWeight: 'bold' }}>
+                      Estat de salut:
                     </Typography>
-                    <FormGroup row>
-                      {[
-                        "cariñoso",
-                        "jugueton",
-                        "tranquilo",
-                        "activo",
-                        "sociable",
-                        "independiente",
-                        "protector",
-                        "timido",
-                        "obediente",
-                      ].map((caracter) => (
-                        <FormControlLabel
-                          key={caracter}
-                          control={
-                            <Checkbox
-                              checked={formData.caracter.includes(caracter)}
-                              onChange={() =>
-                                handleCheckboxChange("caracter", caracter)
-                              }
-                            />
-                          }
-                          label={
-                            caracter.charAt(0).toUpperCase() + caracter.slice(1)
-                          }
-                        />
-                      ))}
+                    <FormGroup>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={formData.desparasitado}
+                            onChange={(e) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                desparasitado: e.target.checked,
+                              }))
+                            }
+                          />
+                        }
+                        label="Desparasitat"
+                      />
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={formData.esterilizado}
+                            onChange={(e) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                esterilizado: e.target.checked,
+                              }))
+                            }
+                          />
+                        }
+                        label="Esterilitzat"
+                      />
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={formData.con_microchip}
+                            onChange={(e) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                con_microchip: e.target.checked,
+                              }))
+                            }
+                          />
+                        }
+                        label="Amb microxip"
+                      />
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={formData.vacunado}
+                            onChange={(e) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                vacunado: e.target.checked,
+                              }))
+                            }
+                          />
+                        }
+                        label="Vacunat"
+                      />
                     </FormGroup>
                   </Grid>
                   <Grid size={{ xs: 12 }}>
@@ -442,22 +538,13 @@ const AddAnimalForm = () => {
                     <TextField
                       fullWidth
                       multiline
-                      rows={4}
+                      rows={8}
                       name="descripcion"
                       label="Descripció"
                       placeholder="Escriu una descripció o genera-la automàticament amb IA"
                       value={formData.descripcion}
                       onChange={handleInputChange}
                       helperText="Pots generar una descripció automàtica amb IA o escriure-la tu mateix/a"
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12 }}>
-                    <TextField
-                      fullWidth
-                      name="ubicacion"
-                      label="Ubicació"
-                      value={formData.ubicacion}
-                      onChange={handleInputChange}
                     />
                   </Grid>
                 </Grid>

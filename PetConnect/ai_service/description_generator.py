@@ -35,9 +35,9 @@ class DescriptionGenerator:
         edad = mascota_data.get('edad', 0)
         genero = mascota_data.get('genero', '')
         tamaño = mascota_data.get('tamaño', '')
-        caracter = mascota_data.get('caracter', 'cariñoso')
-        convivencia_ninos = mascota_data.get('convivencia_ninos', False)
-        convivencia_animales = mascota_data.get('convivencia_animales', 'no')
+        caracter = mascota_data.get('caracter', '')
+        convivencia_ninos = mascota_data.get('convivencia_ninos')
+        convivencia_animales = mascota_data.get('convivencia_animales', '')
         necesidades = mascota_data.get('descripcion_necesidades', '')
         
         # Determinar la raza según la especie
@@ -81,30 +81,34 @@ class DescriptionGenerator:
             edad_desc = f"Con {edad} años de experiencia en dar amor"
         
         # Descripción según el carácter
-        caracter_desc = {
-            'cariñoso': 'Le encanta estar cerca de sus humanos y dar mimos constantemente',
-            'jugueton': 'Adora jugar y divertirse, perfecto para familias activas',
-            'tranquilo': 'Es de naturaleza calmada, ideal para un hogar relajado',
-            'activo': 'Necesita mucha actividad física y mental para ser feliz',
-            'sociable': 'Le encanta conocer gente nueva y hacer amigos',
-            'independiente': 'Valora su espacio personal pero también sabe dar cariño',
-            'protector': 'Cuida de su familia con devoción',
-            'timido': 'Necesita un poco de paciencia para ganar su confianza',
-            'obediente': 'Es muy receptivo al entrenamiento y aprendizaje'
-        }.get(caracter.lower(), 'Tiene un carácter único y especial')
+        if caracter:
+            caracter_desc = {
+                'cariñoso': 'Le encanta estar cerca de sus humanos y dar mimos constantemente',
+                'jugueton': 'Adora jugar y divertirse, perfecto para familias activas',
+                'tranquilo': 'Es de naturaleza calmada, ideal para un hogar relajado',
+                'activo': 'Necesita mucha actividad física y mental para ser feliz',
+                'sociable': 'Le encanta conocer gente nueva y hacer amigos',
+                'independiente': 'Valora su espacio personal pero también sabe dar cariño',
+                'protector': 'Cuida de su familia con devoción',
+                'timido': 'Necesita un poco de paciencia para ganar su confianza',
+                'obediente': 'Es muy receptivo al entrenamiento y aprendizaje'
+            }.get(caracter.lower(), 'Tiene un carácter único y especial')
+        else:
+            caracter_desc = ""
         
         # Información sobre convivencia
         convivencia_desc = ""
-        if convivencia_ninos:
-            convivencia_desc = f"{pronombre.capitalize()} puede convivir perfectamente con niños. "
-        else:
-            convivencia_desc = f"Es mejor para hogares sin niños pequeños. "
+        if convivencia_ninos is not None:
+            if convivencia_ninos:
+                convivencia_desc = f"{pronombre.capitalize()} puede convivir perfectamente con niños. "
+            else:
+                convivencia_desc = f"Es mejor para hogares sin niños pequeños. "
         
         if convivencia_animales == 'cualquier_especie':
             convivencia_desc += f"Además, se lleva bien con otros animales."
         elif convivencia_animales == 'misma_especie':
             convivencia_desc += f"Puede convivir con otros {especie.lower()}s."
-        else:
+        elif convivencia_animales == 'no':
             convivencia_desc += f"Prefiere ser el único animal en casa."
         
         # Necesidades especiales si las hay
@@ -119,7 +123,20 @@ class DescriptionGenerator:
             cierre = f"\n\n¡{nombre} está esperando encontrar su hogar definitivo! ¿Serás tú quien le abra las puertas a una nueva vida? 🐾"
         
         # Ensamblar la biografía completa
-        biografia = f"{intro}! {edad_desc}. {caracter_desc}. {convivencia_desc}{necesidades_desc}{cierre}"
+        partes = [intro + "!", edad_desc + "."]
+        
+        if caracter_desc:
+            partes.append(caracter_desc + ".")
+            
+        if convivencia_desc:
+            partes.append(convivencia_desc)
+            
+        if necesidades_desc:
+            partes.append(necesidades_desc)
+            
+        partes.append(cierre)
+        
+        biografia = " ".join(partes)
         
         return biografia
     

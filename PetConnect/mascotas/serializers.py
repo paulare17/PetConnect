@@ -28,6 +28,7 @@ class MascotaSerializer(serializers.ModelSerializer):
             'protectora',
             'protectora_nombre',
             'protectora_ciudad',
+            'ubicacion',  # Se asigna automáticamente desde la protectora
             'especie_display',
             'genero_display',
             'raza_perro_display',
@@ -70,6 +71,9 @@ class MascotaSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if request and hasattr(request, 'user'):
             validated_data['protectora'] = request.user
+            # Heredar la ubicación de la protectora
+            if hasattr(request.user, 'city') and request.user.city:
+                validated_data['ubicacion'] = request.user.city
         
         # Generar descripción con IA si no se proporciona
         if not validated_data.get('descripcion'):

@@ -96,6 +96,10 @@ class Mascota(models.Model):
     # Biografía generada por IA
     descripcion = models.TextField(blank=True, null=True, verbose_name="Biografía de la mascota", 
                                    help_text="Descripción generada automáticamente o personalizada")
+    
+    # Ubicación (heredada de la protectora)
+    ubicacion = models.CharField(max_length=100, default="Barcelona", verbose_name="Ubicación", 
+                                 help_text="Ciudad/ubicación heredada de la protectora")
 
     #estado del perfil
     adoptado = models.BooleanField(default=False)
