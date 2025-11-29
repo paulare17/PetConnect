@@ -28,6 +28,8 @@ const AddAnimalForm = () => {
   const initialFormData = {
     nombre: "",
     especie: "gato",
+    raza_perro: "mestizo",
+    raza_gato: "mestizo",
     genero: "hembra",
     edad: 0,
     tamaño: "mediano",
@@ -37,7 +39,7 @@ const AddAnimalForm = () => {
     necesidades_especiales: false,
     descripcion_necesidades: "",
     convivencia_animales: "no",
-    convivencia_ninos: "no",
+    convivencia_ninos: false,
     caracter: [],
     descripcion: "",
     ubicacion: "Ciudad",
@@ -67,6 +69,8 @@ const AddAnimalForm = () => {
 
   const handleGenerateDescription = async () => {
     setGeneratingDescription(true);
+    setStatus(null);
+    
     try {
       // Preparar los datos para enviar a la IA
       const dataForIA = {
@@ -78,12 +82,14 @@ const AddAnimalForm = () => {
         genero: formData.genero,
         tamaño: formData.tamaño,
         caracter: formData.caracter.length > 0 ? formData.caracter[0] : 'cariñoso',
-        convivencia_ninos: formData.convivencia_ninos === 'si',
+        convivencia_ninos: formData.convivencia_ninos,
         convivencia_animales: formData.convivencia_animales,
         descripcion_necesidades: formData.descripcion_necesidades
       };
 
-      const res = await api.post("/mascotas/generate-description/", dataForIA);
+      console.log('📤 Enviando datos a IA:', dataForIA);
+      const res = await api.post("/generate-description/", dataForIA);
+      console.log('📥 Respuesta de IA:', res.data);
       
       if (res.data.success && res.data.descripcion) {
         setFormData(prev => ({
@@ -92,12 +98,18 @@ const AddAnimalForm = () => {
         }));
         setStatus({ type: "success", message: "¡Descripción generada con IA! 🤖" });
         setTimeout(() => setStatus(null), 3000);
+      } else {
+        throw new Error('No se recibió descripción del servidor');
       }
     } catch (err) {
-      console.error("Error generant descripció amb IA:", err);
+      console.error("❌ Error generant descripció amb IA:", err);
+      console.error("Error details:", err.response?.data || err.message);
+      
+      const errorMsg = err.response?.data?.error || err.response?.data?.detail || err.message || "Error desconocido";
+      
       setStatus({
         type: "error",
-        message: "Error al generar la descripción con IA. Puedes escribirla manualmente."
+        message: `Error: ${errorMsg}. Puedes escribir la descripción manualmente.`
       });
     } finally {
       setGeneratingDescription(false);
@@ -116,8 +128,11 @@ const AddAnimalForm = () => {
       // Afegir tots els camps del formulari
       Object.keys(formData).forEach(key => {
         if (key === 'caracter') {
-          // Caracter és un array, enviar-lo com a string amb comes
-          formDataToSend.append(key, formData[key].join(','));
+          // Caracter: el modelo espera un solo valor, usar el primero si hay múltiples
+          const caracterValue = Array.isArray(formData[key]) && formData[key].length > 0 
+            ? formData[key][0] 
+            : (formData[key] || 'cariñoso');
+          formDataToSend.append(key, caracterValue);
         } else if (key === 'foto' && formData[key]) {
           // Si hi ha foto (File object)
           formDataToSend.append(key, formData[key]);
@@ -361,10 +376,13 @@ const AddAnimalForm = () => {
                       <Select
                         name="convivencia_ninos"
                         value={formData.convivencia_ninos}
-                        onChange={handleInputChange}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          convivencia_ninos: e.target.value === 'true' || e.target.value === true
+                        }))}
                       >
-                        <MenuItem value="si">Sí</MenuItem>
-                        <MenuItem value="no">No</MenuItem>
+                        <MenuItem value={true}>Sí</MenuItem>
+                        <MenuItem value={false}>No</MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
