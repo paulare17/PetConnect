@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Mascota
+from ai_service.description_generator import DescriptionGenerator
 
 
 
@@ -27,6 +28,7 @@ class MascotaSerializer(serializers.ModelSerializer):
             'protectora',
             'protectora_nombre',
             'protectora_ciudad',
+            'ubicacion',  # Se asigna automáticamente desde la protectora
             'especie_display',
             'genero_display',
             'raza_perro_display',
@@ -69,6 +71,19 @@ class MascotaSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if request and hasattr(request, 'user'):
             validated_data['protectora'] = request.user
+            # Heredar la ubicación de la protectora
+            if hasattr(request.user, 'city') and request.user.city:
+                validated_data['ubicacion'] = request.user.city
+        
+        # Generar descripción con IA si no se proporciona
+        if not validated_data.get('descripcion'):
+            try:
+                generator = DescriptionGenerator()
+                validated_data['descripcion'] = generator.generate_description(validated_data)
+            except Exception as e:
+                print(f"⚠️ Error generando descripción con IA: {e}")
+                # Continuar sin descripción, no bloquear la creación
+        
         return super().create(validated_data)
 
     def update(self, instance, validated_data):

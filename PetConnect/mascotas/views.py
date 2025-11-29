@@ -366,3 +366,54 @@ class MascotaViewSet(viewsets.ModelViewSet):
         mascota.save()
         return Response(self.get_serializer(mascota).data, status=status.HTTP_200_OK)
 
+
+# ======================================================================
+# Vista para generar/regenerar descripción con IA
+# ======================================================================
+from ai_service.description_generator import DescriptionGenerator
+from rest_framework.decorators import permission_classes
+from rest_framework.permissions import AllowAny
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def generate_description(request):
+    """
+    Endpoint para generar una descripción de mascota usando IA.
+    POST /api/mascotas/generate-description/
+    
+    Body (JSON):
+    {
+        "nombre": "Luna",
+        "especie": "gato",
+        "raza_gato": "Siamés",
+        "edad": 2,
+        "genero": "hembra",
+        "tamaño": "mediano",
+        "caracter": "jugueton",
+        "convivencia_ninos": true,
+        "convivencia_animales": "cualquier_especie",
+        "descripcion_necesidades": ""
+    }
+    
+    Response:
+    {
+        "descripcion": "¡Conoce a Luna, una preciosa gato Siamés!..."
+    }
+    """
+    try:
+        print("📥 Datos recibidos en generate_description:", request.data)
+        generator = DescriptionGenerator()
+        descripcion = generator.generate_description(request.data)
+        print("✅ Descripción generada:", descripcion[:100] + "...")
+        return Response({
+            "descripcion": descripcion,
+            "success": True
+        }, status=status.HTTP_200_OK)
+    except Exception as e:
+        print("❌ Error en generate_description:", str(e))
+        import traceback
+        traceback.print_exc()
+        return Response({
+            "error": str(e),
+            "success": False
+        }, status=status.HTTP_400_BAD_REQUEST)
