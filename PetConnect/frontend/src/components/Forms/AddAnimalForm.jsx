@@ -45,6 +45,7 @@ const AddAnimalForm = () => {
 
   const [formData, setFormData] = useState(initialFormData);
   const [submitting, setSubmitting] = useState(false);
+  const [generatingDescription, setGeneratingDescription] = useState(false);
   const [status, setStatus] = useState(null); // {type: 'success'|'error', message: ''}
 
   const handleInputChange = (e) => {
@@ -62,6 +63,45 @@ const AddAnimalForm = () => {
         ? prev[name].filter((item) => item !== value)
         : [...prev[name], value],
     }));
+  };
+
+  const handleGenerateDescription = async () => {
+    setGeneratingDescription(true);
+    try {
+      // Preparar los datos para enviar a la IA
+      const dataForIA = {
+        nombre: formData.nombre || "Mascota",
+        especie: formData.especie,
+        raza_perro: formData.especie === 'perro' ? formData.raza_perro : undefined,
+        raza_gato: formData.especie === 'gato' ? formData.raza_gato : undefined,
+        edad: formData.edad,
+        genero: formData.genero,
+        tamaño: formData.tamaño,
+        caracter: formData.caracter.length > 0 ? formData.caracter[0] : 'cariñoso',
+        convivencia_ninos: formData.convivencia_ninos === 'si',
+        convivencia_animales: formData.convivencia_animales,
+        descripcion_necesidades: formData.descripcion_necesidades
+      };
+
+      const res = await api.post("/mascotas/generate-description/", dataForIA);
+      
+      if (res.data.success && res.data.descripcion) {
+        setFormData(prev => ({
+          ...prev,
+          descripcion: res.data.descripcion
+        }));
+        setStatus({ type: "success", message: "¡Descripción generada con IA! 🤖" });
+        setTimeout(() => setStatus(null), 3000);
+      }
+    } catch (err) {
+      console.error("Error generant descripció amb IA:", err);
+      setStatus({
+        type: "error",
+        message: "Error al generar la descripción con IA. Puedes escribirla manualmente."
+      });
+    } finally {
+      setGeneratingDescription(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -362,14 +402,35 @@ const AddAnimalForm = () => {
                     </FormGroup>
                   </Grid>
                   <Grid size={{ xs: 12 }}>
+                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 1 }}>
+                      <Typography variant="body2">
+                        Descripció de la mascota
+                      </Typography>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={handleGenerateDescription}
+                        disabled={generatingDescription || !formData.nombre}
+                        startIcon={generatingDescription ? <CircularProgress size={16} /> : null}
+                        sx={{ 
+                          textTransform: 'none',
+                          borderRadius: 2,
+                          fontSize: '0.75rem'
+                        }}
+                      >
+                        {generatingDescription ? 'Generant amb IA...' : '✨ Generar amb IA'}
+                      </Button>
+                    </Box>
                     <TextField
                       fullWidth
                       multiline
                       rows={4}
                       name="descripcion"
                       label="Descripció"
+                      placeholder="Escriu una descripció o genera-la automàticament amb IA"
                       value={formData.descripcion}
                       onChange={handleInputChange}
+                      helperText="Pots generar una descripció automàtica amb IA o escriure-la tu mateix/a"
                     />
                   </Grid>
                   <Grid size={{ xs: 12 }}>

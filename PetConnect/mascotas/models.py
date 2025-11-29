@@ -92,6 +92,10 @@ class Mascota(models.Model):
     # Necesidades especiales
     necesidades_especiales = models.BooleanField(default=False, verbose_name="¿Tiene necesidades especiales?")
     descripcion_necesidades = models.TextField(blank=True, null=True, verbose_name="Descripción de necesidades especiales")
+    
+    # Biografía generada por IA
+    descripcion = models.TextField(blank=True, null=True, verbose_name="Biografía de la mascota", 
+                                   help_text="Descripción generada automáticamente o personalizada")
 
     #estado del perfil
     adoptado = models.BooleanField(default=False)

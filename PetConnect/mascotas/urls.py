@@ -36,5 +36,8 @@ urlpatterns = [
     path('tinderpet/next/', views.get_next_card, name='api_tinderpet_next'),
     path('tinderpet/action/', views.swipe_action, name='api_tinderpet_action'),
     
+    # Endpoint para generar descripción con IA
+    path('generate-description/', views.generate_description, name='generate_description'),
+    
     # path('upload/', views.subir_mascota, name='api_subir_mascota'),  # Comentado porque la función no existe
 ]
