@@ -26,7 +26,7 @@ import MaleIcon from '@mui/icons-material/Male';
 import FemaleIcon from '@mui/icons-material/Female';
 import { colors } from '../../constants/colors';
 import api from '../../api/client';
-import CardAnimal from '../home/CardAnimal';
+import CardPet from '../home/CardPet';
 import Pagination from '@mui/material/Pagination';
 
 // Opcions de filtre segons el model Mascota
@@ -295,7 +295,7 @@ function IniciUsuari() {
               >
                 {animales.map((animal) => (
                   <Box key={animal.id} sx={{ display: 'flex', justifyContent: 'center' }}>
-                    <CardAnimal
+                    <CardPet
                       animal={animal}
                       isFavorito={favoritos.includes(animal.id)}
                       onToggleFavorito={() => toggleFavorito(animal.id)}

@@ -38,7 +38,7 @@ const ExpandMore = styled((props) => {
 // El component ara rep també la info de la protectora via props (simulant la futura connexió amb Django REST Framework)
 // protectora = { nombre: string, foto: string }
 
-export default function CardAnimal({ animal, isFavorito, onToggleFavorito, sx }) {
+export default function CardPet({ animal, isFavorito, onToggleFavorito, sx }) {
   // Exemple per defecte si no hi ha animal
   
   const data = animal || null;

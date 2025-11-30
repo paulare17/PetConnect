@@ -38,8 +38,7 @@ class Mascota(models.Model):
         ('mediano', 'Mediano (10-25kg)'),
         ('grande', 'Grande (25-45kg)'),
         ('gigante', 'Gigante (+45kg)'),
-    ]
-    
+    ]    
     # Carácter (ejemplos, ampliar)
     CARACTER = [
         ('cariñoso', 'Cariñoso'),

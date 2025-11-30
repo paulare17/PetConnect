@@ -12,6 +12,7 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import PetsIcon from "@mui/icons-material/Pets";
+import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import {colors} from '../../constants/colors.jsx'
 import { ROLES } from '../../constants/roles.jsx';
 import { useNavigate } from "react-router-dom";
@@ -98,15 +99,14 @@ function ResponsiveAppBar() {
         <Toolbar
           disableGutters
           sx={{
-            minHeight: { xs: 80, md: 90 }, // Consistent amb AppBar
+            minHeight: { xs: 80, md: 90 },
             alignItems: "center",
-            justifyContent: "space-between",
             display: "flex",
-            px: { xs: 2, md: 4 }, // Simplificat: només 2 breakpoints
+            px: { xs: 2, md: 4 },
           }}
         >
            {/* Secció esquerra: Logo + Títol */}
-            <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Box sx={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
 
           <PetsIcon
            onClick={()=> navigate('/')}
@@ -116,7 +116,7 @@ function ResponsiveAppBar() {
               mb: 1,
               display: { xs: "none", md: "flex" },
               color: colors.yellow,
-              fontSize: { xs: "2rem", md: "2.5rem" }, // Mides més grans i simples
+              fontSize: { xs: "2rem", md: "2.5rem" },
               cursor: "pointer",
              "&:hover": {
               transform: "scale(1.1) rotate(10deg)",
@@ -133,13 +133,12 @@ function ResponsiveAppBar() {
             component="a"
             
             sx={{
-              mr: 2,
               display: { xs: "none", md: "flex" },
               fontFamily: "Rubik Bubbles",
               fontWeight: 700,
               color: colors.yellow,
               textDecoration: "none",
-              fontSize: { xs: "1.8rem", md: "2.5rem" }, // Mides més grans i simples
+              fontSize: { xs: "1.8rem", md: "2.5rem" },
               "&:hover": {
                 cursor: "pointer",
               },
@@ -243,14 +242,15 @@ function ResponsiveAppBar() {
           </Typography>
 
             </Box>
- {/*  pages (s'han de modificar) */}
+ {/*  pages - centrades */}
 
           <Box
             sx={{
               flexGrow: 1,
               display: { xs: "none", md: "flex" },
               alignItems: "center",
-              justifyContent: "space-align", 
+              justifyContent: "center",
+              gap: 1
             }}
           >
             {pages.map((page) => (
@@ -258,12 +258,10 @@ function ResponsiveAppBar() {
                 key={page}
                 onClick={() => handlePageAction(page)}
                 sx={{
-                  my: 2,
-                  mx:1,
-                 color: colors.purple,
-                  display: "flex",
-                  alignItems: "center",
+                  color: colors.purple,
                   fontSize: { xs: "1.2rem", md: "1.5rem" }, 
+                  px: 2,
+                  py: 1,
                   "&:hover": {
                     color: colors.darkBlue,
                   },
@@ -273,41 +271,70 @@ function ResponsiveAppBar() {
               </Button>
             ))}
           </Box>
-           {/* Secció dreta: Botó registre + Avatar */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+           {/* Secció dreta: Icona xats + Avatar */}
+          <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 2, md: 2.5 }, flexShrink: 0 }}>
+            {user && (
+              <>
+                <Tooltip title="Els meus xats">
+                  <Button
+                    onClick={() => navigate('/chats')}
+                    sx={{
+                      borderRadius: 5,
+                      bgcolor: colors.yellow,
+                      width: { xs: 42, md: 48 },
+                      height: { xs: 42, md: 48 },
+                      '&:hover': {
+                        bgcolor: colors.lightColor,
+                        transform: 'scale(1.08)',
+                        transition: 'all 0.3s ease'
+                      }
+                    }}
+                  >
+                    <ChatBubbleOutlineIcon sx={{ fontSize: { xs: '1.3rem', md: '1.5rem' }, color: colors.darkBlue }} />
+                  </Button>
+                </Tooltip>
+
+                <Tooltip title="Perfil">
+                  <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                    <Avatar 
+                      sx={{ 
+                        bgcolor: user?.role === ROLES.PROTECTORA ? colors.blue : colors.orange,
+                        width: { xs: 42, md: 48 },
+                        height: { xs: 42, md: 48 },
+                        border: `2px solid ${colors.yellow}`,
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                          transform: 'scale(1.08)',
+                          boxShadow: 3
+                        }
+                      }}
+                    >
+                      <PetsIcon sx={{ color: 'white', fontSize: { xs: '1.3rem', md: '1.5rem' } }} />
+                    </Avatar>
+                  </IconButton>
+                </Tooltip>
+
+                <Menu
+                  sx={{ mt: "45px" }}
+                  id="menu-appbar"
+                  anchorEl={anchorElUser}
+                  anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                  open={Boolean(anchorElUser)}
+                  onClose={handleCloseUserMenu}
+                >
+                  {renderUserMenuItems()}
+                </Menu>
+              </>
+            )}
           </Box>
-
-          {user && (
-
-            <Box sx={{ flexGrow: 0 }}>
-
-            {/* això quan tinguem el django fem q només es vegi si has entrat */}
-                {/* Menu del avatar */}
-            <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-              </IconButton>
-            </Tooltip>
-            <Menu
-              sx={{ mt: "45px" }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
-              >
-              {renderUserMenuItems()}
-            </Menu>
-          </Box>
-      )}
         </Toolbar>
       </Container>
     </AppBar>

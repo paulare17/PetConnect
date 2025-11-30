@@ -19,7 +19,7 @@ import {
   Alert,
   CircularProgress,
 } from "@mui/material";
-import CardAnimal from "../home/CardAnimal.jsx";
+import CardPet from "../home/CardPet.jsx";
 import { colors } from "../../constants/colors.jsx";
 import api from "../../api/client";
 
@@ -579,7 +579,7 @@ const AddAnimalForm = () => {
             </CardContent>
           </Card>
         </Grid>
-        {/* dreta: CardAnimal sticky */}
+        {/* dreta: CardPet sticky */}
         <Grid
           size={{ xs: 12, md: 5 }}
           sx={{
@@ -615,7 +615,7 @@ const AddAnimalForm = () => {
                 <Typography variant="h5" sx={{ mb: 2 , maxHeight: "550px",}}>
                   Com queda el teu anunci:
                 </Typography>
-                <CardAnimal animal={{
+                <CardPet animal={{
                   ...formData,
                   foto: previewUrl || (typeof formData.foto === "string" ? formData.foto : "")
                 }} isFavorito={false} onToggleFavorito={() => {}} />

@@ -23,6 +23,8 @@ import PetTinder from "./components/home/PetTinder.jsx";
 import IniciUsuari from "./components/Inici/IniciUsuari";
 import IniciProtectora from "./components/Inici/IniciProtectora";
 import ProfileMascota from "./components/pages/ProfileMascota.jsx";
+import ChatRoom from "./components/Chat/Chat.jsx";
+import ChatList from "./components/Chat/ChatList.jsx";
 
 function App() {
   // const location = useLocation();
@@ -96,6 +98,18 @@ function App() {
               <UsuarioRoute>
                 <PetTinder />
               </UsuarioRoute>
+            } />
+
+            {/* Rutes protegides - Chat */}
+            <Route path="/chats" element={
+              <ProtectedRoute>
+                <ChatList />
+              </ProtectedRoute>
+            } />
+            <Route path="/chat/:chatId" element={
+              <ProtectedRoute>
+                <ChatRoom />
+              </ProtectedRoute>
             } />
 
             {/* Ruta protegida - Perfil d'una mascota per id */}

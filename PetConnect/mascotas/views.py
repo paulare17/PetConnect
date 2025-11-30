@@ -12,6 +12,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 
 from .models import Mascota, Interaccion
+from chat.models import Chat
 from .serializers import MascotaSerializer
 from .permissions import MascotaPermissions
 from rest_framework.permissions import IsAuthenticated
@@ -80,7 +81,13 @@ def swipe_action(request):
         )
         
         is_like = (action_str == 'like')
-        
+        if is_like:
+            # Comprova si ja existeix el xat, si no el crea
+            chat, chat_created = Chat.objects.get_or_create(
+                mascota=mascota,
+                adoptante=user,
+                defaults={'protectora': mascota.protectora, 'activo': True}
+            )
         return Response(
             {'status': 'ok', 'is_like': is_like, 'message': 'Interacció registrada amb èxit.'}, 
             status=status.HTTP_201_CREATED if created else status.HTTP_200_OK
@@ -167,6 +174,20 @@ class MascotaViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         # Solo protectoras/autenticados pueden crear; el permiso se controla en get_permissions
         serializer.save(protectora=self.request.user)
+
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def mis_mascotas(self, request):
+        """Retorna les mascotes creades per la protectora autenticada.
+
+        Endpoint: GET /api/mascota/mis_mascotas/
+        """
+        user = request.user
+        role = getattr(user, 'role', None)
+        if role != 'protectora':
+            return Response({'detail': 'Només les protectores poden veure les seves mascotes.'}, status=status.HTTP_403_FORBIDDEN)
+        qs = Mascota.objects.filter(protectora=user).order_by('-fecha_creacion')
+        serializer = self.get_serializer(qs, many=True, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def ocultar(self, request, pk=None):

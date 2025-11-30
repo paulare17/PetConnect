@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography, Grid, Card, CardContent, Button, Avatar, CircularProgress, Alert } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import NotificationsIcon from "@mui/icons-material/Notifications";
 import PetsIcon from "@mui/icons-material/Pets";
 import { colors } from "../../constants/colors.jsx";
 import api from "../../api/client.js";
+import ChatMiniList from "../Chat/ChatMiniList.jsx";
+import Chat from "../Chat/Chat.jsx";
 import nikaImg from "../../assets/nika.png";
 import blackImg from "../../assets/black.png";
 
@@ -13,6 +14,7 @@ export default function IniciProtectora() {
   const [mascotas, setMascotas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedChatId, setSelectedChatId] = useState(null);
 
   useEffect(() => {
     const fetchMisMascotas = async () => {
@@ -37,10 +39,10 @@ export default function IniciProtectora() {
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: colors.backgroundOrange }}>
-      <Box sx={{ pt: 8, px: { xs: 2, md: 8 }, pb: 8, maxWidth: 1400, mx: 'auto' }}>
+      <Box sx={{ pt: 8, px: { xs: 2, md: 6 }, pb: 8, maxWidth: 1400, mx: 'auto' }}>
         {/* Botó afegir animal a la part superior */}
         
-        <Grid container spacing={{ xs:4, md:6 }} justifyContent="space-around" alignItems="flex-start">
+        <Grid container spacing={{ xs:4, md:6 }} justifyContent="space-around" alignItems="flex-start" wrap="nowrap" sx={{ flexWrap:'nowrap' }}>
           {/* Columna esquerra: Botó + Adopcions (ordre 2 en mòbil) */}
           <Grid item xs={12} md={3} order={{ xs: 2, md: 1 }}>
             {/* Botó dins la graella, a dalt a l'esquerra */}
@@ -55,7 +57,7 @@ export default function IniciProtectora() {
                   fontSize: { xs: 20, md: 25 },
                   px: { xs: 2.5, md: 3.5 },
                   py: 1,
-                  minWidth: 447,
+                  minWidth: 300,
                   minHeight: 80,
                   borderRadius: 3,
                   boxShadow: 2,
@@ -66,11 +68,11 @@ export default function IniciProtectora() {
                 Afegeix els teus animals
               </Button>
             </Box>
-            <Card sx={{ borderRadius: 4, maxWidth: 520, boxShadow: 3, p: 2, bgcolor: colors.lightColor, border: `2px dashed ${colors.orange}`, minHeight:{ md:440 } }}>
-              <CardContent>
-                <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2, textAlign: "center", color: colors.black }}>
-                  Les teves adopcions
-                </Typography>
+            <Card sx={{ borderRadius: 4, maxWidth: 520, maxHeight: 570, boxShadow: 3, p: 2, bgcolor: colors.lightColor, border: `2px dashed ${colors.orange}`, minHeight:{ md:440 }, display:'flex', flexDirection:'column' }}>
+              <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2, textAlign: "center", color: colors.black }}>
+                Les teves adopcions
+              </Typography>
+              <Box sx={{ flexGrow:1, overflowY:'auto', pr:1 }}>
                 {loading ? (
                   <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
                     <CircularProgress sx={{ color: colors.orange }} />
@@ -89,7 +91,8 @@ export default function IniciProtectora() {
                     display: 'grid',
                     gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(2, 1fr)' },
                     gap: { xs: 2, md: 2 },
-                    alignItems: 'start'
+                    alignItems: 'start',
+                    pb:1
                   }}>
                     {mascotas.map((animal) => (
                       <Box
@@ -126,42 +129,49 @@ export default function IniciProtectora() {
                     ))}
                   </Box>
                 )}
-              </CardContent>
+              </Box>
             </Card>
           </Grid>
 
-          {/* Xats actius (només visual) */}
-          <Grid item xs={12} md={9} order={{ xs: 1, md: 2 }} sx={{ display:'flex' }}>
-            <Card sx={{ flexGrow:1, minWidth: '650px', borderRadius:4, boxShadow:3, p:3, bgcolor:colors.lightColor, border:`3px solid ${colors.purple}`, minHeight:{ md:685 }, display:'flex', flexDirection:'column' }}>
-              <CardContent sx={{ flexGrow:1, display:'flex', flexDirection:'column' }}>
-                <Typography variant="h6" sx={{ fontWeight:'bold', mb:3, textAlign:'center', color:colors.black, fontSize:{ xs:18, md:22 } }}>
+          {/* Xats actius (disseny dues columnes) */}
+          <Grid item xs={12} md={9} order={{ xs: 1, md: 2 }} sx={{ display:'flex', minWidth:0 }}>
+            <Card sx={{ flexGrow:1, borderRadius:4, boxShadow:3, p:3, bgcolor:colors.lightColor, border:`3px solid ${colors.purple}`, minHeight:{ md:685 }, display:'flex', flexDirection:'column', minWidth:0 }}>
+              <CardContent sx={{ flexGrow:1, display:'flex', flexDirection:'column', p:0 }}>
+                <Typography variant="h6" sx={{ fontWeight:'bold', mb:2, mt:2, textAlign:'center', color:colors.black, fontSize:{ xs:18, md:22 } }}>
                   Xats actius
                 </Typography>
-                <Box sx={{ display:'flex', flexDirection:'column', gap:{ xs:2, md:2.5 }, flexGrow:1 }}>
-                  {[...Array(5)].map((_, i) => (
-                    <Box
-                      key={i}
-                      sx={{
-                        bgcolor: colors.blue,
-                        borderRadius: 2,
-                        height: { xs: 56, md: 80 },
-                        display: 'flex',
-                        alignItems: 'center',
-                        px: { xs: 2, md: 4 },
-                        boxShadow: 3,
-                        position:'relative',
-                        transition:'all .25s',
-                        '&:hover': { boxShadow:6, transform:'translateY(-3px)' }
-                      }}
-                    >
-                      <Box sx={{ flex:1, bgcolor:colors.lightBlue, height:{ xs:18, md:24 }, borderRadius:1, mx:{ xs:1, md:2 } }} />
-                      {i < 2 && (
-                        <Box sx={{ ml: 2 }}>
-                          <NotificationsIcon sx={{ color:'red', fontSize:{ xs:28, md:34 } }} />
-                        </Box>
-                      )}
+                <Box sx={{ flexGrow:1, display:'flex', gap:2, px:2, pb:2 }}>
+                  {/* Columna llista (amplada fixa) */}
+                  <Box sx={{ width:300, flexShrink:0, display:'flex' }}>
+                    <ChatMiniList 
+                      maxHeight={650}
+                      onSelectChat={(chatId) => setSelectedChatId(chatId)}
+                    />
+                  </Box>
+                  {/* Columna xat */}
+                  <Box sx={{ flexGrow:1, minWidth:320, display:'flex', position:'relative', minHeight:535, }}>
+                    <Box sx={{
+                      position:'absolute',
+                      inset:0,
+                      display: selectedChatId ? 'none' : 'flex',
+                      alignItems:'center',
+                      justifyContent:'center',
+                      border:`2px dashed ${colors.purple}`,
+                      borderRadius:3,
+                      opacity:0.6,
+                      p:3,
+                      transition:'opacity .2s'
+                    }}>
+                      <Typography variant="body1" color="text.secondary" textAlign="center">
+                        Selecciona un xat de la llista per començar a conversar 🐾
+                      </Typography>
                     </Box>
-                  ))}
+                    {selectedChatId && (
+                      <Box sx={{ flexGrow:1, minWidth:0, height:'100%' }}>
+                        <Chat chatId={selectedChatId} onClose={() => setSelectedChatId(null)} embedded />
+                      </Box>
+                    )}
+                  </Box>
                 </Box>
               </CardContent>
             </Card>
