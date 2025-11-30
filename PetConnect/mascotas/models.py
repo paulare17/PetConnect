@@ -128,6 +128,8 @@ class Mascota(models.Model):
         verbose_name = "Mascota"
         verbose_name_plural = "Mascotas"
         ordering = ['-fecha_creacion']
+        
+        
 
 # Clase para registrar las interacciones de swipe (like/dislike)
 

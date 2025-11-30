@@ -163,10 +163,7 @@ from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 
-# Importaciones de modelos y serializadores (Asegúrate de que Mascota, Interaccion, Usuario y MascotaSerializer estén disponibles)
-from .models import Mascota, Interaccion 
-from usuarios.models import Usuario
-from .models import Mascota
+from .models import Mascota, Interaccion
 from .serializers import MascotaSerializer
 from .permissions import MascotaPermissions
 from rest_framework.permissions import IsAuthenticated
@@ -175,15 +172,14 @@ from rest_framework.permissions import IsAuthenticated
 class MascotaPagination(PageNumberPagination):
     page_size = 12
 
-
 # --- VISTAS DEL SWIPE (FUNCIONALIDAD TINDER) ---
 
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
 def get_next_card(request):
     """
-    [GET] /api/feed/next-card/
-    Retorna la siguiente Mascota que el usuario NO ha swipeado.
+    [GET] /api/pettinder/next/
+    Retorna la següent Mascota que l'usuari NO ha swipejat.
     """
     user = request.user
     
@@ -204,8 +200,8 @@ def get_next_card(request):
         return Response(serializer.data, status=status.HTTP_200_OK)
     else:
         return Response(
-            {'status': 'empty', 'message': '¡Has revisado a todas las mascotas disponibles!'}, 
-            status=status.HTTP_204_NO_CONTENT # 204 No Content si no hay datos que devolver
+            {'status': 'empty', 'message': 'Has revisat totes les mascotes disponibles!'}, 
+            status=status.HTTP_200_OK
         )
 
 
@@ -213,70 +209,39 @@ def get_next_card(request):
 @permission_classes([permissions.IsAuthenticated])
 def swipe_action(request):
     """
-    [POST] /api/swipe/action/ o /api/tinderpet/action/
-    Registra la acción (Like 'L' o Dislike 'D') de un usuario sobre una mascota.
-    Si es LIKE, crea automáticamente un chat entre el adoptante y la protectora.
-    Espera JSON: { "mascota_id": 123, "action": "L" } o { "animal_id": 123, "action": "like" }
+    [POST] /api/pettinder/action/
+    Registra l'acció (Like 'L' o Dislike 'D') d'un usuari sobre una mascota.
+    Espera JSON: { "mascota_id": 123, "action": "like" } o { "mascota_id": 123, "action": "dislike" }
     """
     user = request.user
     try:
-        # Compatibilidad: aceptar tanto 'mascota_id' como 'animal_id'
-        mascota_id = request.data.get('mascota_id') or request.data.get('animal_id')
-        action_val = request.data.get('action')
+        mascota_id = request.data.get('animal_id') or request.data.get('mascota_id')
+        action_str = request.data.get('action', '').lower()
         
-        # Normalizar la acción: 'like'/'dislike' (frontend) -> 'L'/'D' (backend)
-        if action_val:
-            action_val = action_val.upper()
-            if action_val == 'LIKE':
-                action_val = 'L'
-            elif action_val == 'DISLIKE':
-                action_val = 'D'
-        
-        if not mascota_id:
-            return Response({'detail': 'Se requiere mascota_id o animal_id.'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        if action_val not in [Interaccion.LIKE, Interaccion.DISLIKE]:
-            return Response({'detail': 'Acción no válida. Use "L"/"like" o "D"/"dislike".'}, status=status.HTTP_400_BAD_REQUEST)
+      # Validar acción
+        if action_str not in ['like', 'dislike']:
+            return Response({'detail': 'Acció no vàlida. Utilitzi "like" o "dislike".'}, status=status.HTTP_400_BAD_REQUEST)
 
         mascota = get_object_or_404(Mascota, id=mascota_id)
 
-        # Registra o actualiza la interacción (maneja la restricción de unicidad)
+        # Registra o actualitza la interacció (gestiona la restricció d'unicitat)
         interaccion, created = Interaccion.objects.update_or_create(
             usuario=user,
             mascota=mascota,
-            defaults={'accion': action_val}
+            defaults={'accion': action_str}
         )
         
-        is_like = (action_val == Interaccion.LIKE)
-        chat_id = None
-        
-        # Si es LIKE, crear o recuperar el chat automáticamente
-        if is_like:
-            from chat.models import Chat
-            chat, chat_created = Chat.objects.get_or_create(
-                mascota=mascota,
-                adoptante=user,
-                defaults={'protectora': mascota.protectora, 'activo': True}
-            )
-            chat_id = chat.id
+        is_like = (action_str == 'like')
         
         return Response(
-            {
-                'status': 'ok', 
-                'is_like': is_like, 
-                'chat_id': chat_id,
-                'message': 'Interacción registrada con éxito.' + (' Chat creado.' if is_like and chat_created else '')
-            }, 
+            {'status': 'ok', 'is_like': is_like, 'message': 'Interacció registrada amb èxit.'}, 
             status=status.HTTP_201_CREATED if created else status.HTTP_200_OK
         )
 
     except Mascota.DoesNotExist:
-        return Response({'detail': 'Mascota no encontrada.'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'detail': 'Mascota no trobada.'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
-        return Response({'detail': f'Error interno: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-# --- VIEWS ET MODELVIEWSET ---
+        return Response({'detail': f'Error intern: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class MascotaViewSet(viewsets.ModelViewSet):
     """ViewSet para Mascota con solo `list` y `create`.
