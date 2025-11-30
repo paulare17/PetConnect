@@ -39,28 +39,26 @@ export default function ViewLogin() {
     e.preventDefault();
     setError('');
     setLoading(true);
-    
+
+    // Validació bàsica
+    if (!formData.username || !formData.password) {
+      setError('Tots els camps són obligatoris');
+      setLoading(false);
+      return;
+    }
+
     try {
-      console.log('Dades d\'accés:', { username: formData.username, password: formData.password });
-      const loginResult = await login({ 
-        username: formData.username, 
-        password: formData.password 
-      });
-      
+      console.log('Dades d\'accés:', formData);
+      const loginResult = await login(formData);
       // Redirigir segons el rol
-      if (loginResult?.user?.role === 'usuario') {
+      if (loginResult.user?.role === 'usuario') {
         navigate('/inici-usuari-galeria');
-      } else if (loginResult?.user?.role === 'protectora') {
+      } if (loginResult.user?.role === 'protectora') {
         navigate('/inici-protectora');
-      } else {
-        navigate('/');
       }
-    } catch (err) {
-      console.log('Error backend detall:', err.response?.data);
-      const errorMsg = err.response?.data?.detail || 
-                       err.response?.data?.error || 
-                       'Error en l\'autenticació. Comprova les teves credencials.';
-      setError(errorMsg);
+    } catch (error) {
+      console.error('Error en el login:', error);
+      setError('Error en l\'autenticació. Comprova les teves credencials.');
     } finally {
       setLoading(false);
     }

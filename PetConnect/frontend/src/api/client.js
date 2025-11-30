@@ -57,30 +57,7 @@ api.interceptors.response.use(
 // ============================================
 
 // Autenticació
-export const login = async (credentials) => {
-  // Validació client: ha d’enviar username i password com JSON
-  if (!credentials?.username || !credentials?.password) {
-    return Promise.reject({
-      response: { status: 400, data: { detail: 'Cal username i password' } }
-    });
-  }
-  try {
-    const res = await api.post('/usuarios/login/', {
-      username: credentials.username,
-      password: credentials.password,
-    });
-    // Desa tokens i usuari
-    const { access, refresh, user } = res.data || {};
-    if (access) localStorage.setItem('access', access);
-    if (refresh) localStorage.setItem('refresh', refresh);
-    if (user) localStorage.setItem('user', JSON.stringify(user));
-    return res;
-  } catch (err) {
-    // Log detallat per veure el missatge del backend (clau per al 400)
-    console.error('Login error payload:', err?.response?.data);
-    throw err;
-  }
-};
+export const login = (credentials) => api.post('/usuarios/login/', credentials);
 export const register = (userData) => api.post('/usuarios/', userData);
 
 // Usuari actual

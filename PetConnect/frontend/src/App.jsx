@@ -19,7 +19,6 @@ import Footer from "./components/Footer/Footer";
 import FooterLandpage from "./components/Footer/FooterLandpage.jsx";
 import ProtectedRoute, { ProtectoraRoute, UsuarioRoute } from "./components/ProtectedRoute";
 import PetList from "./components/home/PetList.jsx";
-import PetTinder from "./components/home/PetTinder.jsx";
 import IniciUsuari from "./components/Inici/IniciUsuari";
 import IniciProtectora from "./components/Inici/IniciProtectora";
 import ProfileMascota from "./components/pages/ProfileMascota.jsx";
@@ -90,11 +89,6 @@ function App() {
             <Route path="/inici-usuari-galeria" element={
               <UsuarioRoute>
                 <IniciUsuari />
-              </UsuarioRoute>
-            } />
-            <Route path="/pettinder" element={
-              <UsuarioRoute>
-                <PetTinder />
               </UsuarioRoute>
             } />
 
