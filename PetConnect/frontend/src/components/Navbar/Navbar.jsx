@@ -20,10 +20,12 @@ import { ROLES } from "../../constants/roles.jsx";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../../context/AuthProvider";
 import { Divider } from "@mui/material";
+import "flag-icons/css/flag-icons.min.css";
 
 function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [anchorElLanguage, setAnchorElLanguage] = React.useState(null);
   const navigate = useNavigate();
   const { user, logout } = useAuthContext();
 
@@ -40,6 +42,20 @@ function ResponsiveAppBar() {
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
+  };
+
+  const handleOpenLanguageMenu = (event) => {
+    setAnchorElLanguage(event.currentTarget);
+  };
+
+  const handleCloseLanguageMenu = () => {
+    setAnchorElLanguage(null);
+  };
+
+  const handleLanguageChange = (language) => {
+    handleCloseLanguageMenu();
+    // Aquí va la funcionalidad de cambio de idioma
+    console.log('Cambiar a:', language);
   };
 
   const handleUserMenuAction = (setting) => {
@@ -406,12 +422,13 @@ function ResponsiveAppBar() {
               console.log('Toggle dark mode');
             }}
             sx={{
-              color: colors.darkBlue,
-              bgcolor: 'rgba(255, 255, 255, 0.15)',
+              color: colors.yellow,
+              bgcolor: colors.darkBlue,
               width: 40,
               height: 40,
               '&:hover': {
-                bgcolor: 'rgba(255, 255, 255, 0.25)',
+                bgcolor: colors.textDark,
+                color: colors.purple,
                 transform: 'scale(1.05)',
               },
               transition: 'all 0.3s ease',
@@ -424,17 +441,14 @@ function ResponsiveAppBar() {
         {/* Botó Traducció */}
         <Tooltip title="Canviar idioma">
           <IconButton
-            onClick={() => {
-              // handleLanguageChange();
-              console.log('Change language');
-            }}
+            onClick={handleOpenLanguageMenu}
             sx={{
-              color: colors.darkBlue,
-              bgcolor: 'rgba(255, 255, 255, 0.15)',
+              color: colors.yellow,
+              bgcolor: colors.darkBlue,
               width: 40,
               height: 40,
               '&:hover': {
-                bgcolor: 'rgba(255, 255, 255, 0.25)',
+                bgcolor: colors.textDark,
                 transform: 'scale(1.05)',
               },
               transition: 'all 0.3s ease',
@@ -443,6 +457,87 @@ function ResponsiveAppBar() {
             <TranslateIcon sx={{ fontSize: '1.3rem' }} />
           </IconButton>
         </Tooltip>
+
+        {/* Menú de idiomas */}
+        <Menu
+          anchorEl={anchorElLanguage}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+          }}
+          keepMounted
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+          open={Boolean(anchorElLanguage)}
+          onClose={handleCloseLanguageMenu}
+          PaperProps={{
+            sx: {
+              minWidth: 80,
+              borderRadius: 2,
+              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+            },
+          }}
+        >
+          <MenuItem
+            onClick={() => handleLanguageChange('ca')}
+            sx={{
+              py: 1,
+              px: 2,
+              fontSize: '0.85rem',
+              textAlign: 'center',
+              justifyContent: 'center',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.8,
+              '&:hover': {
+                bgcolor: colors.lightBlue,
+              },
+            }}
+          >
+            <span className="fi fi-es-ct fis" style={{ fontSize: '1.2rem' }}></span>
+            <span>CAT</span>
+          </MenuItem>
+          <MenuItem
+            onClick={() => handleLanguageChange('es')}
+            sx={{
+              py: 1,
+              px: 2,
+              fontSize: '0.85rem',
+              textAlign: 'center',
+              justifyContent: 'center',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.8,
+              '&:hover': {
+                bgcolor: colors.lightBlue,
+              },
+            }}
+          >
+            <span className="fi fi-es fis" style={{ fontSize: '1.2rem' }}></span>
+            <span>ESP</span>
+          </MenuItem>
+          <MenuItem
+            onClick={() => handleLanguageChange('en')}
+            sx={{
+              py: 1,
+              px: 2,
+              fontSize: '0.85rem',
+              textAlign: 'center',
+              justifyContent: 'center',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.8,
+              '&:hover': {
+                bgcolor: colors.lightBlue,
+              },
+            }}
+          >
+            <span className="fi fi-gb fis" style={{ fontSize: '1.2rem' }}></span>
+            <span>ENG</span>
+          </MenuItem>
+        </Menu>
       </Box>
 
       {/* Avatar */}

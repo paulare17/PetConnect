@@ -1,5 +1,7 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Nunito", Helvetica, Arial, sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
   line-height: 1.5;
   font-weight: 400;
 
@@ -40,12 +42,10 @@ body {
   scrollbar-color: transparent transparent;
 }
 
-#root {
-}
-
 .custom-title {
   font-size: 4rem;
   background: linear-gradient(90deg, var(--orange), var(--blue));
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
