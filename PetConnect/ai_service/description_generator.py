@@ -11,6 +11,8 @@ class DescriptionGenerator:
     @staticmethod
     def generate_description(mascota_data):
         """
+
+        
         Genera una biografía automática basada en los datos de la mascota.
         
         Args:
