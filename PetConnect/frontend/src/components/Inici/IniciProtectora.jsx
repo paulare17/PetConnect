@@ -63,7 +63,7 @@ export default function IniciProtectora() {
                   boxShadow: 2,
                   '&:hover': { bgcolor: colors.orange, color: 'white' }
                 }}
-                onClick={() => navigate('/afegir-animal')}
+                onClick={() => navigate('/afegir-mascota')}
               >
                 Afegeix els teus animals
               </Button>

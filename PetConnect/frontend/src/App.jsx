@@ -67,7 +67,7 @@ function App() {
             <Route path="/formulari-usuari" element={<FormUsuari />} />
 
             {/* Rutes protegides - Només protectores */}
-            <Route path="/afegir-animal" element={
+            <Route path="/afegir-mascota" element={
               <ProtectoraRoute>
                 <AddAnimalForm />
               </ProtectoraRoute>
@@ -89,7 +89,7 @@ function App() {
                 <UserProfile />
               </UsuarioRoute>
             } />
-            <Route path="/inici-usuari-galeria" element={
+            <Route path="/inici-usuari" element={
               <UsuarioRoute>
                 <IniciUsuari />
               </UsuarioRoute>

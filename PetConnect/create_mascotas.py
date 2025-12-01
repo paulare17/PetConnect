@@ -58,7 +58,7 @@ gossos = [
         'vacunado': True,
         'adoptado': False,
         'oculto': False,
-        'foto': 'mascotas/gos.jpg',
+        'foto': 'mascotas/gos2.jpg',
         'protectora': protectora
     },
     {
@@ -118,7 +118,7 @@ gossos = [
         'vacunado': True,
         'adoptado': False,
         'oculto': False,
-        'foto': 'mascotas/gos.jpg',
+        'foto': 'mascotas/gos2.jpg',
         'protectora': protectora
     }
 ]

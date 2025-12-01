@@ -135,7 +135,7 @@ function IniciUsuari() {
   return (
     <Box
       sx={{
-        backgroundColor: colors.lightColor,
+        backgroundColor: colors.backgroundOrange,
         minHeight: '100vh',
         py: 4,
       }}
