@@ -19,7 +19,8 @@ import { colors } from "../../constants/colors.jsx";
 import { ROLES } from "../../constants/roles.jsx";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../../context/AuthProvider";
-import { Divider } from "@mui/material";
+import { useDarkMode } from "../../context/darkModeContext";
+import { Divider, useTheme } from "@mui/material";
 import "flag-icons/css/flag-icons.min.css";
 
 function ResponsiveAppBar() {
@@ -28,6 +29,8 @@ function ResponsiveAppBar() {
   const [anchorElLanguage, setAnchorElLanguage] = React.useState(null);
   const navigate = useNavigate();
   const { user, logout } = useAuthContext();
+  const { isDarkMode, toggleDarkMode } = useDarkMode();
+  const theme = useTheme();
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -98,7 +101,7 @@ function ResponsiveAppBar() {
     <AppBar
       position="static"
       sx={{
-        bgcolor: colors.orange,
+        bgcolor: isDarkMode ? theme.palette.background.paper : colors.orange,
         minHeight: { xs: 80, md: 90 },
         width: "100%",
         boxSizing: "border-box",
@@ -137,7 +140,7 @@ function ResponsiveAppBar() {
                 mr: 0.5,
                 mb: 1,
                 display: { xs: "none", md: "flex" },
-                color: colors.yellow,
+                color: isDarkMode ? theme.palette.primary.light : colors.yellow,
                 fontSize: { xs: "2rem", md: "2.5rem" },
                 cursor: "pointer",
                 "&:hover": {
@@ -163,7 +166,7 @@ function ResponsiveAppBar() {
                 display: { xs: "none", md: "flex" },
                 fontFamily: "Rubik Bubbles",
                 fontWeight: 700,
-                color: colors.yellow,
+                color: isDarkMode ? theme.palette.primary.light : colors.yellow,
                 textDecoration: "none",
                 fontSize: { xs: "1.8rem", md: "2.5rem" },
                 "&:hover": {
@@ -251,7 +254,7 @@ function ResponsiveAppBar() {
                   <MenuItem
                     onClick={() => {
                       handleCloseNavMenu();
-                      // toggleDarkMode(); // Funció per canviar el tema
+                      toggleDarkMode();
                     }}
                     sx={{
                       py: 1.5,
@@ -336,7 +339,7 @@ function ResponsiveAppBar() {
                 flexGrow: 1,
                 fontFamily: "Rubik Bubbles",
                 fontWeight: 700,
-                color: colors.yellow,
+                color: isDarkMode ? theme.palette.primary.light : colors.yellow,
                 textDecoration: "none",
                 fontSize: { xs: "2rem", sm: "2.2rem" },
               }}
@@ -376,17 +379,17 @@ function ResponsiveAppBar() {
                     },
                   }),
                   ...(page !== "Xateja" && {
-                    color: colors.lightColor,
+                    color: isDarkMode ? theme.palette.text.primary : colors.lightColor,
                     fontSize: { xs: "1rem", md: "1.1rem" },
                     px: 3,
                     py: 1,
                     borderRadius: "25px",
-                    bgcolor: "rgba(255, 255, 255, 0.15)",
+                    bgcolor: isDarkMode ? "rgba(168, 156, 248, 0.1)" : "rgba(255, 255, 255, 0.15)",
                     textTransform: "none",
                     fontWeight: 500,
                     "&:hover": {
-                      bgcolor: "rgba(255, 255, 255, 0.3)",
-                      color: colors.darkBlue,
+                      bgcolor: isDarkMode ? "rgba(168, 156, 248, 0.2)" : "rgba(255, 255, 255, 0.3)",
+                      color: isDarkMode ? theme.palette.primary.light : colors.darkBlue,
                       transform: "translateY(-2px)",
                       boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
                     },
@@ -413,22 +416,21 @@ function ResponsiveAppBar() {
   {user && (
     <>
       {/* Botons només en desktop */}
-      <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1 }}>
+      <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1, mr: 3, }}>
         {/* Botó DarkMode */}
-        <Tooltip title="Mode fosc">
+        <Tooltip title={isDarkMode ? "Modo claro" : "Modo fosc"}>
           <IconButton
             onClick={() => {
-              // toggleDarkMode();
-              console.log('Toggle dark mode');
+              toggleDarkMode();
             }}
             sx={{
-              color: colors.yellow,
-              bgcolor: colors.darkBlue,
+              color: isDarkMode ? theme.palette.primary.main : colors.yellow,
+              bgcolor: isDarkMode ? theme.palette.background.paper : colors.darkBlue,
               width: 30,
               height: 30,
               '&:hover': {
-                bgcolor: colors.textDark,
-                color: colors.purple,
+                bgcolor: isDarkMode ? theme.palette.action.hover : colors.textDark,
+                color: isDarkMode ? theme.palette.primary.light : colors.purple,
                 transform: 'scale(1.05)',
               },
               transition: 'all 0.3s ease',
@@ -443,12 +445,12 @@ function ResponsiveAppBar() {
           <IconButton
             onClick={handleOpenLanguageMenu}
             sx={{
-              color: colors.yellow,
-              bgcolor: colors.darkBlue,
+              color: isDarkMode ? theme.palette.primary.main : colors.yellow,
+              bgcolor: isDarkMode ? theme.palette.background.paper : colors.darkBlue,
               width: 30,
               height: 30,
               '&:hover': {
-                bgcolor: colors.textDark,
+                bgcolor: isDarkMode ? theme.palette.action.hover : colors.textDark,
                 transform: 'scale(1.05)',
               },
               transition: 'all 0.3s ease',
@@ -477,6 +479,7 @@ function ResponsiveAppBar() {
               minWidth: 80,
               borderRadius: 2,
               boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+              bgcolor: isDarkMode ? theme.palette.background.paper : 'white',
             },
           }}
         >
@@ -492,7 +495,7 @@ function ResponsiveAppBar() {
               alignItems: 'center',
               gap: 0.8,
               '&:hover': {
-                bgcolor: colors.lightBlue,
+                bgcolor: isDarkMode ? theme.palette.action.hover : colors.lightBlue,
               },
             }}
           >
@@ -511,7 +514,7 @@ function ResponsiveAppBar() {
               alignItems: 'center',
               gap: 0.8,
               '&:hover': {
-                bgcolor: colors.lightBlue,
+                bgcolor: isDarkMode ? theme.palette.action.hover : colors.lightBlue,
               },
             }}
           >
@@ -530,7 +533,7 @@ function ResponsiveAppBar() {
               alignItems: 'center',
               gap: 0.8,
               '&:hover': {
-                bgcolor: colors.lightBlue,
+                bgcolor: isDarkMode ? theme.palette.action.hover : colors.lightBlue,
               },
             }}
           >
@@ -547,11 +550,11 @@ function ResponsiveAppBar() {
             sx={{
               bgcolor:
                 user?.role === ROLES.PROTECTORA
-                  ? colors.blue
-                  : colors.orange,
+                  ? isDarkMode ? theme.palette.primary.dark : colors.blue
+                  : isDarkMode ? theme.palette.secondary.dark : colors.orange,
               width: { xs: 42, md: 48 },
               height: { xs: 42, md: 48 },
-              border: `2px solid ${colors.yellow}`,
+              border: `2px solid ${isDarkMode ? theme.palette.primary.light : colors.yellow}`,
               transition: "all 0.3s ease",
               "&:hover": {
                 transform: "scale(1.08)",
@@ -595,13 +598,13 @@ function ResponsiveAppBar() {
       >
         {/* Header amb info usuari */}
         <Box
-          sx={{ px: 2, py: 1.5, bgcolor: colors.backgroundBlue}}
+          sx={{ px: 2, py: 1.5, bgcolor: isDarkMode ? theme.palette.background.default : colors.backgroundBlue}}
         >
           <Typography
             sx={{
               fontWeight: 600,
               fontSize: "0.95rem",
-              color: colors.textDark,
+              color: isDarkMode ? theme.palette.text.primary : colors.textDark,
             }}
           >
             {user?.username || "Nom Usuari"}
@@ -609,7 +612,7 @@ function ResponsiveAppBar() {
           <Typography
             sx={{
               fontSize: "0.8rem",
-              color: colors.textDark,
+              color: isDarkMode ? theme.palette.text.secondary : colors.textDark,
               opacity: 0.7,
             }}
           >
