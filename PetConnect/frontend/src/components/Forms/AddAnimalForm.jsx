@@ -18,6 +18,8 @@ import {
   Divider,
   Alert,
   CircularProgress,
+  Chip,
+  Autocomplete,
 } from "@mui/material";
 import CardAnimal from "../home/CardAnimal.jsx";
 import { colors } from "../../constants/colors.jsx";
@@ -36,7 +38,7 @@ const AddAnimalForm = () => {
     tamaño: "",
     color: "",
     foto: "",
-    caracter: "",
+    caracter: [],
     convivencia_animales: "",
     convivencia_ninos: "",
     desparasitado: false,
@@ -112,10 +114,15 @@ const AddAnimalForm = () => {
         edad: parseInt(formData.edad) || 1,
         genero: formData.genero,
         tamaño: formData.tamaño,
-        caracter: formData.caracter || 'cariñoso',
+        caracter: Array.isArray(formData.caracter) ? formData.caracter.join(', ') : formData.caracter || '',
         convivencia_ninos: formData.convivencia_ninos === "" ? undefined : formData.convivencia_ninos,
         convivencia_animales: formData.convivencia_animales,
-        descripcion_necesidades: formData.descripcion_necesidades
+        descripcion_necesidades: formData.descripcion_necesidades,
+        // Estado de salud
+        desparasitado: formData.desparasitado,
+        esterilizado: formData.esterilizado,
+        con_microchip: formData.con_microchip,
+        vacunado: formData.vacunado
       };
 
       console.log('📤 Enviando datos a IA:', dataForIA);
@@ -433,24 +440,37 @@ const AddAnimalForm = () => {
                     </FormControl>
                   </Grid>
                   <Grid size={{ xs: 12 }}>
-                    <FormControl fullWidth>
-                      <InputLabel>Caràcter principal</InputLabel>
-                      <Select
-                        name="caracter"
-                        value={formData.caracter}
-                        onChange={handleInputChange}
-                      >
-                        <MenuItem value="cariñoso">Cariñoso</MenuItem>
-                        <MenuItem value="jugueton">Juguetón</MenuItem>
-                        <MenuItem value="tranquilo">Tranquilo</MenuItem>
-                        <MenuItem value="activo">Activo</MenuItem>
-                        <MenuItem value="sociable">Sociable</MenuItem>
-                        <MenuItem value="independiente">Independiente</MenuItem>
-                        <MenuItem value="protector">Protector</MenuItem>
-                        <MenuItem value="timido">Tímido</MenuItem>
-                        <MenuItem value="obediente">Obediente</MenuItem>
-                      </Select>
-                    </FormControl>
+                    <Autocomplete
+                      multiple
+                      options={[
+                        'cariñoso', 'jugueton', 'tranquilo', 'activo', 'sociable',
+                        'independiente', 'protector', 'timido', 'obediente'
+                      ]}
+                      value={formData.caracter}
+                      onChange={(event, newValue) => {
+                        setFormData(prev => ({
+                          ...prev,
+                          caracter: newValue
+                        }));
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Caràcter (pots seleccionar múltiples i buscar)"
+                          placeholder="Escriu per buscar..."
+                        />
+                      )}
+                      renderTags={(value, getTagProps) =>
+                        value.map((option, index) => (
+                          <Chip
+                            label={option.charAt(0).toUpperCase() + option.slice(1)}
+                            {...getTagProps({ index })}
+                            size="small"
+                          />
+                        ))
+                      }
+                      getOptionLabel={(option) => option.charAt(0).toUpperCase() + option.slice(1)}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12 }}>
                     <Typography variant="body2" sx={{ mb: 1, fontWeight: 'bold' }}>
@@ -538,7 +558,7 @@ const AddAnimalForm = () => {
                     <TextField
                       fullWidth
                       multiline
-                      rows={8}
+                      rows={10}
                       name="descripcion"
                       label="Descripció"
                       placeholder="Escriu una descripció o genera-la automàticament amb IA"
