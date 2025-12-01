@@ -424,8 +424,8 @@ function ResponsiveAppBar() {
             sx={{
               color: colors.yellow,
               bgcolor: colors.darkBlue,
-              width: 40,
-              height: 40,
+              width: 30,
+              height: 30,
               '&:hover': {
                 bgcolor: colors.textDark,
                 color: colors.purple,
@@ -434,7 +434,7 @@ function ResponsiveAppBar() {
               transition: 'all 0.3s ease',
             }}
           >
-            <DarkModeIcon sx={{ fontSize: '1.3rem' }} />
+            <DarkModeIcon sx={{ fontSize: '1.1rem' }} />
           </IconButton>
         </Tooltip>
 
@@ -445,8 +445,8 @@ function ResponsiveAppBar() {
             sx={{
               color: colors.yellow,
               bgcolor: colors.darkBlue,
-              width: 40,
-              height: 40,
+              width: 30,
+              height: 30,
               '&:hover': {
                 bgcolor: colors.textDark,
                 transform: 'scale(1.05)',
@@ -454,7 +454,7 @@ function ResponsiveAppBar() {
               transition: 'all 0.3s ease',
             }}
           >
-            <TranslateIcon sx={{ fontSize: '1.3rem' }} />
+            <TranslateIcon sx={{ fontSize: '1.1rem' }} />
           </IconButton>
         </Tooltip>
 
