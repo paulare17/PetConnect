@@ -1,12 +1,15 @@
 :root{
-      --orange: #f5842b;
-  --dark-orange:#fc6d00ff;
+  --orange: #f5842b;
+  --dark-orange: #fc6d00ff;
   --blue: #66c5bd;
   --dark-blue: #29afa4ff;
+  --light-blue: #bfe0ddff;
   --orange-background: #f1d5b6;
   --yellow: #f6ce5b;
   --purple: #bcbefa;
+  --dark-purple: #9a8cfc;
   --light-color: #f8f9fa;
+  --black: #000000;
 }
 
 .petjades-container {
@@ -29,7 +32,7 @@
 
 /* Petjada 1 - Primera onda */
 .petjada-1 {
-  top: 15%;
+  top: 25%;
   left: 8%;
   color: var(--yellow); /* Orange */
   animation: apareixerPetjada 2s ease-in-out 1s forwards, 
@@ -41,7 +44,7 @@
 
 /* Petjada 2 */
 .petjada-2 {
-  top: 20%;
+  top: 7%;
   left: 30%;
   color: var(--blue); /* Blue */
   animation: apareixerPetjada 2s ease-in-out 2.5s forwards,
@@ -67,7 +70,7 @@
 .petjada-4 {
   top: 20%;
   right: 20%;
-  color: #bcbefa; /* Purple */
+  color: var(--purple); /* Purple */
   animation: apareixerPetjada 2s ease-in-out 5.5s forwards,
              fadeOut 2s ease-in-out 12.5s forwards,
              apareixerPetjada 2s ease-in-out 19.5s forwards,
@@ -101,8 +104,8 @@
 
 /* Petjada 7 */
 .petjada-7 {
-  top: 25%;
-  left: 45%;
+  top: 10%;
+  left: 55%;
   color: #f6ce5b; /* Yellow */
   animation: apareixerPetjada 2s ease-in-out 7.5s forwards,
              fadeOut 2s ease-in-out 14.5s forwards,

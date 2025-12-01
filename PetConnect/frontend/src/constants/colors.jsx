@@ -8,6 +8,21 @@ export const colors = {
   backgroundBlue: "#e0f2f1", // Fons clar blau per protectores
   yellow: "#f6ce5b",
   purple: "#bcbefa",
+  darkPurple: "#9a8cfc",
   lightColor: "#f8f9fa",
   black: "#000000",
 }
+
+
+// export const colors = {
+//   orange: "#f5842b",
+//   darkOrange: "#e8722a",
+//   backgroundOrange: "#fef4e8",
+//   blue: "#66c5bd",
+//   darkBlue: "#2ba89e",
+//   lightBlue: "#d4f1ee",
+//   textDark: "#3a3a3a",
+//   textLight: "#f8f8f8",
+//   accent: "#7ed957",
+//   warmNeutral: "#faf6f1",
+// };
