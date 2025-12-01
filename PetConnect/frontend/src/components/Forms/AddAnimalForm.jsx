@@ -56,6 +56,32 @@ const AddAnimalForm = () => {
   const [submitting, setSubmitting] = useState(false);
   const [generatingDescription, setGeneratingDescription] = useState(false);
   const [status, setStatus] = useState(null); // {type: 'success'|'error', message: ''}
+  
+  // Estado para las opciones del formulario
+  const [formChoices, setFormChoices] = useState({
+    especies: [],
+    generos: [],
+    razas_perros: [],
+    razas_gatos: [],
+    tamanos: [],
+    caracteres: [],
+    convivencia_animales: [],
+    colores: [],
+    convivencia_ninos: []
+  });
+
+  // Cargar opciones del formulario desde el backend
+  useEffect(() => {
+    const fetchFormChoices = async () => {
+      try {
+        const res = await api.get("/form-choices/");
+        setFormChoices(res.data);
+      } catch (error) {
+        console.error("Error cargando opciones del formulario:", error);
+      }
+    };
+    fetchFormChoices();
+  }, []);
 
   // Sincronizar raza cuando cambia la especie
   useEffect(() => {
@@ -258,52 +284,67 @@ const AddAnimalForm = () => {
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <FormControl fullWidth>
-                      <InputLabel>Espècie</InputLabel>
-                      <Select
-                        name="especie"
-                        value={formData.especie}
-                        onChange={handleInputChange}
-                      >
-                        <MenuItem value="perro">Perro</MenuItem>
-                        <MenuItem value="gato">Gato</MenuItem>
-                      </Select>
-                    </FormControl>
+                    <Autocomplete
+                      options={formChoices.especies.map(e => e.value)}
+                      value={formData.especie}
+                      onChange={(event, newValue) => {
+                        setFormData(prev => ({
+                          ...prev,
+                          especie: newValue || '',
+                          raza: '',
+                          raza_perro: newValue === 'perro' ? '' : prev.raza_perro,
+                          raza_gato: newValue === 'gato' ? '' : prev.raza_gato,
+                        }));
+                      }}
+                      renderInput={(params) => (
+                        <TextField {...params} label="Espècie" />
+                      )}
+                      getOptionLabel={(option) => {
+                        const found = formChoices.especies.find(e => e.value === option);
+                        return found ? found.label : option;
+                      }}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <FormControl fullWidth>
-                      <InputLabel>Raça</InputLabel>
-                      <Select
-                        name="raza"
-                        value={formData.raza}
-                        onChange={handleInputChange}
-                      >
-                        {formData.especie === 'perro' ? [
-                            <MenuItem key="mestizo" value="mestizo">Mestizo</MenuItem>,
-                            <MenuItem key="labrador" value="labrador">Labrador Retriever</MenuItem>,
-                            <MenuItem key="pastor_aleman" value="pastor_aleman">Pastor Alemán</MenuItem>,
-                            <MenuItem key="bulldog" value="bulldog">Bulldog Inglés</MenuItem>,
-                            <MenuItem key="beagle" value="beagle">Beagle</MenuItem>
-                        ] : [
-                            <MenuItem key="mestizo" value="mestizo">Mestizo</MenuItem>,
-                            <MenuItem key="siames" value="siames">Siamés</MenuItem>,
-                            <MenuItem key="persa" value="persa">Persa</MenuItem>
-                        ]}
-                      </Select>
-                    </FormControl>
+                    <Autocomplete
+                      options={(formData.especie === 'perro' 
+                        ? formChoices.razas_perros 
+                        : formChoices.razas_gatos
+                      ).map(r => r.value)}
+                      value={formData.raza}
+                      onChange={(event, newValue) => {
+                        setFormData(prev => ({
+                          ...prev,
+                          raza: newValue || '',
+                          raza_perro: prev.especie === 'perro' ? newValue || '' : prev.raza_perro,
+                          raza_gato: prev.especie === 'gato' ? newValue || '' : prev.raza_gato,
+                        }));
+                      }}
+                      renderInput={(params) => (
+                        <TextField {...params} label="Raça" />
+                      )}
+                      getOptionLabel={(option) => {
+                        const razas = formData.especie === 'perro' ? formChoices.razas_perros : formChoices.razas_gatos;
+                        const found = razas.find(r => r.value === option);
+                        return found ? found.label : option;
+                      }}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <FormControl fullWidth>
-                      <InputLabel>Gènere</InputLabel>
-                      <Select
-                        name="genero"
-                        value={formData.genero}
-                        onChange={handleInputChange}
-                      >
-                        <MenuItem value="macho">Macho</MenuItem>
-                        <MenuItem value="hembra">Hembra</MenuItem>
-                      </Select>
-                    </FormControl>
+                    <Autocomplete
+                      options={formChoices.generos.map(g => g.value)}
+                      value={formData.genero}
+                      onChange={(event, newValue) => {
+                        setFormData(prev => ({ ...prev, genero: newValue || '' }));
+                      }}
+                      renderInput={(params) => (
+                        <TextField {...params} label="Gènere" />
+                      )}
+                      getOptionLabel={(option) => {
+                        const found = formChoices.generos.find(g => g.value === option);
+                        return found ? found.label : option;
+                      }}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
@@ -316,40 +357,36 @@ const AddAnimalForm = () => {
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <FormControl fullWidth>
-                      <InputLabel>Mida</InputLabel>
-                      <Select
-                        name="tamaño"
-                        value={formData.tamaño}
-                        onChange={handleInputChange}
-                      >
-                        <MenuItem value="pequeño">Pequeño</MenuItem>
-                        <MenuItem value="mediano">Mediano</MenuItem>
-                        <MenuItem value="grande">Grande</MenuItem>
-                        <MenuItem value="gigante">Gigante</MenuItem>
-                      </Select>
-                    </FormControl>
+                    <Autocomplete
+                      options={formChoices.tamanos.map(t => t.value)}
+                      value={formData.tamaño}
+                      onChange={(event, newValue) => {
+                        setFormData(prev => ({ ...prev, tamaño: newValue || '' }));
+                      }}
+                      renderInput={(params) => (
+                        <TextField {...params} label="Mida" />
+                      )}
+                      getOptionLabel={(option) => {
+                        const found = formChoices.tamanos.find(t => t.value === option);
+                        return found ? found.label : option;
+                      }}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <FormControl fullWidth>
-                      <InputLabel>Color</InputLabel>
-                      <Select
-                        name="color"
-                        value={formData.color}
-                        onChange={handleInputChange}
-                      >
-                        <MenuItem value="negro">Negro</MenuItem>
-                        <MenuItem value="blanco">Blanco</MenuItem>
-                        <MenuItem value="marrón">Marrón</MenuItem>
-                        <MenuItem value="gris">Gris</MenuItem>
-                        <MenuItem value="naranja">Naranja/Atigrado</MenuItem>
-                        <MenuItem value="dorado">Dorado</MenuItem>
-                        <MenuItem value="crema">Crema</MenuItem>
-                        <MenuItem value="bicolor">Bicolor</MenuItem>
-                        <MenuItem value="tricolor">Tricolor</MenuItem>
-                        <MenuItem value="manchado">Manchado</MenuItem>
-                      </Select>
-                    </FormControl>
+                    <Autocomplete
+                      options={formChoices.colores.map(c => c.value)}
+                      value={formData.color}
+                      onChange={(event, newValue) => {
+                        setFormData(prev => ({ ...prev, color: newValue || '' }));
+                      }}
+                      renderInput={(params) => (
+                        <TextField {...params} label="Color" />
+                      )}
+                      getOptionLabel={(option) => {
+                        const found = formChoices.colores.find(c => c.value === option);
+                        return found ? found.label : option;
+                      }}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12 }}>
                       <Button
@@ -407,45 +444,41 @@ const AddAnimalForm = () => {
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <FormControl fullWidth>
-                      <InputLabel>Convivència amb altres animals</InputLabel>
-                      <Select
-                        name="convivencia_animales"
-                        value={formData.convivencia_animales}
-                        onChange={handleInputChange}
-                      >
-                        <MenuItem value="no">
-                          No pot conviure amb altres animals
-                        </MenuItem>
-                        <MenuItem value="misma_especie">
-                          Només amb animals de la mateixa espècie
-                        </MenuItem>
-                        <MenuItem value="cualquier_especie">
-                          Pot conviure amb qualsevol animal
-                        </MenuItem>
-                      </Select>
-                    </FormControl>
+                    <Autocomplete
+                      options={formChoices.convivencia_animales.map(c => c.value)}
+                      value={formData.convivencia_animales}
+                      onChange={(event, newValue) => {
+                        setFormData(prev => ({ ...prev, convivencia_animales: newValue || '' }));
+                      }}
+                      renderInput={(params) => (
+                        <TextField {...params} label="Convivència amb altres animals" />
+                      )}
+                      getOptionLabel={(option) => {
+                        const found = formChoices.convivencia_animales.find(c => c.value === option);
+                        return found ? found.label : option;
+                      }}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <FormControl fullWidth>
-                      <InputLabel>Convivència amb nens</InputLabel>
-                      <Select
-                        name="convivencia_ninos"
-                        value={formData.convivencia_ninos}
-                        onChange={handleInputChange}
-                      >
-                        <MenuItem value={true}>Sí</MenuItem>
-                        <MenuItem value={false}>No</MenuItem>
-                      </Select>
-                    </FormControl>
+                    <Autocomplete
+                      options={formChoices.convivencia_ninos.map(c => c.value)}
+                      value={formData.convivencia_ninos}
+                      onChange={(event, newValue) => {
+                        setFormData(prev => ({ ...prev, convivencia_ninos: newValue === null ? '' : newValue }));
+                      }}
+                      renderInput={(params) => (
+                        <TextField {...params} label="Convivència amb nens" />
+                      )}
+                      getOptionLabel={(option) => {
+                        const found = formChoices.convivencia_ninos.find(c => c.value === option);
+                        return found ? found.label : (option === true ? 'Sí' : 'No');
+                      }}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12 }}>
                     <Autocomplete
                       multiple
-                      options={[
-                        'cariñoso', 'jugueton', 'tranquilo', 'activo', 'sociable',
-                        'independiente', 'protector', 'timido', 'obediente'
-                      ]}
+                      options={formChoices.caracteres.map(c => c.value)}
                       value={formData.caracter}
                       onChange={(event, newValue) => {
                         setFormData(prev => ({
@@ -461,15 +494,21 @@ const AddAnimalForm = () => {
                         />
                       )}
                       renderTags={(value, getTagProps) =>
-                        value.map((option, index) => (
-                          <Chip
-                            label={option.charAt(0).toUpperCase() + option.slice(1)}
-                            {...getTagProps({ index })}
-                            size="small"
-                          />
-                        ))
+                        value.map((option, index) => {
+                          const found = formChoices.caracteres.find(c => c.value === option);
+                          return (
+                            <Chip
+                              label={found ? found.label : option}
+                              {...getTagProps({ index })}
+                              size="small"
+                            />
+                          );
+                        })
                       }
-                      getOptionLabel={(option) => option.charAt(0).toUpperCase() + option.slice(1)}
+                      getOptionLabel={(option) => {
+                        const found = formChoices.caracteres.find(c => c.value === option);
+                        return found ? found.label : option;
+                      }}
                     />
                   </Grid>
                   <Grid size={{ xs: 12 }}>

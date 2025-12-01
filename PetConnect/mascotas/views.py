@@ -374,6 +374,56 @@ from ai_service.description_generator import DescriptionGenerator
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import AllowAny
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_form_choices(request):
+    """
+    Endpoint para obtener todas las opciones de los campos del formulario.
+    GET /api/mascotas/form-choices/
+    
+    Response:
+    {
+        "especies": [{"value": "perro", "label": "Perro"}, ...],
+        "generos": [...],
+        "razas_perros": [...],
+        "razas_gatos": [...],
+        "tamanos": [...],
+        "caracteres": [...],
+        "convivencia_animales": [...],
+        "colores": [...]
+    }
+    """
+    from .models import Mascota
+    
+    # Colores definidos en el frontend (podrías moverlos al modelo si quieres)
+    COLORES = [
+        ('negro', 'Negro'),
+        ('blanco', 'Blanco'),
+        ('marrón', 'Marrón'),
+        ('gris', 'Gris'),
+        ('naranja', 'Naranja/Atigrado'),
+        ('dorado', 'Dorado'),
+        ('crema', 'Crema'),
+        ('bicolor', 'Bicolor'),
+        ('tricolor', 'Tricolor'),
+        ('manchado', 'Manchado'),
+    ]
+    
+    choices = {
+        "especies": [{"value": val, "label": lbl} for val, lbl in Mascota.ESPECIES],
+        "generos": [{"value": val, "label": lbl} for val, lbl in Mascota.GENERO],
+        "razas_perros": [{"value": val, "label": lbl} for val, lbl in Mascota.RAZAS_PERROS],
+        "razas_gatos": [{"value": val, "label": lbl} for val, lbl in Mascota.RAZAS_GATOS],
+        "tamanos": [{"value": val, "label": lbl} for val, lbl in Mascota.TAMAÑO],
+        "caracteres": [{"value": val, "label": lbl} for val, lbl in Mascota.CARACTER],
+        "convivencia_animales": [{"value": val, "label": lbl} for val, lbl in Mascota.CONVIVENCIA_ANIMALES],
+        "colores": [{"value": val, "label": lbl} for val, lbl in COLORES],
+        "convivencia_ninos": [{"value": True, "label": "Sí"}, {"value": False, "label": "No"}]
+    }
+    
+    return Response(choices, status=status.HTTP_200_OK)
+
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def generate_description(request):

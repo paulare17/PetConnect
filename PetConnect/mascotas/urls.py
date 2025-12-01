@@ -36,6 +36,9 @@ urlpatterns = [
     path('tinderpet/next/', views.get_next_card, name='api_tinderpet_next'),
     path('tinderpet/action/', views.swipe_action, name='api_tinderpet_action'),
     
+    # Endpoint para obtener opciones del formulario desde el modelo
+    path('form-choices/', views.get_form_choices, name='get_form_choices'),
+    
     # Endpoint para generar descripción con IA
     path('generate-description/', views.generate_description, name='generate_description'),
     
