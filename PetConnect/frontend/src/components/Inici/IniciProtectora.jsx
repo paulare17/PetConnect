@@ -38,7 +38,7 @@ export default function IniciProtectora() {
   };
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: colors.backgroundOrange }}>
+    <Box sx={{ minHeight: "100vh", bgcolor: colors.background }}>
       <Box sx={{ pt: 8, px: { xs: 2, md: 6 }, pb: 8, maxWidth: 1400, mx: 'auto' }}>
         {/* Botó afegir animal a la part superior */}
         
@@ -53,7 +53,7 @@ export default function IniciProtectora() {
                 sx={{
                   bgcolor: colors.yellow,
                   color: colors.black,
-                  fontWeight: 'bold',
+             
                   fontSize: { xs: 20, md: 25 },
                   px: { xs: 2.5, md: 3.5 },
                   py: 1,
@@ -69,7 +69,7 @@ export default function IniciProtectora() {
               </Button>
             </Box>
             <Card sx={{ borderRadius: 4, maxWidth: 520, maxHeight: 570, boxShadow: 3, p: 2, bgcolor: colors.lightColor, border: `2px dashed ${colors.orange}`, minHeight:{ md:440 }, display:'flex', flexDirection:'column' }}>
-              <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2, textAlign: "center", color: colors.black }}>
+              <Typography variant="h6" sx={{  mb: 2, textAlign: "center", color: colors.black }}>
                 Les teves adopcions
               </Typography>
               <Box sx={{ flexGrow:1, overflowY:'auto', pr:1 }}>
@@ -105,7 +105,7 @@ export default function IniciProtectora() {
                           p: { xs: 1, md: 2 },
                           borderRadius: 2,
                           transition: 'background 0.2s',
-                          '&:hover': { bgcolor: colors.backgroundOrange }
+                          '&:hover': { bgcolor: colors.background }
                         }}
                         onClick={() => navigate(`/mascotes/${animal.id}`)}
                       >
@@ -122,7 +122,7 @@ export default function IniciProtectora() {
                             '&:hover': { transform: 'scale(1.04)' }
                           }}
                         />
-                        <Typography variant="body2" sx={{ fontWeight: 'bold', textAlign: 'center', fontSize: { xs: 12, md: 16 } }}>
+                        <Typography variant="body2" sx={{  textAlign: 'center', fontSize: { xs: 12, md: 16 } }}>
                           {animal.nombre}
                         </Typography>
                       </Box>

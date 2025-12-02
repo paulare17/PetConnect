@@ -61,7 +61,7 @@ export const DarkModeProvider = ({ children }) => {
         secondary: {
           main: colors.orange,
           dark: colors.darkOrange,
-          light: colors.backgroundOrange,
+          light: colors.background,
         },
         background: {
           default: colors.lightColor,

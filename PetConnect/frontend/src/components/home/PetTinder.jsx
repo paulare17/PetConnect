@@ -119,7 +119,7 @@ function PetTinder() {
 
             {/* Columna central: Card de mascota sempre visible */}
             <Box sx={{ flex: 1 }}>
-                <Typography variant="h4" gutterBottom textAlign="center" sx={{ color: colors.orange, fontWeight: 'bold', mb: 3 }}>
+                <Typography variant="h4" gutterBottom textAlign="center" sx={{ color: colors.orange, mb: 3 }}>
                     Descobreix la teva mascota ideal
                 </Typography>
                 {message && (
@@ -142,7 +142,7 @@ function PetTinder() {
                             sx={{
                                 backgroundColor: colors.purple,
                                 color: 'white',
-                                fontWeight: 'bold',
+                              
                                 borderRadius: '50px',
                                 px: 4,
                                 py: 1.5,
@@ -160,7 +160,7 @@ function PetTinder() {
                             sx={{
                                 backgroundColor: colors.orange,
                                 color: 'white',
-                                fontWeight: 'bold',
+                           
                                 borderRadius: '50px',
                                 px: 4,
                                 py: 1.5,

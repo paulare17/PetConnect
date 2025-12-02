@@ -162,7 +162,6 @@ function TinderPet() {
             {message && (
                 <div style={{ 
                     color: chatCreated ? '#28a745' : '#007bff',
-                    fontWeight: 'bold',
                     marginBottom: '15px',
                     fontSize: '18px'
                 }}>

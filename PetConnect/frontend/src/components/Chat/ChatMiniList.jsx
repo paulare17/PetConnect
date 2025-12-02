@@ -13,11 +13,12 @@ import {
 } from '@mui/material';
 import PetsIcon from '@mui/icons-material/Pets';
 import api from '../../api/client';
-import { colors } from '../../constants/colors';
+import { useColors } from '../../hooks/useColors';
 import { useAuthContext } from '../../context/AuthProvider';
 
 export default function ChatMiniList({ maxHeight = 400, onSelectChat }) {
   const { user } = useAuthContext();
+  const { colors } = useColors();
   const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(true);
   // No usem estat d'error per evitar lint de variables no usades
@@ -95,7 +96,7 @@ export default function ChatMiniList({ maxHeight = 400, onSelectChat }) {
                       <Chip
                         label={chat.num_mensajes}
                         size="small"
-                        sx={{ bgcolor: colors.lightColor, color: colors.darkOrange, fontWeight: 'bold', minWidth: 24 }}
+                        sx={{ bgcolor: colors.lightColor, color: colors.darkOrange,  minWidth: 24 }}
                       />
                     )}
                   </ListItemButton>

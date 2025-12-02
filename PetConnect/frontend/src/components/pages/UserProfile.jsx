@@ -3,13 +3,14 @@ import { Box, CircularProgress, Typography } from "@mui/material";
 import { getUserProfile } from "../../api/client";
 import FormUsuari from "../Forms/FormUsuari";
 import ProfilePageUser from "./ProfilePageUser";
-import { colors } from "../../constants/colors";
+import { useColors } from "../../hooks/useColors";
 
 /**
  * Component contenidor que decideix si mostrar el formulari o el perfil
  * segons si l'usuari ja té un perfil creat
  */
 export default function UserProfile() {
+  const { colors } = useColors();
   const [loading, setLoading] = useState(true);
   const [hasProfile, setHasProfile] = useState(false);
   const [profileData, setProfileData] = useState(null);
@@ -81,7 +82,7 @@ export default function UserProfile() {
           justifyContent: "center",
           alignItems: "center",
           minHeight: "100vh",
-          backgroundColor: colors.backgroundOrange,
+          backgroundColor: colors.background,
         }}
       >
         <CircularProgress sx={{ color: colors.blue }} />
@@ -97,7 +98,7 @@ export default function UserProfile() {
           justifyContent: "center",
           alignItems: "center",
           minHeight: "100vh",
-          backgroundColor: colors.backgroundOrange,
+          backgroundColor: colors.background,
         }}
       >
         <Typography color="error">{error}</Typography>

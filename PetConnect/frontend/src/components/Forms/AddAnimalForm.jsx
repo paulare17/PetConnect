@@ -20,11 +20,12 @@ import {
   CircularProgress,
 } from "@mui/material";
 import CardPet from "../home/CardPet.jsx";
-import { colors } from "../../constants/colors.jsx";
+import { useColors } from "../../hooks/useColors";
 import api from "../../api/client";
 
 const AddAnimalForm = () => {
-    const [previewUrl, setPreviewUrl] = useState("");
+  const { colors } = useColors();
+  const [previewUrl, setPreviewUrl] = useState("");
   const initialFormData = {
     nombre: "",
     especie: "gato",
@@ -192,13 +193,13 @@ const AddAnimalForm = () => {
     <Box
     //   className="no-scroll-form"
       sx={{
-          backgroundColor: colors.backgroundOrange,
+          backgroundColor: colors.background,
           padding: 3,
           minHeight: 'calc(100vh - 90px)',
         // minHeight: "100vh",
         width: "100%",
         justifyContent: "center",
-        
+        transition: 'background-color 0.3s ease',
       }}
     >
       <Grid
@@ -228,6 +229,7 @@ const AddAnimalForm = () => {
           <Card sx={{ borderRadius: 5, width: "100%",
             
             bgcolor: colors.lightColor,
+            transition: 'background-color 0.3s ease',
             maxWidth: 800 }}>
             <CardContent>
               <Typography

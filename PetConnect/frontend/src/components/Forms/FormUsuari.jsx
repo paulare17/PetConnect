@@ -32,7 +32,7 @@ import {
   Group,
   VolunteerActivism,
 } from "@mui/icons-material";
-import { colors } from "../../constants/colors.jsx";
+import { useColors } from "../../hooks/useColors";
 import { useNavigate } from "react-router-dom";
 import { createUserProfile } from "../../api/client";
 import {
@@ -47,6 +47,7 @@ import {
 
 export default function FormUsuari({ onProfileCreated, existingProfile }) {
   const navigate = useNavigate();
+  const { colors } = useColors();
   const [formData, setFormData] = useState(existingProfile || {
     // Informació bàsica
     telefono: "",
@@ -181,7 +182,7 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
   return (
     <Box
       sx={{
-        backgroundColor: colors.backgroundOrange,
+        backgroundColor: colors.background,
         padding: 3,
         display: "flex",
         justifyContent: "center",
@@ -199,7 +200,6 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
             sx={{
               mb: 3,
               color: colors.blue,
-              fontWeight: "bold",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",

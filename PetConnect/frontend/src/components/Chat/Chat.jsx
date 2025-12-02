@@ -336,7 +336,7 @@ export default function ChatRoom({ chatId: chatIdProp, onClose, embedded = false
                     }}
                   >
                     <Typography variant="caption" display="block" sx={{ 
-                      fontWeight: 'bold',
+                    
                       opacity: 0.9,
                       mb: 0.5 
                     }}>

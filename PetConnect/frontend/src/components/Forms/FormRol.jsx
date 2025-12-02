@@ -3,13 +3,15 @@ import PetsIcon from "@mui/icons-material/Pets";
 import { Typography, Box } from "@mui/material";
 import petsImageOrange from "../../assets/paw-orange.svg";
 import petsImageBlue from "../../assets/paw-blue.svg";
-import { colors } from "../../constants/colors.jsx";
+import { useColors } from "../../hooks/useColors";
 
 export default function EscollirRol() {
+  const { colors } = useColors();
+  
   return (
     <Box
       sx={{
-        bgcolor: colors.backgroundOrange,
+        bgcolor: colors.background,
         flex: 1,
         display: "flex",
         flexDirection: "column",
@@ -75,7 +77,6 @@ export default function EscollirRol() {
             variant="h5"
             sx={{
               color: colors.orange,
-              fontWeight: "bold",
               textAlign: "center",
               fontSize: { xs: "1.2rem", sm: "1.4rem", md: "1.6rem" }, // ✅ Responsive font
             }}
@@ -116,7 +117,6 @@ export default function EscollirRol() {
             variant="h5"
             sx={{
               color: colors.blue,
-              fontWeight: "bold",
               textAlign: "center",
               fontSize: { xs: "1.2rem", sm: "1.4rem", md: "1.6rem" }, // ✅ Responsive font
             }}

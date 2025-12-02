@@ -1,32 +1,37 @@
 import { useState } from 'react';
-import { Box, Typography } from '@mui/material';
-import { colors } from '../../constants/colors';
+import { Box, Typography, Container } from '@mui/material';
+import { useColors } from '../../hooks/useColors';
 import ChatMiniList from './ChatMiniList';
 import Chat from './Chat';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 
 export default function ChatList() {
+  const { colors } = useColors();
   const [selectedChatId, setSelectedChatId] = useState(null);
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: colors.backgroundOrange, display: 'flex', flexDirection: 'column' }}>
-      {/* Header */}
-      <Box 
-        sx={{ 
-          p: 3, 
-          background: `linear-gradient(135deg, ${colors.orange} 0%, ${colors.darkOrange} 100%)`,
-          color: 'white',
-          boxShadow: 2
-        }}
-      >
-        <Box sx={{ maxWidth: 1400, mx: 'auto' }}>
-          <Typography variant="h4" fontWeight="bold">
+    <Box sx={{ minHeight: "100vh", bgcolor: colors.background, display: 'flex', flexDirection: 'column', py: 4 }}>
+      <Container maxWidth="xl">
+        {/* Capçalera */}
+        <Box sx={{ textAlign: 'center', mb: 4 }}>
+          <Typography
+            variant="h3"
+            component="h1"
+            sx={{
+
+              color: colors.orange,
+              mb: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 2,
+            }}
+          >
+            <ChatBubbleOutlineIcon sx={{ fontSize: 48 }} />
             Els meus xats
           </Typography>
-          <Typography variant="body2" sx={{ opacity: 0.9 }}>
-            Gestiona les teves converses amb les protectores
-          </Typography>
         </Box>
-      </Box>
+      </Container>
 
       {/* Layout dues columnes */}
       <Box sx={{ flexGrow: 1, display: 'flex', maxWidth: 1400, mx: 'auto', width: '100%', p: 5, gap: 3 }}>

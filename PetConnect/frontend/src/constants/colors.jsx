@@ -1,55 +1,76 @@
 export const colors = {
+  background: "#f1d5b6",
+
+  
+  
+  // Taronges
   orange: "#f5842b",
   darkOrange: "#fc6d00ff",
   backgroundOrange: "#f1d5b6",
+  
+  // Blaus/Turqueses
   blue: "#66c5bd",
   darkBlue: "#29afa4ff",
   lightBlue: "#bfe0ddff",
-  backgroundBlue: "#e0f2f1", // Fons clar blau per protectores
+  backgroundBlue: "#e0f2f1",
+  
+  // Grocs
   yellow: "#f6ce5b",
   lightYellow: "#fff3d1",
+  
+  // Liles
   purple: "#bcbefa",
   darkPurple: "#9a8cfc",
   lightPurple: "#e6e0ff",
+  
+  // Neutres i fons
   lightColor: "#f8f9fa",
   black: "#000000",
   textDark: "#3a3a3a",
-
+  textLight: "#ffffff",
+  
+  
+  // Bordes
+  border: "#e0e0e0",
+  borderLight: "#f0f0f0",
 }
 
 
 export const darkColors = {
-  // Liles - Color principal (més saturats per destacar en fons fosc)
-  purple: "#a89cf8",           // Lila principal més brillant
-  darkPurple: "#7b6be0",       // Lila fosc per accents
-  lightPurple: "#c4b8ff",      // Lila clar per hover/focus
+  background: "#0f0820", // Fons molt fosc amb base morada
 
-  // Taronges - Mantenen calidesa però més suaus
-  orange: "#e8884a",           // Taronja suavitzat
-  darkOrange: "#d4702e",       // Taronja fosc
-  backgroundOrange: "#3d2a1a", // Fons taronja molt fosc
+  // Taronges - Convertits a blaus brillants (color complementari)
+  orange: "#4d9fff", // Blau brillant per navbar
+  darkOrange: "#2e7edb", // Blau més fosc per hover
+  backgroundOrange: "#1a2540", // Fons blau fosc
 
-  // Blaus/Turqueses - Més profunds
-  blue: "#4fa89f",             // Turquesa més apagat
-  darkBlue: "#1f8a80",         // Turquesa fosc
-  lightBlue: "#2d4a47",        // Fons turquesa fosc
-  backgroundBlue: "#1a2f2d",   // Fons blau molt fosc
+  // Blaus/Turqueses - Mantenen essència però més vibrants
+  blue: "#7c5cff", // Morat-blau per botons
+  darkBlue: "#5c3ed9", // Morat fosc per hover
+  lightBlue: "#2a1f4a", // Blau molt fosc
+  backgroundBlue: "#151030", // Fons quasi negre amb tint blau
 
-  // Groc - Més daurat per contrast
-  yellow: "#d4ad3a",           // Groc daurat
+  // Grocs - Convertits a cians/turquesa
+  yellow: "#00d4ff",
+  lightYellow: "#0a2535",
 
-  // Fons i textos
-  background: "#1a1a2e",       // Fons principal (to lila molt fosc)
-  backgroundSecondary: "#252540", // Fons secundari (cards, etc.)
-  backgroundTertiary: "#2f2f4a",  // Fons terciari (hover states)
-  
-  lightColor: "#1e1e32",       // Substitueix el blanc
-  textLight: "#e8e8f0",        // Text clar principal
-  textMuted: "#a0a0b8",        // Text secundari
-  black: "#0d0d1a",            // Negre amb to lila
-  textDark: "#f0f0f5",         // Text sobre fons fosc (invertit)
+  // Liles - Protagonistes en dark mode
+  purple: "#a78bfa", // Lila brillant
+  darkPurple: "#8b5cf6", // Morat vibrant
+  lightPurple: "#6d28d9", // Morat profund
+
+  // Neutres i fons
+  lightColor: "#1a1333", // Fons secundari morat fosc
+  black: "#05030f", // Negre quasi pur amb tint morat
+  textDark: "#e8e4f5", // Text clar amb tint lleugerament morat
+  textLight: "#f5f3ff", // Blanc trencat amb tint lila
+  textMuted: "#9b8ec4", // Text apagat morat
+
+  // Fons principals
+  backgroundSecondary: "#15102b",
+  backgroundTertiary: "#1f1640",
 
   // Bordes i separadors
-  border: "#3a3a5c",           // Bordes subtils
-  borderLight: "#4a4a6c",      // Bordes més visibles
+  border: "#2d2256",
+  borderLight: "#3d2f6a",
 }

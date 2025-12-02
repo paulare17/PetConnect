@@ -248,55 +248,55 @@ function ResponsiveAppBar() {
                 sx={{ my: 1, borderColor: colors.orange, borderWidth: 1 }}
               />
 
-              {/* Accions d'usuari (només si està autenticat) */}
-              {user && (
-                <>
-                  <MenuItem
-                    onClick={() => {
-                      handleCloseNavMenu();
-                      toggleDarkMode();
-                    }}
+              {/* Accions sempre visibles (DarkMode i Idioma) */}
+              <MenuItem
+                key="darkmode"
+                onClick={() => {
+                  handleCloseNavMenu();
+                  toggleDarkMode();
+                }}
+                sx={{
+                  py: 1.5,
+                  px: 2.5,
+                  "&:hover": {
+                    bgcolor: colors.lightBlue,
+                  },
+                }}
+              >
+                <Box display="flex" alignItems="center" gap={1.5}>
+                  <DarkModeIcon
                     sx={{
-                      py: 1.5,
-                      px: 2.5,
-                      "&:hover": {
-                        bgcolor: colors.lightBlue,
-                      },
+                      fontSize: "1.2rem",
+                      color: colors.textDark,
                     }}
+                  />
+                  <Typography
+                    sx={{ fontSize: "1rem", color: colors.textDark }}
                   >
-                    <Box display="flex" alignItems="center" gap={1.5}>
-                      <DarkModeIcon
-                        sx={{
-                          fontSize: "1.2rem",
-                          color: colors.textDark,
-                        }}
-                      />
-                      <Typography
-                        sx={{ fontSize: "1rem", color: colors.textDark }}
-                      >
-                        Mode fosc
-                      </Typography>
-                    </Box>
-                  </MenuItem>
+                    Mode fosc
+                  </Typography>
+                </Box>
+              </MenuItem>
 
-                  <MenuItem
-                    onClick={() => {
-                      handleCloseNavMenu();
-                      // handleLanguageChange(); // Funció per canviar idioma
-                    }}
+              <MenuItem
+                key="language"
+                onClick={() => {
+                  handleCloseNavMenu();
+                  // handleLanguageChange(); // Funció per canviar idioma
+                }}
+                sx={{
+                  py: 1.5,
+                  px: 2.5,
+                  "&:hover": {
+                    bgcolor: colors.lightBlue,
+                  },
+                }}
+              >
+                <Box display="flex" alignItems="center" gap={1.5}>
+                  <TranslateIcon
                     sx={{
-                      py: 1.5,
-                      px: 2.5,
-                      "&:hover": {
-                        bgcolor: colors.lightBlue,
-                      },
-                    }}
-                  >
-                    <Box display="flex" alignItems="center" gap={1.5}>
-                      <TranslateIcon
-                        sx={{
-                          fontSize: "1.2rem",
-                          color: colors.textDark,
+                      fontSize: "1.2rem",
+                      color: colors.textDark,
                         }}
                       />
                       <Typography
@@ -306,8 +306,6 @@ function ResponsiveAppBar() {
                       </Typography>
                     </Box>
                   </MenuItem>
-                </>
-              )}
             </Menu>
           </Box>
 
@@ -413,136 +411,137 @@ function ResponsiveAppBar() {
     flexShrink: 0,
   }}
 >
+  {/* Botons sempre visibles (DarkMode i Traducció) - només en desktop */}
+  <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1, mr: user ? 3 : 0, }}>
+    {/* Botó DarkMode */}
+    <Tooltip title={isDarkMode ? "Modo claro" : "Modo fosc"}>
+      <IconButton
+        onClick={() => {
+          toggleDarkMode();
+        }}
+        sx={{
+          color: isDarkMode ? theme.palette.primary.main : colors.yellow,
+          bgcolor: isDarkMode ? theme.palette.background.paper : colors.darkBlue,
+          width: 30,
+          height: 30,
+          '&:hover': {
+            bgcolor: isDarkMode ? theme.palette.action.hover : colors.textDark,
+            color: isDarkMode ? theme.palette.primary.light : colors.purple,
+            transform: 'scale(1.05)',
+          },
+          transition: 'all 0.3s ease',
+        }}
+      >
+        <DarkModeIcon sx={{ fontSize: '1.1rem' }} />
+      </IconButton>
+    </Tooltip>
+
+    {/* Botó Traducció */}
+    <Tooltip title="Canviar idioma">
+      <IconButton
+        onClick={handleOpenLanguageMenu}
+        sx={{
+          color: isDarkMode ? theme.palette.primary.main : colors.yellow,
+          bgcolor: isDarkMode ? theme.palette.background.paper : colors.darkBlue,
+          width: 30,
+          height: 30,
+          '&:hover': {
+            bgcolor: isDarkMode ? theme.palette.action.hover : colors.textDark,
+            transform: 'scale(1.05)',
+          },
+          transition: 'all 0.3s ease',
+        }}
+      >
+        <TranslateIcon sx={{ fontSize: '1.1rem' }} />
+      </IconButton>
+    </Tooltip>
+
+    {/* Menú de idiomas */}
+    <Menu
+      anchorEl={anchorElLanguage}
+      anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'right',
+      }}
+      keepMounted
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      open={Boolean(anchorElLanguage)}
+      onClose={handleCloseLanguageMenu}
+      PaperProps={{
+        sx: {
+          minWidth: 80,
+          borderRadius: 2,
+          boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+          bgcolor: isDarkMode ? theme.palette.background.paper : 'white',
+        },
+      }}
+    >
+      <MenuItem
+        onClick={() => handleLanguageChange('ca')}
+        sx={{
+          py: 1,
+          px: 2,
+          fontSize: '0.85rem',
+          textAlign: 'center',
+          justifyContent: 'center',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 0.8,
+          '&:hover': {
+            bgcolor: isDarkMode ? theme.palette.action.hover : colors.lightBlue,
+          },
+        }}
+      >
+        <span className="fi fi-es-ct fis" style={{ fontSize: '1.2rem' }}></span>
+        <span>CAT</span>
+      </MenuItem>
+      <MenuItem
+        onClick={() => handleLanguageChange('es')}
+        sx={{
+          py: 1,
+          px: 2,
+          fontSize: '0.85rem',
+          textAlign: 'center',
+          justifyContent: 'center',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 0.8,
+          '&:hover': {
+            bgcolor: isDarkMode ? theme.palette.action.hover : colors.lightBlue,
+          },
+        }}
+      >
+        <span className="fi fi-es fis" style={{ fontSize: '1.2rem' }}></span>
+        <span>ESP</span>
+      </MenuItem>
+      <MenuItem
+        onClick={() => handleLanguageChange('en')}
+        sx={{
+          py: 1,
+          px: 2,
+          fontSize: '0.85rem',
+          textAlign: 'center',
+          justifyContent: 'center',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 0.8,
+          '&:hover': {
+            bgcolor: isDarkMode ? theme.palette.action.hover : colors.lightBlue,
+          },
+        }}
+      >
+        <span className="fi fi-gb fis" style={{ fontSize: '1.2rem' }}></span>
+        <span>ENG</span>
+      </MenuItem>
+    </Menu>
+  </Box>
+
+  {/* Avatar i menú d'usuari (només si està autenticat) */}
   {user && (
     <>
-      {/* Botons només en desktop */}
-      <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1, mr: 3, }}>
-        {/* Botó DarkMode */}
-        <Tooltip title={isDarkMode ? "Modo claro" : "Modo fosc"}>
-          <IconButton
-            onClick={() => {
-              toggleDarkMode();
-            }}
-            sx={{
-              color: isDarkMode ? theme.palette.primary.main : colors.yellow,
-              bgcolor: isDarkMode ? theme.palette.background.paper : colors.darkBlue,
-              width: 30,
-              height: 30,
-              '&:hover': {
-                bgcolor: isDarkMode ? theme.palette.action.hover : colors.textDark,
-                color: isDarkMode ? theme.palette.primary.light : colors.purple,
-                transform: 'scale(1.05)',
-              },
-              transition: 'all 0.3s ease',
-            }}
-          >
-            <DarkModeIcon sx={{ fontSize: '1.1rem' }} />
-          </IconButton>
-        </Tooltip>
-
-        {/* Botó Traducció */}
-        <Tooltip title="Canviar idioma">
-          <IconButton
-            onClick={handleOpenLanguageMenu}
-            sx={{
-              color: isDarkMode ? theme.palette.primary.main : colors.yellow,
-              bgcolor: isDarkMode ? theme.palette.background.paper : colors.darkBlue,
-              width: 30,
-              height: 30,
-              '&:hover': {
-                bgcolor: isDarkMode ? theme.palette.action.hover : colors.textDark,
-                transform: 'scale(1.05)',
-              },
-              transition: 'all 0.3s ease',
-            }}
-          >
-            <TranslateIcon sx={{ fontSize: '1.1rem' }} />
-          </IconButton>
-        </Tooltip>
-
-        {/* Menú de idiomas */}
-        <Menu
-          anchorEl={anchorElLanguage}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'right',
-          }}
-          keepMounted
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
-          }}
-          open={Boolean(anchorElLanguage)}
-          onClose={handleCloseLanguageMenu}
-          PaperProps={{
-            sx: {
-              minWidth: 80,
-              borderRadius: 2,
-              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-              bgcolor: isDarkMode ? theme.palette.background.paper : 'white',
-            },
-          }}
-        >
-          <MenuItem
-            onClick={() => handleLanguageChange('ca')}
-            sx={{
-              py: 1,
-              px: 2,
-              fontSize: '0.85rem',
-              textAlign: 'center',
-              justifyContent: 'center',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.8,
-              '&:hover': {
-                bgcolor: isDarkMode ? theme.palette.action.hover : colors.lightBlue,
-              },
-            }}
-          >
-            <span className="fi fi-es-ct fis" style={{ fontSize: '1.2rem' }}></span>
-            <span>CAT</span>
-          </MenuItem>
-          <MenuItem
-            onClick={() => handleLanguageChange('es')}
-            sx={{
-              py: 1,
-              px: 2,
-              fontSize: '0.85rem',
-              textAlign: 'center',
-              justifyContent: 'center',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.8,
-              '&:hover': {
-                bgcolor: isDarkMode ? theme.palette.action.hover : colors.lightBlue,
-              },
-            }}
-          >
-            <span className="fi fi-es fis" style={{ fontSize: '1.2rem' }}></span>
-            <span>ESP</span>
-          </MenuItem>
-          <MenuItem
-            onClick={() => handleLanguageChange('en')}
-            sx={{
-              py: 1,
-              px: 2,
-              fontSize: '0.85rem',
-              textAlign: 'center',
-              justifyContent: 'center',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.8,
-              '&:hover': {
-                bgcolor: isDarkMode ? theme.palette.action.hover : colors.lightBlue,
-              },
-            }}
-          >
-            <span className="fi fi-gb fis" style={{ fontSize: '1.2rem' }}></span>
-            <span>ENG</span>
-          </MenuItem>
-        </Menu>
-      </Box>
-
       {/* Avatar */}
       <Tooltip title="Perfil">
         <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
@@ -602,7 +601,7 @@ function ResponsiveAppBar() {
         >
           <Typography
             sx={{
-              fontWeight: 600,
+              fontWeight: 400,
               fontSize: "0.95rem",
               color: isDarkMode ? theme.palette.text.primary : colors.textDark,
             }}

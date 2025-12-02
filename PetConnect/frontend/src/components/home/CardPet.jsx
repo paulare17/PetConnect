@@ -16,7 +16,7 @@ import PetsIcon from '@mui/icons-material/Pets';
 import MaleIcon from '@mui/icons-material/Male';
 import FemaleIcon from '@mui/icons-material/Female';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { colors } from '../../constants/colors';
+import { useColors } from '../../hooks/useColors';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import blackCatImg from '../../assets/black.png';
@@ -39,6 +39,7 @@ const ExpandMore = styled((props) => {
 // protectora = { nombre: string, foto: string }
 
 export default function CardPet({ animal, isFavorito, onToggleFavorito, sx }) {
+  const { colors } = useColors();
   // Exemple per defecte si no hi ha animal
   
   const data = animal || null;
@@ -46,7 +47,7 @@ export default function CardPet({ animal, isFavorito, onToggleFavorito, sx }) {
   if (!data) return null;
 
   // Colors i icones segons espècie
-  const cardColor = data.especie === 'perro' ? colors.backgroundOrange : colors.backgroundBlue;
+  const cardColor = data.especie === 'perro' ? colors.background : colors.backgroundBlue;
   const iconColor = data.especie === 'perro' ? colors.darkOrange : colors.darkBlue;
   let imageSrc;
   if (!data.foto) {
@@ -100,7 +101,7 @@ export default function CardPet({ animal, isFavorito, onToggleFavorito, sx }) {
 
       {/* Contingut */}
       <CardContent sx={{ flexGrow: 1 }}>
-        <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold', color: colors.black, mb: 1, textAlign: 'center' }}>
+        <Typography variant="h6" component="h2" sx={{ color: colors.black, mb: 1, textAlign: 'center' }}>
           {data.nombre}
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
@@ -135,7 +136,7 @@ export default function CardPet({ animal, isFavorito, onToggleFavorito, sx }) {
       <CardActions sx={{ backgroundColor: cardColor, justifyContent: 'center', pb: 2 }}>
         <Button
           variant="contained"
-          sx={{ backgroundColor: colors.orange, color: 'white', fontWeight: 'bold', '&:hover': { backgroundColor: colors.darkOrange }, px: 4 }}
+          sx={{ backgroundColor: colors.orange, color: 'white', '&:hover': { backgroundColor: colors.darkOrange }, px: 4 }}
         >
           Més Info
         </Button>

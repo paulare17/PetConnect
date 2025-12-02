@@ -5,11 +5,12 @@ import gatImatgeInfEsq from "../../assets/gat-cantonada.png";
 import gatImatgeSupDreta from "../../assets/gat-superior.png";
 import gosImatgeCentre from "../../assets/gos-baix.png";
 import "./petjades.css";
-import { colors } from "../../constants/colors.jsx";
+import { useColors } from "../../hooks/useColors";
 import { useNavigate } from "react-router-dom";
 
 export default function Landpage() {
   const navigate = useNavigate();
+  const { colors } = useColors();
   const [isHovering, setIsHovering] = useState(false);
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
   const [isOverInteractive, setIsOverInteractive] = useState(false);
@@ -48,12 +49,13 @@ export default function Landpage() {
       sx={{
         minHeight: "calc(100vh - 90px)",
         width: "100%",
-        bgcolor: colors.backgroundOrange,
+        bgcolor: colors.background,
         display: "flex",
         flexDirection: "column",
         position: "relative",
         overflow: "hidden",
         cursor: isHovering ? "none" : "default",
+        transition: 'background-color 0.3s ease',
       }}
     >
       {/* Cursor personalitzat amb icona PetsIcon */}
@@ -123,6 +125,7 @@ export default function Landpage() {
 
         {/* Subtítol */}
         <Typography
+        className="custom-subtitle"
           variant="h4"
           sx={{
             fontFamily: "'Rubik Bubbles', sans-serif",
@@ -132,7 +135,7 @@ export default function Landpage() {
             opacity: 0.9,
             lineHeight: 1.4,
             textAlign: "center",
-            background: `linear-gradient(90deg, ${colors.blue}, ${colors.orange})`,
+            // background: `linear-gradient(90deg, ${colors.blue}, ${colors.orange})`,
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
           }}
@@ -148,6 +151,7 @@ export default function Landpage() {
           sx={{ width: "100%", maxWidth: "320px", mb: 4 }}
         >
           <Button
+          className="custom-color-button-orange"
             onClick={() => navigate("/formulari-dialog")}
             variant="contained"
             sx={{
@@ -157,7 +161,7 @@ export default function Landpage() {
               py: 1.5,
               px: 4,
               fontSize: { xs: "1rem", md: "1.2rem" },
-              fontWeight: 600,
+              fontWeight: 500,
               textTransform: "none",
               cursor: "none !important",
               boxShadow: `0 8px 20px ${colors.orange}40`,
@@ -173,6 +177,7 @@ export default function Landpage() {
           </Button>
 
           <Button
+          className="custom-color-button-blue"
             onClick={() => navigate("/formulari-acces")}
             variant="contained"
             sx={{
@@ -182,7 +187,7 @@ export default function Landpage() {
               py: 1.2,
               px: 3.5,
               fontSize: { xs: "0.9rem", md: "1rem" },
-              fontWeight: 600,
+              fontWeight: 500,
               textTransform: "none",
               cursor: "none !important",
               boxShadow: `0 8px 20px ${colors.blue}40`,

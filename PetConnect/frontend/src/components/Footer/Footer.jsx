@@ -1,11 +1,13 @@
 import PetsIcon from "@mui/icons-material/Pets";
-import { colors } from "../../constants/colors.jsx";
+import { useColors } from "../../hooks/useColors";
 
 export default function Footer() {
+  const { colors } = useColors();
+  
   return (
 <footer
       className="d-flex flex-column align-items-center justify-content-center"
-      style={{ backgroundColor: colors.orange, width: "100%" }}
+      style={{ backgroundColor: colors.orange, width: "100%", transition: 'background-color 0.3s ease' }}
     >
       <div className="container d-flex justify-content-center align-items-center py-4">
         <a href="https://facebook.com" className="footer-link mx-3" aria-label="Facebook" target="_blank" rel="noopener noreferrer">

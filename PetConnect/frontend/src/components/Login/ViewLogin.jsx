@@ -11,7 +11,7 @@ import {
   IconButton
 } from '@mui/material';
 import { Visibility, VisibilityOff, Email, Lock } from '@mui/icons-material';
-import {colors } from '../../constants/colors.jsx';
+import { useColors } from '../../hooks/useColors';
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from '../../context/AuthProvider';
 
@@ -19,6 +19,7 @@ import { useAuthContext } from '../../context/AuthProvider';
 export default function ViewLogin() {
   const navigate = useNavigate();
   const { login } = useAuthContext();
+  const { colors } = useColors();
   const [formData, setFormData] = useState({
     username: '',
     password: ''
@@ -77,10 +78,11 @@ export default function ViewLogin() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        bgcolor: colors.backgroundOrange,
+        bgcolor: colors.background,
+        transition: 'background-color 0.3s ease',
       }}
     >
-      <Card sx={{ maxWidth: 400, width: '100%', borderRadius: 5}}>
+      <Card sx={{ maxWidth: 400, width: '100%', borderRadius: 5, bgcolor: colors.lightColor, transition: 'background-color 0.3s ease'}}>
         <CardContent sx={{ p: 4 }}>
           <Typography 
             variant="h4" 
