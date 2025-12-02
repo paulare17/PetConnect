@@ -28,7 +28,6 @@ import ChatList from "./components/Chat/ChatList.jsx";
 
 function App() {
   // const location = useLocation();
-
   // const isLandpage = location.pathname ==="/" ? : ; 
 
 
