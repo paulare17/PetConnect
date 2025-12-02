@@ -1,5 +1,7 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Nunito", Helvetica, Arial, sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
   line-height: 1.5;
   font-weight: 400;
 
@@ -7,6 +9,7 @@
   color: rgba(255, 255, 255, 0.87);
   background-color: var(--orange-fondo);
 
+  /* Light mode colors */
   --orange: #f5842b;
   --dark-orange: #fc6d00ff;
   --blue: #66c5bd;
@@ -15,6 +18,10 @@
   --yellow: #f6ce5b;
   --purple: #bcbefa;
   --light-color: #f8f9fa;
+  --background: #ffffff;
+  --background-secondary: #f5f5f5;
+  --text-primary: #3a3a3a;
+  --text-secondary: #666666;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -23,6 +30,22 @@
   width: 100%;
   min-height: 100vh;
   overflow-x: hidden;
+}
+
+/* Dark mode CSS variables - applied via MUI theme */
+[data-theme="dark"] {
+  --orange: #4d9fff;
+  --dark-orange: #2e7edb;
+  --blue: #7c5cff;
+  --dark-blue: #5c3ed9;
+  --orange-background: #1a2540;
+  --yellow: #00d4ff;
+  --purple: #a78bfa;
+  --light-color: #1a1333;
+  --background: #0f0820;
+  --background-secondary: #15102b;
+  --text-primary: #e8e4f5;
+  --text-secondary: #9b8ec4;
 }
 
 /* Eliminar scroll innecessari */
@@ -40,30 +63,35 @@ body {
   scrollbar-color: transparent transparent;
 }
 
-#root {
-}
-
 .custom-title {
   font-size: 4rem;
   background: linear-gradient(90deg, var(--orange), var(--blue));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.custom-subtitle {
+  font-size: 1.5rem;
+  background: linear-gradient(90deg, var(--blue), var(--orange));
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.sticker-button {
-  /* Estil replicat, amb els teus colors */
-  padding: 10px 20px;
-  background-color: var(--blue); /* El teu 'blue' - color de fons principal */
-  border: 3px solid #000000; /* El teu 'black' - Vora forta */
-  border-radius: 5px;
-  
-  font-weight: bold;
-  text-transform: uppercase;
-  color: var(--light-color); /* El teu 'lightColor' - Text clar (o utilitza '#000000' si prefereixes text negre) */
-  
+.custom-color-button-orange {
+  background-color: var(--orange) !important;
+  color: var(--light-color) !important;
+}
+.custom-color-button-orange:hover {
+  background-color: var(--dark-orange) !important;
+}
 
-  box-shadow: 4px 4px 0 var(--dark-blue); 
- 
+.custom-color-button-blue {
+  background-color: var(--blue) !important;
+  color: var(--light-color) !important;
+}
+.custom-color-button-blue:hover {
+  background-color: var(--dark-blue) !important;
 }
 
 /* Footer link styles */

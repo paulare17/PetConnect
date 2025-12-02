@@ -16,7 +16,7 @@ import {
   InputLabel,
   Button
 } from '@mui/material';
-import CardAnimal from './CardAnimal.jsx';
+import CardPet from './CardPet.jsx';
 import useMascotas from '../../hooks/useMascotas';
 
 /**
@@ -145,7 +145,7 @@ export default function PetList() {
         <Grid container spacing={3}>
           {mascotas.map((mascota) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={mascota.id}>
-              <CardAnimal 
+              <CardPet 
                 itemData={[mascota]} 
                 protectora={{
                   nombre: mascota.protectora_nombre || 'Protectora',

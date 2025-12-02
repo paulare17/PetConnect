@@ -38,8 +38,7 @@ class Mascota(models.Model):
         ('mediano', 'Mediano (10-25kg)'),
         ('grande', 'Grande (25-45kg)'),
         ('gigante', 'Gigante (+45kg)'),
-    ]
-    
+    ]    
     # Carácter (ejemplos, ampliar)
     CARACTER = [
         ('cariñoso', 'Cariñoso'),
@@ -128,6 +127,8 @@ class Mascota(models.Model):
         verbose_name = "Mascota"
         verbose_name_plural = "Mascotas"
         ordering = ['-fecha_creacion']
+        
+        
 
 # Clase para registrar las interacciones de swipe (like/dislike)
 

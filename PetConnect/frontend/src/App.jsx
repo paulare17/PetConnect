@@ -19,13 +19,15 @@ import Footer from "./components/Footer/Footer";
 import FooterLandpage from "./components/Footer/FooterLandpage.jsx";
 import ProtectedRoute, { ProtectoraRoute, UsuarioRoute } from "./components/ProtectedRoute";
 import PetList from "./components/home/PetList.jsx";
+import PetTinder from "./components/home/PetTinder.jsx";
 import IniciUsuari from "./components/Inici/IniciUsuari";
 import IniciProtectora from "./components/Inici/IniciProtectora";
 import ProfileMascota from "./components/pages/ProfileMascota.jsx";
+import ChatRoom from "./components/Chat/Chat.jsx";
+import ChatList from "./components/Chat/ChatList.jsx";
 
 function App() {
   // const location = useLocation();
-
   // const isLandpage = location.pathname ==="/" ? : ; 
 
 
@@ -64,7 +66,7 @@ function App() {
             <Route path="/formulari-usuari" element={<FormUsuari />} />
 
             {/* Rutes protegides - Només protectores */}
-            <Route path="/afegir-animal" element={
+            <Route path="/afegir-mascota" element={
               <ProtectoraRoute>
                 <AddAnimalForm />
               </ProtectoraRoute>
@@ -86,10 +88,27 @@ function App() {
                 <UserProfile />
               </UsuarioRoute>
             } />
-            <Route path="/inici-usuari-galeria" element={
+            <Route path="/inici-usuari" element={
               <UsuarioRoute>
                 <IniciUsuari />
               </UsuarioRoute>
+            } />
+            <Route path="/pettinder" element={
+              <UsuarioRoute>
+                <PetTinder />
+              </UsuarioRoute>
+            } />
+
+            {/* Rutes protegides - Chat */}
+            <Route path="/chats" element={
+              <ProtectedRoute>
+                <ChatList />
+              </ProtectedRoute>
+            } />
+            <Route path="/chat/:chatId" element={
+              <ProtectedRoute>
+                <ChatRoom />
+              </ProtectedRoute>
             } />
 
             {/* Ruta protegida - Perfil d'una mascota per id */}

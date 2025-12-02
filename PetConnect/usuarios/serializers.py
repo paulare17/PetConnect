@@ -88,3 +88,25 @@ class LoginSerializer(serializers.Serializer):
     """Serializer para login"""
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)
+    
+    def validate(self, attrs):
+        username = attrs.get('username')
+        password = attrs.get('password')
+        
+        if not username:
+            raise serializers.ValidationError({'username': 'Aquest camp és obligatori.'})
+        if not password:
+            raise serializers.ValidationError({'password': 'Aquest camp és obligatori.'})
+        
+        # Comprova si l'usuari existeix
+        try:
+            user = Usuario.objects.get(username=username)
+        except Usuario.DoesNotExist:
+            raise serializers.ValidationError({'username': 'Usuari no trobat.'})
+        
+        # Comprova la contrasenya
+        if not user.check_password(password):
+            raise serializers.ValidationError({'password': 'Contrasenya incorrecta.'})
+        
+        attrs['user'] = user
+        return attrs

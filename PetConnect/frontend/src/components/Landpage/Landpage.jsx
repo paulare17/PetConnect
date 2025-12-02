@@ -1,36 +1,86 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box, Button, Typography } from "@mui/material";
 import PetsIcon from "@mui/icons-material/Pets";
-import gatImatgeInfEsq from "../../assets/gat-cantonada.png"; // ✅ Import la imatge
+import gatImatgeInfEsq from "../../assets/gat-cantonada.png";
 import gatImatgeSupDreta from "../../assets/gat-superior.png";
 import gosImatgeCentre from "../../assets/gos-baix.png";
-import './petjades.css'
-import {colors} from '../../constants/colors.jsx'
+import "./petjades.css";
+import { useColors } from "../../hooks/useColors";
 import { useNavigate } from "react-router-dom";
 
-
 export default function Landpage() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const { colors } = useColors();
+  const [isHovering, setIsHovering] = useState(false);
+  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
+  const [isOverInteractive, setIsOverInteractive] = useState(false);
+  const [cursorColor, setCursorColor] = useState(colors.darkPurple);
+
+  const handleMouseMove = (e) => {
+    if (isHovering) {
+      setCursorPos({ x: e.clientX, y: e.clientY });
+      
+      // Detectar si el cursor està sobre un element interactiu
+      const elementBelow = document.elementFromPoint(e.clientX, e.clientY);
+      const button = elementBelow?.closest("button");
+      const isInteractive = button !== null;
+      
+      if (isInteractive) {
+        // Comprovar el text del botó per determinar el color
+        const buttonText = button.textContent;
+        if (buttonText.includes("Ja tens compte")) {
+          setCursorColor(colors.darkOrange);
+        } else {
+          setCursorColor(colors.darkBlue);
+        }
+      } else {
+        setCursorColor(colors.darkPurple);
+      }
+      
+      setIsOverInteractive(isInteractive);
+    }
+  };
+
   return (
     <Box
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
       sx={{
-        minHeight: 'calc(100vh - 90px)',
-        width: "100%", // Usa 100% en lloc de 100vw
-        flex: 1, // Ocupa l'espai restant després de la navbar
-        bgcolor: colors.backgroundOrange,
+        minHeight: "calc(100vh - 90px)",
+        width: "100%",
+        bgcolor: colors.background,
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center", 
-        position: "relative", 
-        // overflow: "auto", 
-      //  minHeight: 0, // Permet que el flex item es redueixi
-        padding: { xs: 1, sm: 2, md: 3 }, // Menys padding
-        gap: { xs: 1, sm: 1.5, md: 2 }, // Menys gap
+        position: "relative",
+        overflow: "hidden",
+        cursor: isHovering ? "none" : "default",
+        transition: 'background-color 0.3s ease',
       }}
     >
-
-<div className="petjades-container">
+      {/* Cursor personalitzat amb icona PetsIcon */}
+      {isHovering && (
+        <Box
+          sx={{
+            position: "fixed",
+            left: cursorPos.x,
+            top: cursorPos.y,
+            pointerEvents: "none",
+            zIndex: 9999,
+            transform: "translate(-50%, -50%)",
+          }}
+        >
+          <PetsIcon
+            sx={{
+              fontSize: isOverInteractive ? "32px" : "24px",
+              color: cursorColor,
+              opacity: 0.8,
+              transition: "all 0.2s ease-in-out",
+            }}
+          />
+        </Box>
+      )}
+      <Box className="petjades-container">
         <PetsIcon className="petjada petjada-1" />
         <PetsIcon className="petjada petjada-2" />
         <PetsIcon className="petjada petjada-3" />
@@ -39,128 +89,225 @@ export default function Landpage() {
         <PetsIcon className="petjada petjada-6" />
         <PetsIcon className="petjada petjada-7" />
         <PetsIcon className="petjada petjada-8" />
-      </div>
+      </Box>
 
+      {/* Contingut principal centrat */}
       <Box
-        component="img"
-        src={gatImatgeSupDreta}
-        alt="Gato siamés"
         sx={{
-          position: "absolute",
-          top: 0,
-          right: 0,
-          width: 250,
-          height: "auto",
-          //   borderRadius: 2,
-          objectFit: "cover",
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          px: { xs: 2, sm: 4, md: 6 },
+          py: { xs: 4, md: 6 },
+          zIndex: 2,
         }}
-      />
-      {/* Títol principal amb icona */}
-      <Box
-        display="flex"
-        alignItems="center"
-        gap={{ xs: 0.5, sm: 1, md: 1.5 }}
-        sx={{ zIndex: 2 }}
-  
       >
-        <PetsIcon
-          sx={{
-            mb: 2,
-            display: { xs: "none", sm: "flex" },
-            color: colors.orange,
-            fontSize: { xs: 80, sm: 100, md: 120 },
-            cursor: "pointer",
-            "&:hover": {
-              transform: "scale(1.1) rotate(10deg)",
-              transition: "all 0.3s ease-in-out",
-              color: colors.blue,
-            },
-          }}
-        />
+        {/* Títol */}
         <Typography
           className="custom-title"
           variant="h1"
           sx={{
             fontFamily: "'Rubik Bubbles', sans-serif",
-            fontSize: { xs: '3.5rem', sm:'4.5rem', md: '6rem', lg: '7rem', xl:'8rem'
-
-          }}}
+            fontSize: {
+              xs: "2.8rem",
+              sm: "3.5rem",
+              md: "5rem",
+              lg: "6rem",
+            },
+            textAlign: "center",
+            mb: 2,
+          }}
         >
           PetConnect
         </Typography>
-      </Box>
 
-      {/* Botons */}
-      <Box
-        display="flex"
-        flexDirection="column" 
-        gap={{ xs: 2, sm: 2.5, md: 3 }} 
-        sx={{ zIndex: 2 }}
-      >
-        <Button
-        onClick={()=> navigate('/formulari-acces')}
-          variant="contained"
+        {/* Subtítol */}
+        <Typography
+        className="custom-subtitle"
+          variant="h4"
           sx={{
-            bgcolor: colors.blue,
-            "&:hover": {
-              bgcolor: colors.darkBlue,
-              transform: "translateY(-2px)",
-              boxShadow: "0 4px 12px rgba(102, 197, 189, 0.3)",
-            },
-            borderRadius: 5,
-            px: 4,
-            fontSize: "1.1rem",
-            transition: "all 0.3s ease-in-out",
+            fontFamily: "'Rubik Bubbles', sans-serif",
+            fontSize: { xs: "1rem", sm: "1.2rem", md: "1.6rem" },
+            mb: 4,
+            fontWeight: 500,
+            opacity: 0.9,
+            lineHeight: 1.4,
+            textAlign: "center",
+            // background: `linear-gradient(90deg, ${colors.blue}, ${colors.orange})`,
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
           }}
         >
-          Iniciar sessió
-        </Button>
+          Connecta amb la teva mascota perfecta
+        </Typography>
 
-        <Button
-        onClick={()=> navigate('/formulari-dialog')}
-          variant="contained"
-          sx={{
-            bgcolor: colors.orange,
-            "&:hover": {
-              bgcolor: colors.darkOrange,
-              transform: "translateY(-2px)",
-              boxShadow: "0 4px 12px rgba(245, 132, 43, 0.3)",
-            },
-            borderRadius: 5,
-            px: 4,
-            fontSize: "1.1rem",
-            transition: "all 0.3s ease-in-out",
-          }}
+        {/* Botons */}
+        <Box
+          display="flex"
+          flexDirection="column"
+          gap={2}
+          sx={{ width: "100%", maxWidth: "320px", mb: 4 }}
         >
-          Registrar-se
-        </Button>
+          <Button
+          className="custom-color-button-orange"
+            onClick={() => navigate("/formulari-dialog")}
+            variant="contained"
+            sx={{
+              bgcolor: colors.orange,
+              color: "white",
+              borderRadius: "50px",
+              py: 1.5,
+              px: 4,
+              fontSize: { xs: "1rem", md: "1.2rem" },
+              fontWeight: 500,
+              textTransform: "none",
+              cursor: "none !important",
+              boxShadow: `0 8px 20px ${colors.orange}40`,
+              "&:hover": {
+                bgcolor: colors.darkOrange,
+                transform: "translateY(-4px) scale(1.02)",
+                boxShadow: `0 12px 30px ${colors.orange}60`,
+              },
+              transition: "all 0.3s ease-in-out",
+            }}
+          >
+            Registra't ara
+          </Button>
+
+          <Button
+          className="custom-color-button-blue"
+            onClick={() => navigate("/formulari-acces")}
+            variant="contained"
+            sx={{
+              bgcolor: colors.blue,
+              color: "white",
+              borderRadius: "50px",
+              py: 1.2,
+              px: 3.5,
+              fontSize: { xs: "0.9rem", md: "1rem" },
+              fontWeight: 500,
+              textTransform: "none",
+              cursor: "none !important",
+              boxShadow: `0 8px 20px ${colors.blue}40`,
+              "&:hover": {
+                bgcolor: colors.darkBlue,
+                transform: "translateY(-2px)",
+                boxShadow: `0 8px 20px ${colors.blue}60`,
+              },
+              transition: "all 0.3s ease-in-out",
+            }}
+          >
+            Ja tens compte? Inicia sessió
+          </Button>
+        </Box>
+<Box
+  display="flex"
+  justifyContent="center"
+  gap={{ xs: 1.5, sm: 2.5 }}
+  flexWrap="wrap"
+  sx={{ mt: 3 }}
+>
+  <Box
+    display="flex"
+    alignItems="center"
+    gap={0.5}
+  >
+    <Typography sx={{ fontSize: '24px' }}>✅</Typography>
+    <Typography
+      sx={{
+        color: colors.textDark,
+        fontSize: { xs: '0.85rem', sm: '0.95rem' },
+      }}
+    >
+      Segur i fiable
+    </Typography>
+  </Box>
+
+  <Box
+    display="flex"
+    alignItems="center"
+    gap={0.5}
+  >
+    <Typography sx={{ fontSize: '24px' }}>❤️</Typography>
+    <Typography
+      sx={{
+        color: colors.textDark,
+        fontSize: { xs: '0.85rem', sm: '0.95rem' },
+      }}
+    >
+      Garantia d'adopció responsable
+    </Typography>
+  </Box>
+
+  <Box
+    display="flex"
+    alignItems="center"
+    gap={0.5}
+  >
+    <Typography sx={{ fontSize: '24px' }}>⭐</Typography>
+    <Typography
+      sx={{
+        color: colors.textDark,
+        fontSize: { xs: '0.85rem', sm: '0.95rem' },
+      }}
+    >
+      Recomanat
+    </Typography>
+  </Box>
+</Box>
+  
       </Box>
+
+      {/* Imatges decoratives - posicionades als costats */}
       <Box
         component="img"
-        src={gatImatgeInfEsq} 
-        alt="Gato siamés"
+        src={gatImatgeSupDreta}
+        alt="Gat"
+        sx={{
+          position: "absolute",
+          top: 0,
+          right: 0,
+          width: { xs: 120, sm: 180, md: 220 },
+          height: "auto",
+          objectFit: "cover",
+          opacity: 0.9,
+          zIndex: 1,
+        }}
+      />
+
+      <Box
+        component="img"
+        src={gatImatgeInfEsq}
+        alt="Gat"
         sx={{
           position: "absolute",
           bottom: 0,
           left: 0,
-          width: 300,
+          width: { xs: 140, sm: 200, md: 260 },
           height: "auto",
-          //   borderRadius: 2,
           objectFit: "cover",
+          opacity: 0.9,
+          zIndex: 1,
         }}
       />
+
       <Box
         component="img"
-        src={gosImatgeCentre} 
-        alt="Perro"
+        src={gosImatgeCentre}
+        alt="Gos"
         sx={{
           position: "absolute",
           bottom: 0,
-          left: "50",
-          width: 250,
+          left: "70%",
+          // transform: "translateX(-10%)",
+          width: { xs: 200, sm: 200, md: 250 },
           height: "auto",
-          //   borderRadius: 2,
           objectFit: "cover",
+          opacity: 0.9,
+          zIndex: 1,
+          display: { sm: "block" },
         }}
       />
     </Box>

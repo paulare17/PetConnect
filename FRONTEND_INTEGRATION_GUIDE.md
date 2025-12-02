@@ -1,11 +1,11 @@
 ## 🔧 Cambios Necesarios en el Frontend
 
-### 1. Actualizar CardAnimal.jsx (Vista Galería)
+### 1. Actualizar CardPet.jsx (Vista Galería)
 
 Actualmente el botón de favorito solo controla el estado local. Necesitas conectarlo al backend:
 
 ```jsx
-// CardAnimal.jsx
+// CardPet.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../../api/client'; // Tu cliente axios configurado
@@ -13,7 +13,7 @@ import { styled } from '@mui/material/styles';
 import Card from '@mui/material/Card';
 // ... resto de imports
 
-export default function CardAnimal({ animal, onLikeSuccess, sx }) {
+export default function CardPet({ animal, onLikeSuccess, sx }) {
   const [isFavorito, setIsFavorito] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -162,7 +162,6 @@ function TinderPet() {
             {message && (
                 <div style={{ 
                     color: chatCreated ? '#28a745' : '#007bff',
-                    fontWeight: 'bold',
                     marginBottom: '15px',
                     fontSize: '18px'
                 }}>
@@ -408,7 +407,7 @@ function App() {
 ## 🎯 Flujo Completo
 
 ### Usuario da "Me Gusta" desde la Galería:
-1. Click en corazón → `CardAnimal.handleToggleFavorito()`
+1. Click en corazón → `CardPet.handleToggleFavorito()`
 2. POST `/api/swipe/action/` con `action: "L"`
 3. Backend crea el chat automáticamente
 4. Frontend recibe `chat_id` en la respuesta
@@ -448,7 +447,7 @@ function App() {
 
 ## 🚀 Próximos Pasos
 
-1. Actualizar `CardAnimal.jsx` con la lógica de interacción
+1. Actualizar `CardPet.jsx` con la lógica de interacción
 2. Actualizar `PetTinder.jsx` para mostrar el chat creado
 3. Crear el componente `ChatList.jsx`
 4. Añadir las rutas del chat

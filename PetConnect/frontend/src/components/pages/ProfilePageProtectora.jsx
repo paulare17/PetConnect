@@ -10,7 +10,7 @@ import {
   Link,
   CircularProgress,
 } from "@mui/material";
-import { colors } from "../../constants/colors.jsx";
+import { useColors } from "../../hooks/useColors";
 import { getCurrentUser, getProtectoraProfile } from "../../api/client";
 import GroupIcon from "@mui/icons-material/Group";
 import PetsIcon from "@mui/icons-material/Pets";
@@ -27,6 +27,7 @@ import {
 } from "../../constants/options.jsx";
 
 const ProfilePageProtectora = () => {
+  const { colors } = useColors();
   const [userData, setUserData] = useState(null);
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -58,7 +59,7 @@ const ProfilePageProtectora = () => {
           justifyContent: "center",
           alignItems: "center",
           minHeight: "100vh",
-          backgroundColor: colors.backgroundOrange,
+          backgroundColor: colors.background,
         }}
       >
         <CircularProgress sx={{ color: colors.blue }} />
@@ -70,7 +71,7 @@ const ProfilePageProtectora = () => {
     return (
       <Box
         sx={{
-          backgroundColor: colors.backgroundOrange,
+          backgroundColor: colors.background,
           minHeight: "100vh",
           py: 5,
           px: 1,
@@ -89,7 +90,7 @@ const ProfilePageProtectora = () => {
   return (
     <Box
       sx={{
-        backgroundColor: colors.backgroundOrange,
+        backgroundColor: colors.background,
         minHeight: "100vh",
         py: 5,
         px: 1,
@@ -101,7 +102,7 @@ const ProfilePageProtectora = () => {
             variant="h4"
             sx={{
               color: colors.blue,
-              fontWeight: "bold",
+            
               display: "flex",
               alignItems: "center",
               gap: 1,
@@ -115,7 +116,7 @@ const ProfilePageProtectora = () => {
           {/* Informació Bàsica */}
           <Typography
             variant="h6"
-            sx={{ color: colors.blue, fontWeight: "bold", mb: 2 }}
+            sx={{ color: colors.blue, mb: 2 }}
           >
             Informació Bàsica
           </Typography>
@@ -217,7 +218,7 @@ const ProfilePageProtectora = () => {
           {/* Ubicació */}
           <Typography
             variant="h6"
-            sx={{ color: colors.blue, fontWeight: "bold", mb: 2 }}
+            sx={{ color: colors.blue,  mb: 2 }}
           >
             Ubicació
           </Typography>
@@ -272,7 +273,7 @@ const ProfilePageProtectora = () => {
           <Divider sx={{ my: 2 }} />
           <Typography
             variant="h6"
-            sx={{ color: colors.blue, fontWeight: "bold", mb: 2 }}
+            sx={{ color: colors.blue, mb: 2 }}
           >
             Direcció jurídica i refugi
           </Typography>
@@ -329,7 +330,7 @@ const ProfilePageProtectora = () => {
           <Divider sx={{ my: 2 }} />
           <Typography
             variant="h6"
-            sx={{ color: colors.blue, fontWeight: "bold", mb: 2 }}
+            sx={{ color: colors.blue, mb: 2 }}
           >
             Horaris per dia
           </Typography>
@@ -375,7 +376,7 @@ const ProfilePageProtectora = () => {
           <Divider sx={{ my: 2 }} />
           <Typography
             variant="h6"
-            sx={{ color: colors.blue, fontWeight: "bold", mb: 2 }}
+            sx={{ color: colors.blue,  mb: 2 }}
           >
             Informació dels Animals
           </Typography>
@@ -459,7 +460,7 @@ const ProfilePageProtectora = () => {
           <Divider sx={{ my: 2 }} />
           <Typography
             variant="h6"
-            sx={{ color: colors.blue, fontWeight: "bold", mb: 2 }}
+            sx={{ color: colors.blue, mb: 2 }}
           >
             Descripció i Serveis
           </Typography>
@@ -502,7 +503,7 @@ const ProfilePageProtectora = () => {
           </Typography>
           <Typography
             variant="subtitle2"
-            sx={{ color: colors.orange, fontWeight: "bold", mt: 2 }}
+            sx={{ color: colors.orange,  mt: 2 }}
           >
             Procés d'adopció
           </Typography>
@@ -514,7 +515,7 @@ const ProfilePageProtectora = () => {
           <Divider sx={{ my: 2 }} />
           <Typography
             variant="h6"
-            sx={{ color: colors.blue, fontWeight: "bold", mb: 2 }}
+            sx={{ color: colors.blue, mb: 2 }}
           >
             Xarxes Socials
           </Typography>

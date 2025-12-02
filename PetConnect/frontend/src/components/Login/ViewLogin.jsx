@@ -11,7 +11,7 @@ import {
   IconButton
 } from '@mui/material';
 import { Visibility, VisibilityOff, Email, Lock } from '@mui/icons-material';
-import {colors } from '../../constants/colors.jsx';
+import { useColors } from '../../hooks/useColors';
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from '../../context/AuthProvider';
 
@@ -19,6 +19,7 @@ import { useAuthContext } from '../../context/AuthProvider';
 export default function ViewLogin() {
   const navigate = useNavigate();
   const { login } = useAuthContext();
+  const { colors } = useColors();
   const [formData, setFormData] = useState({
     username: '',
     password: ''
@@ -39,26 +40,28 @@ export default function ViewLogin() {
     e.preventDefault();
     setError('');
     setLoading(true);
-
-    // Validació bàsica
-    if (!formData.username || !formData.password) {
-      setError('Tots els camps són obligatoris');
-      setLoading(false);
-      return;
-    }
-
+    
     try {
-      console.log('Dades d\'accés:', formData);
-      const loginResult = await login(formData);
+      console.log('Dades d\'accés:', { username: formData.username, password: formData.password });
+      const loginResult = await login({ 
+        username: formData.username, 
+        password: formData.password 
+      });
+      
       // Redirigir segons el rol
-      if (loginResult.user?.role === 'usuario') {
-        navigate('/inici-usuari-galeria');
-      } if (loginResult.user?.role === 'protectora') {
+      if (loginResult?.user?.role === 'usuario') {
+        navigate('/inici-usuari');
+      } else if (loginResult?.user?.role === 'protectora') {
         navigate('/inici-protectora');
+      } else {
+        navigate('/');
       }
-    } catch (error) {
-      console.error('Error en el login:', error);
-      setError('Error en l\'autenticació. Comprova les teves credencials.');
+    } catch (err) {
+      console.log('Error backend detall:', err.response?.data);
+      const errorMsg = err.response?.data?.detail || 
+                       err.response?.data?.error || 
+                       'Error en l\'autenticació. Comprova les teves credencials.';
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -75,10 +78,11 @@ export default function ViewLogin() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        bgcolor: colors.backgroundOrange,
+        bgcolor: colors.background,
+        transition: 'background-color 0.3s ease',
       }}
     >
-      <Card sx={{ maxWidth: 400, width: '100%', borderRadius: 5}}>
+      <Card sx={{ maxWidth: 400, width: '100%', borderRadius: 5, bgcolor: colors.lightColor, transition: 'background-color 0.3s ease'}}>
         <CardContent sx={{ p: 4 }}>
           <Typography 
             variant="h4" 

@@ -11,7 +11,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { getCurrentUser } from "../../api/client";
-import { colors } from "../../constants/colors.jsx";
+import { useColors } from "../../hooks/useColors";
 import GroupIcon from "@mui/icons-material/Group";
 import PetsIcon from "@mui/icons-material/Pets";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
@@ -32,6 +32,7 @@ import {
 } from "../../constants/options.jsx";
 
 const ProfilePage = ({ profileData: initialProfileData }) => {
+  const { colors } = useColors();
   const [userData, setUserData] = useState(null);
   const [profileData, setProfileData] = useState(initialProfileData);
   const [loading, setLoading] = useState(true);
@@ -71,7 +72,7 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
           justifyContent: "center",
           alignItems: "center",
           minHeight: "100vh",
-          backgroundColor: colors.backgroundOrange,
+          backgroundColor: colors.background,
         }}
       >
         <CircularProgress sx={{ color: colors.blue }} />
@@ -81,7 +82,7 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
   return (
     <Box
       sx={{
-        backgroundColor: colors.backgroundOrange,
+        backgroundColor: colors.background,
         minHeight: "100vh",
         py: 5,
         px: 1,
@@ -107,7 +108,6 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
               variant="h4"
               sx={{
                 color: colors.blue,
-                fontWeight: "bold",
                 display: "flex",
                 alignItems: "center",
                 gap: 1,
@@ -127,7 +127,7 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
             <Grid item xs={12} sm={6}>
               <Typography
                 variant="subtitle2"
-                sx={{ color: colors.orange, fontWeight: "bold", mb: 1 }}
+                sx={{ color: colors.orange,  mb: 1 }}
               >
                 <EmailIcon sx={{ mr: 1, verticalAlign: "middle" }} />
                 Email
@@ -139,7 +139,7 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
             <Grid item xs={12} sm={6}>
               <Typography
                 variant="subtitle2"
-                sx={{ color: colors.orange, fontWeight: "bold", mb: 1 }}
+                sx={{ color: colors.orange,  mb: 1 }}
               >
                 <PhoneIcon sx={{ mr: 1, verticalAlign: "middle" }} />
                 Telèfon
@@ -151,7 +151,7 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
             <Grid item xs={12} sm={6}>
               <Typography
                 variant="subtitle2"
-                sx={{ color: colors.orange, fontWeight: "bold", mb: 1 }}
+                sx={{ color: colors.orange,  mb: 1 }}
               >
                 <LocationOnIcon sx={{ mr: 1, verticalAlign: "middle" }} />
                 Barri
@@ -163,7 +163,7 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
             <Grid item xs={12} sm={6}>
               <Typography
                 variant="subtitle2"
-                sx={{ color: colors.orange, fontWeight: "bold", mb: 1 }}
+                sx={{ color: colors.orange,  mb: 1 }}
               >
                 <FamilyRestroomIcon sx={{ mr: 1, verticalAlign: "middle" }} />
                 Data de naixement
@@ -175,7 +175,7 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
             <Grid item xs={12} sm={6}>
               <Typography
                 variant="subtitle2"
-                sx={{ color: colors.orange, fontWeight: "bold", mb: 1 }}
+                sx={{ color: colors.orange,  mb: 1 }}
               >
                 <GroupIcon sx={{ mr: 1, verticalAlign: "middle" }} />
                 Gènere
@@ -187,7 +187,7 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
             <Grid item xs={12} sm={6}>
               <Typography
                 variant="subtitle2"
-                sx={{ color: colors.orange, fontWeight: "bold", mb: 1 }}
+                sx={{ color: colors.orange,  mb: 1 }}
               >
                 <HomeIcon sx={{ mr: 1, verticalAlign: "middle" }} />
                 Tipus de vivenda
@@ -204,7 +204,7 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
             variant="h6"
             sx={{
               color: colors.blue,
-              fontWeight: "bold",
+  
               mb: 2,
               display: "flex",
               alignItems: "center",
@@ -353,7 +353,6 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
             variant="h6"
             sx={{
               color: colors.blue,
-              fontWeight: "bold",
               mb: 2,
               display: "flex",
               alignItems: "center",

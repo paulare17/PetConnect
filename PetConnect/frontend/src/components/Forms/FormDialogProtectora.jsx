@@ -73,7 +73,7 @@ export default function FormDialogProtectora() {
             alignItems: "center",
             gap: 1,
             color: colors.blue,
-            fontWeight: "bold",
+   
           }}
         >
           <BusinessIcon /> Accés Protectores

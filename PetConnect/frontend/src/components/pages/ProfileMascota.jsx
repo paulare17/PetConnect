@@ -64,12 +64,12 @@ function ProfileAnimal() {
 
   // Imatge principal
   const imageSrc = animal.foto || 'https://via.placeholder.com/400x300?text=Sense+imatge';
-  const cardColor = animal.especie === 'perro' ? colors.backgroundOrange : colors.backgroundBlue;
+  const cardColor = animal.especie === 'perro' ? colors.background : colors.backgroundBlue;
   const iconColor = animal.especie === 'perro' ? colors.darkOrange : colors.darkBlue;
   const raza = animal.especie === 'perro' ? animal.raza_perro : animal.raza_gato;
 
   return (
-    <Box sx={{ background: colors.backgroundOrange, minHeight: '100vh', py: 6 }}>
+    <Box sx={{ background: colors.background, minHeight: '100vh', py: 6 }}>
       <Container maxWidth="md">
         <Paper elevation={4} sx={{ p: 4, borderRadius: 5, background: colors.lightColor, maxWidth: 900, mx: 'auto', position: 'relative' }}>
           {/* Cor de favorit */}
@@ -92,7 +92,7 @@ function ProfileAnimal() {
               </Card>
             </Grid>
             <Grid item xs={12} md={7}>
-              <Typography variant="h2" sx={{ fontWeight: 'bold', color: colors.black, mb: 2 }}>
+              <Typography variant="h2" sx={{ color: colors.black, mb: 2 }}>
                 {animal.nombre}
               </Typography>
               {/* Quadre lila per característiques destacades */}
@@ -115,7 +115,7 @@ function ProfileAnimal() {
                 </Box>
                 <Chip
                   label={animal.adoptado ? 'ADOPTAT' : 'DISPONIBLE'}
-                  sx={{ backgroundColor: animal.adoptado ? colors.purple : colors.orange, color: 'white', fontWeight: 'bold', mt: 1 }}
+                  sx={{ backgroundColor: animal.adoptado ? colors.purple : colors.orange, color: 'white', mt: 1 }}
                 />
               </Box>
             </Grid>
@@ -152,7 +152,7 @@ function ProfileAnimal() {
           {/* Dades de la protectora */}
           {animal.protectora && (
             <Box sx={{ mt: 4 }}>
-              <Typography variant="h6" sx={{ color: colors.orange, fontWeight: 'bold', mb: 1 }}>
+              <Typography variant="h6" sx={{ color: colors.orange, mb: 1 }}>
                 Protectora encarregada
               </Typography>
               <Typography variant="body2"><strong>Nom:</strong> {animal.protectora.nombre || animal.protectora}</Typography>
@@ -162,7 +162,7 @@ function ProfileAnimal() {
           )}
 
           <Box sx={{ textAlign: 'center', mt: 6 }}>
-            <Button variant="contained" sx={{ backgroundColor: colors.orange, color: 'white', fontWeight: 'bold', px: 6, py: 2, fontSize: '1.2rem', '&:hover': { backgroundColor: colors.darkOrange } }}>
+            <Button variant="contained" sx={{ backgroundColor: colors.orange, color: 'white', px: 6, py: 2, fontSize: '1.2rem', '&:hover': { backgroundColor: colors.darkOrange } }}>
               Sol·licita Adopció
             </Button>
           </Box>
@@ -170,7 +170,7 @@ function ProfileAnimal() {
 
         {/* Galeria d'altres animals (slider/carousel) */}
         <Box sx={{ mt: 6, mb: 2 }}>
-          <Typography variant="h5" sx={{ color: colors.orange, fontWeight: 'bold', mb: 2, textAlign: 'center' }}>
+          <Typography variant="h5" sx={{ color: colors.orange, mb: 2, textAlign: 'center' }}>
             Altres animals disponibles
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
@@ -185,13 +185,13 @@ function ProfileAnimal() {
                   alt={a.nombre}
                   sx={{ objectFit: 'cover', width: 120, height: 100, borderRadius: 2, mb: 1 }}
                 />
-                <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: colors.black }}>
+                <Typography variant="subtitle1" sx={{ color: colors.black }}>
                   {a.nombre}
                 </Typography>
                 <Typography variant="body2" sx={{ color: colors.black }}>
                   {a.raza_perro || a.raza_gato || 'Raça'}
                 </Typography>
-                <Chip icon={<PetsIcon />} label={a.especie === 'perro' ? 'Gos' : 'Gat'} sx={{ backgroundColor: colors.orange, color: 'white', fontWeight: 'bold', mt: 1 }} />
+                <Chip icon={<PetsIcon />} label={a.especie === 'perro' ? 'Gos' : 'Gat'} sx={{ backgroundColor: colors.orange, color: 'white',  mt: 1 }} />
                 <IconButton sx={{ mt: 1 }}><FavoriteBorderIcon sx={{ color: 'red' }} /></IconButton>
               </Card>
             ))}

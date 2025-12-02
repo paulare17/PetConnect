@@ -24,9 +24,9 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import PetsIcon from '@mui/icons-material/Pets';
 import MaleIcon from '@mui/icons-material/Male';
 import FemaleIcon from '@mui/icons-material/Female';
-import { colors } from '../../constants/colors';
+import { useColors } from '../../hooks/useColors';
 import api from '../../api/client';
-import CardAnimal from '../home/CardAnimal';
+import CardPet from '../home/CardPet';
 import Pagination from '@mui/material/Pagination';
 
 // Opcions de filtre segons el model Mascota
@@ -51,6 +51,7 @@ const FILTROS = {
 };
 
 function IniciUsuari() {
+  const { colors } = useColors();
   const [animales, setAnimales] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -135,7 +136,7 @@ function IniciUsuari() {
   return (
     <Box
       sx={{
-        backgroundColor: colors.lightColor,
+        backgroundColor: colors.background,
         minHeight: '100vh',
         py: 4,
       }}
@@ -147,7 +148,7 @@ function IniciUsuari() {
             variant="h3"
             component="h1"
             sx={{
-              fontWeight: 'bold',
+              
               color: colors.orange,
               mb: 1,
               display: 'flex',
@@ -269,7 +270,7 @@ function IniciUsuari() {
               backgroundColor: colors.orange,
               color: 'white',
               fontSize: '1.1rem',
-              fontWeight: 'bold',
+
               py: 2,
               px: 1,
             }}
@@ -295,7 +296,7 @@ function IniciUsuari() {
               >
                 {animales.map((animal) => (
                   <Box key={animal.id} sx={{ display: 'flex', justifyContent: 'center' }}>
-                    <CardAnimal
+                    <CardPet
                       animal={animal}
                       isFavorito={favoritos.includes(animal.id)}
                       onToggleFavorito={() => toggleFavorito(animal.id)}

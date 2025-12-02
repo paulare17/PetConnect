@@ -1,11 +1,25 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import {
+    Box,
+    Typography,
+    Button,
+    CircularProgress,
+    Alert
+} from '@mui/material';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import CloseIcon from '@mui/icons-material/Close';
+import { colors } from '../../constants/colors';
+import api from '../../api/client';
+import ChatMiniList from '../Chat/ChatMiniList';
+import Chat from '../Chat/Chat';
+import CardPet from './CardPet.jsx';
 
-function TinderPet() {
+function PetTinder() {
     const [animal, setAnimal] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [message, setMessage] = useState('');
+    const [selectedChatId, setSelectedChatId] = useState(null);
 
     // Función que se encarga de cargar el siguiente animal
     const fetchNextAnimal = useCallback(() => {
@@ -13,8 +27,8 @@ function TinderPet() {
         setAnimal(null); // Limpiamos el animal anterior
         setMessage('');  // Limpiamos mensajes
 
-        // Llama al endpoint de TinderPet Next
-        axios.get('/api/tinderpet/next/')
+        // Llama al endpoint de PetTinder Next
+        api.get('/pettinder/next/')
             .then(response => {
                 // Si la respuesta incluye un animal, lo mostramos
                 if (response.data.id) {
@@ -26,8 +40,8 @@ function TinderPet() {
                 setLoading(false);
             })
             .catch(err => {
-                console.error("Error al obtener el siguiente animal:", err);
-                setError("Error al cargar. Verifique el servidor de Django.");
+                console.error("Error al obtenir el següent animal:", err);
+                setError("Error al carregar. Verifica el servidor de Django.");
                 setLoading(false);
             });
     }, []);
@@ -40,127 +54,127 @@ function TinderPet() {
 
     // Función genérica para manejar las acciones (Like/Dislike)
     const handleAction = (actionType) => {
-        if (!animal || animal.message) return; // No hacer nada si no hay animal
+        if (!animal || animal.message) return;
 
         const actionData = {
             animal_id: animal.id,
             action: actionType 
         };
 
-        // Llama al endpoint de TinderPet Action (POST)
-        axios.post('/api/tinderpet/action/', actionData)
-            .then(response => {
-                setMessage(`¡Acción ${actionType.toUpperCase()} registrada para ${animal.nombre}!`);
-                // Después de la acción, cargamos el siguiente animal
-                setTimeout(() => fetchNextAnimal(), 500); // Pequeño delay para el feedback visual
+        api.post('/pettinder/action/', actionData)
+            .then((response) => {
+                setMessage(`Acció ${actionType === 'like' ? 'M\'agrada' : 'No m\'agrada'} registrada per ${animal.nombre}!`);
+                // Si és un like i el backend retorna chat_id, obrim el xat inline
+                if (actionType === 'like' && response.data.is_like && response.data.chat_id) {
+                    setSelectedChatId(response.data.chat_id);
+                }
+                // La card canvia a següent animal quan fem like/dislike
+                setTimeout(() => fetchNextAnimal(), 500);
             })
             .catch(err => {
                 console.error(`Error al registrar ${actionType}:`, err);
-                setMessage(`Error: No se pudo registrar la acción.`);
+                setMessage(`Error: No s'ha pogut registrar l'acció.`);
             });
     };
 
-    // --- Renderizado ---
-    if (loading) return <div style={{ textAlign: 'center', marginTop: '50px', fontSize: '20px' }}>Buscando la siguiente mascota...</div>;
-    if (error) return <div style={{ textAlign: 'center', marginTop: '50px', color: 'red', fontSize: '20px' }}>{error}</div>;
+    // --- Renderitzat ---
+    if (loading) {
+        return (
+            <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+                <CircularProgress />
+            </Box>
+        );
+    }
+
+    if (error) {
+        return (
+            <Box p={3}>
+                <Alert severity="error">{error}</Alert>
+            </Box>
+        );
+    }
 
     // Si no quedan animales disponibles
     if (animal && animal.message) {
         return (
-            <div style={{ textAlign: 'center', marginTop: '100px', fontSize: '24px', color: '#6c757d' }}>
-                {animal.message}
-            </div>
+            <Box textAlign="center" mt={10}>
+                <Typography variant="h5" color="text.secondary">
+                    {animal.message}
+                </Typography>
+            </Box>
         );
     }
-    
-    // Si hay un animal para mostrar
-    const imagePlaceholder = animal.especie === 'Perro' ? '🐾' : '🐈';
-    const cardColor = animal.especie === 'Perro' ? '#e6f7ff' : '#fff0f0'; 
 
+    // --- Layout amb ChatMiniList, CardPet sempre visible i Chat a la dreta ---
     return (
-        <div style={{ 
-            maxWidth: '600px', 
-            margin: '50px auto', 
-            textAlign: 'center',
-            padding: '20px',
-            border: '1px solid #ddd',
-            borderRadius: '15px',
-            boxShadow: '0 8px 16px rgba(0,0,0,0.1)',
-            backgroundColor: cardColor
-        }}>
-            <h1 style={{ color: '#007bff' }}>Mascota para TinderPet</h1>
+        <Box sx={{ display: 'grid', gridTemplateColumns: '260px 1fr 520px', gap: 3, maxWidth: '1400px', margin: '50px auto', p: 3 }}>
+            {/* Panell esquerre: mini llista o xat inline */}
+            <Box>
+                {selectedChatId ? (
+                    <Chat chatId={selectedChatId} onClose={() => setSelectedChatId(null)} />
+                ) : (
+                    <ChatMiniList maxHeight={600} onSelectChat={setSelectedChatId} />
+                )}
+            </Box>
 
-            {/* Mensajes de feedback */}
-            {message && (
-                <div style={{ 
-                    color: '#28a745', 
-                    fontWeight: 'bold', 
-                    marginBottom: '15px',
-                    fontSize: '18px'
-                }}>
-                    {message}
-                </div>
-            )}
-
-            {/* Ficha del Animal */}
-            <div style={{ padding: '20px', backgroundColor: '#fff', borderRadius: '10px' }}>
-                <div style={{ 
-                    height: '200px', 
-                    backgroundColor: '#ced4da', 
-                    display: 'flex', 
-                    justifyContent: 'center', 
-                    alignItems: 'center',
-                    fontSize: '100px',
-                    borderRadius: '8px',
-                    marginBottom: '15px'
-                }}>
-                    {imagePlaceholder}
-                </div>
-                
-                <h2 style={{ margin: '0 0 5px 0' }}>{animal.nombre}</h2>
-                <p style={{ color: '#6c757d' }}>{animal.especie}, {animal.raza} | {animal.edad_años} año(s)</p>
-                
-                <div style={{ marginTop: '15px', borderTop: '1px solid #eee', paddingTop: '15px' }}>
-                    <p style={{ fontWeight: 'bold', marginBottom: '5px' }}>Historia Breve:</p>
-                    <p style={{ margin: 0 }}>{animal.historia_breve}</p>
-                </div>
-            </div>
-
-            {/* Botones de Acción */}
-            <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: '30px' }}>
-                <button 
-                    onClick={() => handleAction('dislike')}
-                    style={{
-                        padding: '15px 30px',
-                        fontSize: '20px',
-                        backgroundColor: '#dc3545',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '50px',
-                        cursor: 'pointer',
-                        boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-                    }}
-                >
-                    ❌ No Me Gusta
-                </button>
-                <button 
-                    onClick={() => handleAction('like')}
-                    style={{
-                        padding: '15px 30px',
-                        fontSize: '20px',
-                        backgroundColor: '#28a745',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '50px',
-                        cursor: 'pointer',
-                        boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-                    }}
-                >
-                    ✅ Me Gusta
-                </button>
-            </div>
-        </div>
+            {/* Columna central: Card de mascota sempre visible */}
+            <Box sx={{ flex: 1 }}>
+                <Typography variant="h4" gutterBottom textAlign="center" sx={{ color: colors.orange, mb: 3 }}>
+                    Descobreix la teva mascota ideal
+                </Typography>
+                {message && (
+                    <Alert 
+                        severity="success" 
+                        sx={{ mb: 2 }}
+                        onClose={() => setMessage('')}
+                    >
+                        {message}
+                    </Alert>
+                )}
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <CardPet animal={animal} />
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3, gap: 2 }}>
+                        <Button 
+                            variant="contained"
+                            size="large"
+                            startIcon={<CloseIcon />}
+                            onClick={() => handleAction('dislike')}
+                            sx={{
+                                backgroundColor: colors.purple,
+                                color: 'white',
+                              
+                                borderRadius: '50px',
+                                px: 4,
+                                py: 1.5,
+                                '&:hover': { backgroundColor: colors.darkBlue, transform: 'scale(1.05)' },
+                                transition: 'all 0.2s'
+                            }}
+                        >
+                            No m'agrada
+                        </Button>
+                        <Button 
+                            variant="contained"
+                            size="large"
+                            startIcon={<FavoriteIcon />}
+                            onClick={() => handleAction('like')}
+                            sx={{
+                                backgroundColor: colors.orange,
+                                color: 'white',
+                           
+                                borderRadius: '50px',
+                                px: 4,
+                                py: 1.5,
+                                '&:hover': { backgroundColor: colors.darkOrange, transform: 'scale(1.05)' },
+                                transition: 'all 0.2s'
+                            }}
+                        >
+                            M'agrada
+                        </Button>
+                    </Box>
+                </Box>
+            </Box>
+        </Box>
     );
 }
 
-export default TinderPet;
+export default PetTinder;
