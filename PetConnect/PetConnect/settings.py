@@ -59,7 +59,7 @@ SIMPLE_JWT = {
 AUTH_USER_MODEL = 'usuarios.Usuario'
 
 LOGIN_URL = '/usuarios/login'
-LOGIN_REDIRECT_URL = '/usuarios/home'
+LOGIN_REDIRECT_URL = '/usuarios/MostraMascotes'
 LOGOUT_REDIRECT_URL = '/usuarios/login'
 
 MIDDLEWARE = [

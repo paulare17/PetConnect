@@ -368,7 +368,6 @@ function ResponsiveAppBar() {
                     py: 1.2,
                     borderRadius: "25px",
                     bgcolor: colors.blue,
-                    fontWeight: 600,
                     boxShadow: `0 4px 12px ${colors.blue}40`,
                     "&:hover": {
                       bgcolor: colors.darkBlue,

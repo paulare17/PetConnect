@@ -19,7 +19,7 @@ import {
   Alert,
   CircularProgress,
 } from "@mui/material";
-import CardPet from "../home/CardPet.jsx";
+import CardPet from "../MostraMascotes/CardPet.jsx";
 import { useColors } from "../../hooks/useColors";
 import api from "../../api/client";
 

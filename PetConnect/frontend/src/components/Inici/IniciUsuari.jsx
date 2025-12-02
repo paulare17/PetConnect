@@ -26,7 +26,7 @@ import MaleIcon from '@mui/icons-material/Male';
 import FemaleIcon from '@mui/icons-material/Female';
 import { useColors } from '../../hooks/useColors';
 import api from '../../api/client';
-import CardPet from '../home/CardPet';
+import CardPet from '../MostraMascotes/CardPet';
 import Pagination from '@mui/material/Pagination';
 
 // Opcions de filtre segons el model Mascota

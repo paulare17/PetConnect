@@ -1,12 +1,7 @@
 import * as React from 'react';
-import { styled } from '@mui/material/styles';
 import Card from '@mui/material/Card';
-import CardHeader from '@mui/material/CardHeader';
 import CardMedia from '@mui/material/CardMedia';
 import CardContent from '@mui/material/CardContent';
-import CardActions from '@mui/material/CardActions';
-import Collapse from '@mui/material/Collapse';
-import Avatar from '@mui/material/Avatar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Chip from '@mui/material/Chip';
@@ -15,25 +10,10 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import PetsIcon from '@mui/icons-material/Pets';
 import MaleIcon from '@mui/icons-material/Male';
 import FemaleIcon from '@mui/icons-material/Female';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useColors } from '../../hooks/useColors';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import blackCatImg from '../../assets/black.png';
 import nikaDogImg from '../../assets/nika.png';
-
-const ExpandMore = styled((props) => {
-  const { ...other } = props;
-  return <IconButton {...other} />;
-})(
-  ({ theme }) => ({
-    marginLeft: 'auto',
-    transition: theme.transitions.create('transform', {
-      duration: theme.transitions.duration.shortest,
-    }),
-    transform: 'rotate(0deg)',
-  })
-);
 
 // El component ara rep també la info de la protectora via props (simulant la futura connexió amb Django REST Framework)
 // protectora = { nombre: string, foto: string }
@@ -115,32 +95,19 @@ export default function CardPet({ animal, isFavorito, onToggleFavorito, sx }) {
           </Typography>
         </Box>
         <Box sx={{ mt: 2 }}>
-          <Typography variant="body2" sx={{ mb: 0.5 }}>
-            <strong>Edat:</strong> {data.edad} any{data.edad !== 1 ? 's' : ''}
+          <Typography variant="body2" sx={{ 
+            color: 'text.secondary',
+            display: '-webkit-box',
+            WebkitLineClamp: 4,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            lineHeight: 1.5
+          }}>
+            {data.descripcion || 'Sense descripció disponible.'}
           </Typography>
-          <Typography variant="body2" sx={{ mb: 0.5 }}>
-            <strong>Sexe:</strong> {data.genero === 'macho' ? 'Mascle' : 'Femella'}
-          </Typography>
-          <Typography variant="body2" sx={{ mb: 0.5 }}>
-            <strong>Mida:</strong> {data.tamaño || 'No especificat'}
-          </Typography>
-          {data.peso && (
-            <Typography variant="body2" sx={{ mb: 0.5 }}>
-              <strong>Pes:</strong> {data.peso} kg
-            </Typography>
-          )}
         </Box>
       </CardContent>
-
-      {/* Accions */}
-      <CardActions sx={{ backgroundColor: cardColor, justifyContent: 'center', pb: 2 }}>
-        <Button
-          variant="contained"
-          sx={{ backgroundColor: colors.orange, color: 'white', '&:hover': { backgroundColor: colors.darkOrange }, px: 4 }}
-        >
-          Més Info
-        </Button>
-      </CardActions>
     </Card>
   );
 }

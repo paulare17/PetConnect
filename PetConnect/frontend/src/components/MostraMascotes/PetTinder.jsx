@@ -8,11 +8,12 @@ import {
 } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import CloseIcon from '@mui/icons-material/Close';
-import { colors } from '../../constants/colors';
-import api from '../../api/client';
-import ChatMiniList from '../Chat/ChatMiniList';
-import Chat from '../Chat/Chat';
+import { colors } from '../../constants/colors.jsx';
+import api from '../../api/client.js';
+import ChatMiniList from '../Chat/ChatMiniList.jsx';
+import Chat from '../Chat/Chat.jsx';
 import CardPet from './CardPet.jsx';
+import CardPetDetail from './CardPetDetail.jsx';
 
 function PetTinder() {
     const [animal, setAnimal] = useState(null);
@@ -107,9 +108,17 @@ function PetTinder() {
 
     // --- Layout amb ChatMiniList, CardPet sempre visible i Chat a la dreta ---
     return (
-        <Box sx={{ display: 'grid', gridTemplateColumns: '260px 1fr 520px', gap: 3, maxWidth: '1400px', margin: '50px auto', p: 3 }}>
+        <Box sx={{ 
+            display: 'grid', 
+            gridTemplateColumns: '260px 1fr 380px', 
+            gap: 3, 
+            maxWidth: '1400px', 
+            margin: '50px auto', 
+            p: 3,
+            minHeight: 'calc(100vh - 150px)'
+        }}>
             {/* Panell esquerre: mini llista o xat inline */}
-            <Box>
+            <Box sx={{ height: 'fit-content', maxHeight: '700px' }}>
                 {selectedChatId ? (
                     <Chat chatId={selectedChatId} onClose={() => setSelectedChatId(null)} />
                 ) : (
@@ -118,60 +127,63 @@ function PetTinder() {
             </Box>
 
             {/* Columna central: Card de mascota sempre visible */}
-            <Box sx={{ flex: 1 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <Typography variant="h4" gutterBottom textAlign="center" sx={{ color: colors.orange, mb: 3 }}>
                     Descobreix la teva mascota ideal
                 </Typography>
                 {message && (
                     <Alert 
                         severity="success" 
-                        sx={{ mb: 2 }}
+                        sx={{ mb: 2, width: '100%', maxWidth: 400 }}
                         onClose={() => setMessage('')}
                     >
                         {message}
                     </Alert>
                 )}
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Box sx={{ width: '100%', maxWidth: 400, minHeight: 500 }}>
                     <CardPet animal={animal} />
-                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3, gap: 2 }}>
-                        <Button 
-                            variant="contained"
-                            size="large"
-                            startIcon={<CloseIcon />}
-                            onClick={() => handleAction('dislike')}
-                            sx={{
-                                backgroundColor: colors.purple,
-                                color: 'white',
-                              
-                                borderRadius: '50px',
-                                px: 4,
-                                py: 1.5,
-                                '&:hover': { backgroundColor: colors.darkBlue, transform: 'scale(1.05)' },
-                                transition: 'all 0.2s'
-                            }}
-                        >
-                            No m'agrada
-                        </Button>
-                        <Button 
-                            variant="contained"
-                            size="large"
-                            startIcon={<FavoriteIcon />}
-                            onClick={() => handleAction('like')}
-                            sx={{
-                                backgroundColor: colors.orange,
-                                color: 'white',
-                           
-                                borderRadius: '50px',
-                                px: 4,
-                                py: 1.5,
-                                '&:hover': { backgroundColor: colors.darkOrange, transform: 'scale(1.05)' },
-                                transition: 'all 0.2s'
-                            }}
-                        >
-                            M'agrada
-                        </Button>
-                    </Box>
                 </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3, gap: 2 }}>
+                    <Button 
+                        variant="contained"
+                        size="large"
+                        startIcon={<CloseIcon />}
+                        onClick={() => handleAction('dislike')}
+                        sx={{
+                            backgroundColor: colors.purple,
+                            color: 'white',
+                            borderRadius: '50px',
+                            px: 4,
+                            py: 1.5,
+                            '&:hover': { backgroundColor: colors.darkBlue, transform: 'scale(1.05)' },
+                            transition: 'all 0.2s'
+                        }}
+                    >
+                        No m'agrada
+                    </Button>
+                    <Button 
+                        variant="contained"
+                        size="large"
+                        startIcon={<FavoriteIcon />}
+                        onClick={() => handleAction('like')}
+                        sx={{
+                            backgroundColor: colors.orange,
+                            color: 'white',
+                            borderRadius: '50px',
+                            px: 4,
+                            py: 1.5,
+                            '&:hover': { backgroundColor: colors.darkOrange, transform: 'scale(1.05)' },
+                            transition: 'all 0.2s'
+                        }}
+                    >
+                        M'agrada
+                    </Button>
+                </Box>
+            </Box>
+
+            {/* Columna dreta: Detalls de la mascota */}
+            <Box sx={{ height: 'fit-content', maxHeight: '700px' }}>
+                <CardPetDetail animal={animal} />
             </Box>
         </Box>
     );

@@ -38,19 +38,27 @@ function ProfileAnimal() {
   useEffect(() => {
     setLoading(true);
     setError(null);
+    console.log('Carregant mascota amb id:', id);
     api.get(`/mascota/${id}/`)
       .then(res => {
+        console.log('Dades de la mascota:', res.data);
         setAnimal(res.data);
         setLoading(false);
       })
       .catch(err => {
+        console.error('Error carregant mascota:', err);
         setError('No s\'ha pogut carregar el perfil de l\'animal.');
         setLoading(false);
       });
     // Carrega altres animals per la galeria
     api.get(`/mascota/`)
       .then(res => {
-        setAltres(res.data.filter(a => a.id !== Number(id)).slice(0, 10));
+        console.log('Altres mascotes:', res.data);
+        const altresAnimals = Array.isArray(res.data) ? res.data : res.data.results || [];
+        setAltres(altresAnimals.filter(a => a.id !== Number(id)).slice(0, 10));
+      })
+      .catch(err => {
+        console.error('Error carregant altres mascotes:', err);
       });
   }, [id]);
 
