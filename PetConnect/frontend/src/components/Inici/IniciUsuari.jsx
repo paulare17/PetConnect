@@ -110,7 +110,7 @@ function IniciUsuari() {
         setError(t('iniciUsuari.errorLoading'));
         setLoading(false);
       });
-  }, [filtros, page]);
+  }, [filtros, page, t]);
 
   // Gestió de favorits
   const toggleFavorito = (id) => {

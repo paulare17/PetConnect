@@ -35,6 +35,7 @@ export default function ChatRoom({ chatId: chatIdProp, onClose, embedded = false
   const [error, setError] = useState(null);
   const [chatInfo, setChatInfo] = useState(null);
   const [wsConnected, setWsConnected] = useState(false);
+  const [showAvailabilityNotice, setShowAvailabilityNotice] = useState(true);
   
   const wsRef = useRef(null);
   const messagesEndRef = useRef(null);
@@ -287,6 +288,47 @@ export default function ChatRoom({ chatId: chatIdProp, onClose, embedded = false
           )}
         </Box>
       </Paper>
+
+      {/* Avís de disponibilitat de protectores al començar la conversa */}
+      {showAvailabilityNotice && (
+        <Alert 
+          severity="info" 
+          sx={{ mb: 2 }}
+        >
+          {t('chatComponent.disclaimer')}
+          <Box sx={{ mt: 1 }}>
+            {chatInfo?.protectora_username && (
+              <Typography variant="body2"><strong>{chatInfo.protectora_username}</strong></Typography>
+            )}
+            {chatInfo?.protectora_info?.horaris && (
+              <Typography variant="body2">{t('chatComponent.schedule')}: {chatInfo.protectora_info.horaris}</Typography>
+            )}
+            {chatInfo?.protectora_info?.telefono && (
+              <Typography variant="body2">{t('chatComponent.phone')}: {chatInfo.protectora_info.telefono}</Typography>
+            )}
+            {chatInfo?.protectora_info?.telefono_emergencia && (
+              <Typography variant="body2">{t('chatComponent.emergencyPhone')}: {chatInfo.protectora_info.telefono_emergencia}</Typography>
+            )}
+            {chatInfo?.protectora_info?.email && (
+              <Typography variant="body2">Email: {chatInfo.protectora_info.email}</Typography>
+            )}
+            {chatInfo?.protectora_info?.web && (
+              <Typography variant="body2">Web: {chatInfo.protectora_info.web}</Typography>
+            )}
+            {chatInfo?.protectora_info?.instagram && (() => {
+              const ig = chatInfo.protectora_info.instagram;
+              const isUrl = typeof ig === 'string' && /^https?:\/\//i.test(ig);
+              const handle = typeof ig === 'string' ? ig.replace(/^@/, '') : ig;
+              const href = isUrl ? ig : `https://instagram.com/${handle}`;
+              return (
+                <Typography variant="body2">
+                  {t('chatComponent.instagram')}: <a href={href} target="_blank" rel="noopener noreferrer">{isUrl ? ig : `@${handle}`}</a>
+                </Typography>
+              );
+            })()}
+          </Box>
+        </Alert>
+      )}
 
       {error && (
         <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 2 }}>

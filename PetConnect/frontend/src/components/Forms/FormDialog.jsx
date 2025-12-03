@@ -63,11 +63,43 @@ export default function FormDialog() {
   const handleGetLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
           const { latitude, longitude } = position.coords;
-          // Aquí pots usar una API de geocoding per convertir coordenades a adreça
-          // Per simplicitat, mostrem les coordenades
-          setUbicacion(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+          
+          try {
+            // Utilitzem l'API de Nominatim (OpenStreetMap) per geocoding invers
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`,
+              {
+                headers: {
+                  'Accept-Language': 'ca,es,en'
+                }
+              }
+            );
+            
+            if (response.ok) {
+              const data = await response.json();
+              const address = data.address;
+              
+              // Prioritzem ciutat, poble o barri
+              const location = address.city || 
+                             address.town || 
+                             address.village || 
+                             address.suburb || 
+                             address.municipality ||
+                             address.county ||
+                             `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+              
+              setUbicacion(location);
+            } else {
+              // Si falla l'API, mostrem coordenades
+              setUbicacion(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+            }
+          } catch (error) {
+            console.error("Error obtenint adreça:", error);
+            // Si falla, mostrem coordenades
+            setUbicacion(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+          }
         },
         (error) => {
           console.error("Error obtenint ubicació:", error);
@@ -120,7 +152,6 @@ export default function FormDialog() {
               variant="standard"
             />
 
-            {/* la de la ubi s'ha de comentar com ho fem */}
             <TextField
               required
               margin="dense"
@@ -132,24 +163,24 @@ export default function FormDialog() {
               variant="standard"
               value={ubicacion}
               onChange={(e) => setUbicacion(e.target.value)}
-            />
-            <Button
-              startIcon={<LocationOnIcon />}
-              onClick={handleGetLocation}
-              sx={{
-                color: colors.blue,
-                textTransform: "none",
-                fontSize: "0.875rem",
-                lineHeight: 1.2,
-                mt: 1,
-                "&:hover": {
-                  color: colors.darkBlue,
-                  backgroundColor: "transparent",
-                },
+              InputProps={{
+                endAdornment: (
+                  <IconButton
+                    onClick={handleGetLocation}
+                    size="small"
+                    sx={{
+                      color: colors.blue,
+                      "&:hover": {
+                        color: colors.darkBlue,
+                        backgroundColor: "rgba(102, 197, 189, 0.1)",
+                      },
+                    }}
+                  >
+                    <LocationOnIcon />
+                  </IconButton>
+                ),
               }}
-            >
-              {t('formDialog.locationButton')}
-            </Button>
+            />
           </form>
         </DialogContent>
         <DialogActions>
@@ -167,7 +198,7 @@ export default function FormDialog() {
               borderRadius: 5,
               // px: 4,
               mb: 2,
-              mr: 5.5,
+              mr: 2,
               fontSize: "0.7rem",
               transition: "all 0.3s ease-in-out",
             }}
@@ -203,10 +234,11 @@ export default function FormDialog() {
                 transform: "translateY(-2px)",
                 boxShadow: "0 4px 12px rgba(102, 197, 189, 0.3)",
               },
+              width: "40%",
               borderRadius: 5,
-              px: 4,
+              px: 1,
               mb: 2,
-              mr: 4,
+              mr: 1,
               fontSize: "1.1rem",
               transition: "all 0.3s ease-in-out",
             }}

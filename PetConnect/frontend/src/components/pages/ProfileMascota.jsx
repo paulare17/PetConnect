@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
   Container,
@@ -26,17 +26,23 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { useTranslation } from 'react-i18next';
 import { useColors } from '../../hooks/useColors';
 import api from '../../api/client';
+import { useAuthContext } from '../../context/AuthProvider';
+import { ROLES } from '../../constants/roles';
 
 function ProfileAnimal() {
   const { t } = useTranslation();
   const { colors } = useColors();
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuthContext();
   const [animal, setAnimal] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [favorit, setFavorit] = useState(false);
   const [altres, setAltres] = useState([]);
   const [galeriaIndex, setGaleriaIndex] = useState(0);
+  const [updatingAdoption, setUpdatingAdoption] = useState(false);
+  const [startingChat, setStartingChat] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -63,7 +69,7 @@ function ProfileAnimal() {
       .catch(err => {
         console.error('Error carregant altres mascotes:', err);
       });
-  }, [id]);
+  }, [id, t]);
 
   if (loading) {
     return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}><CircularProgress sx={{ color: colors.orange }} size={60} /></Box>;
@@ -184,9 +190,76 @@ function ProfileAnimal() {
           )}
 
           <Box sx={{ textAlign: 'center', mt: 6 }}>
-            <Button variant="contained" sx={{ backgroundColor: colors.orange, color: 'white', px: 6, py: 2, fontSize: '1.2rem', '&:hover': { backgroundColor: colors.darkOrange } }}>
-              {t('profileMascota.requestAdoption')}
-            </Button>
+            {user?.role === ROLES.PROTECTORA ? (
+              <Button 
+                variant="contained" 
+                disabled={updatingAdoption}
+                onClick={async () => {
+                  setUpdatingAdoption(true);
+                  try {
+                    const res = await api.patch(`/mascota/${id}/`, {
+                      adoptado: !animal.adoptado
+                    });
+                    setAnimal(res.data);
+                  } catch (err) {
+                    console.error('Error actualitzant estat d\'adopció:', err);
+                    alert(t('profileMascota.errorUpdatingAdoption'));
+                  } finally {
+                    setUpdatingAdoption(false);
+                  }
+                }}
+                sx={{ 
+                  backgroundColor: animal.adoptado ? colors.purple : colors.green, 
+                  color: 'white', 
+                  px: 6, 
+                  py: 2, 
+                  fontSize: '1.2rem', 
+                  '&:hover': { 
+                    backgroundColor: animal.adoptado ? colors.darkPurple : colors.darkGreen 
+                  },
+                  '&:disabled': {
+                    backgroundColor: colors.lightColor,
+                  }
+                }}
+              >
+                {updatingAdoption 
+                  ? t('profileMascota.updating') 
+                  : animal.adoptado 
+                    ? t('profileMascota.markAsAvailable') 
+                    : t('profileMascota.markAsAdopted')
+                }
+              </Button>
+            ) : (
+              <Button 
+                variant="contained" 
+                sx={{ 
+                  backgroundColor: colors.orange, 
+                  color: 'white', 
+                  px: 6, 
+                  py: 2, 
+                  fontSize: '1.2rem', 
+                  '&:hover': { backgroundColor: colors.darkOrange } 
+                }}
+                onClick={async () => {
+                  if (!animal?.id) return;
+                  try {
+                    setStartingChat(true);
+                    const res = await api.post('/chat/chats/obtener_o_crear/', { mascota_id: Number(id) });
+                    const chatId = res.data?.chat?.id || res.data?.id;
+                    // Portem a la pàgina de xats amb el xat de la protectora obert
+                    if (chatId) navigate(`/chats?chatId=${chatId}`);
+                    else navigate('/chats');
+                  } catch (err) {
+                    console.error('Error iniciant xat amb protectora:', err);
+                    alert(t('chatComponent.errorLoading'));
+                  } finally {
+                    setStartingChat(false);
+                  }
+                }}
+              >
+                {startingChat ? t('chatComponent.newChat') : t('profileMascota.requestAdoption')}
+              </Button>
+            )}
           </Box>
         </Paper>
 

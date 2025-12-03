@@ -1,76 +1,71 @@
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Box, Typography, Container } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+// import { useTranslation } from 'react-i18next';
+import { Box, useMediaQuery } from '@mui/material';
 import { useColors } from '../../hooks/useColors';
 import ChatMiniList from './ChatMiniList';
 import Chat from './Chat';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 
 export default function ChatList() {
-  const { t } = useTranslation();
+  // const { t } = useTranslation();
   const { colors } = useColors();
   const [selectedChatId, setSelectedChatId] = useState(null);
+  const location = useLocation();
+  const isMobile = useMediaQuery('(max-width:600px)');
+  const navigate = useNavigate();
+
+  // Obre automàticament el xat si ve especificat a la URL
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const chatIdParam = params.get('chatId');
+    if (chatIdParam) {
+      setSelectedChatId(chatIdParam);
+    }
+  }, [location.search]);
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: colors.background, display: 'flex', flexDirection: 'column', py: 4 }}>
-      <Container maxWidth="xl">
-        {/* Capçalera */}
-        <Box sx={{ textAlign: 'center', mb: 4 }}>
-          <Typography
-            variant="h3"
-            component="h1"
-            sx={{
+    <Box sx={{ 
+      minHeight: isMobile ? "calc(100vh - 120px)" : "80vh", 
+      height: isMobile ? 'calc(100vh - 120px)' : '80vh', 
+      bgcolor: colors.background, 
+      display: 'flex', 
+      flexDirection: 'column' 
+    }}>
 
-              color: colors.orange,
-              mb: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 2,
-            }}
-          >
-            <ChatBubbleOutlineIcon sx={{ fontSize: 48 }} />
-            {t('chatComponent.title')}
-          </Typography>
-        </Box>
-      </Container>
-
-      {/* Layout dues columnes */}
-      <Box sx={{ flexGrow: 1, display: 'flex', maxWidth: 1400, mx: 'auto', width: '100%', p: 5, gap: 3 }}>
-        {/* Columna llista */}
-        <Box sx={{ width: 350, flexShrink: 0, display: 'flex' }}>
+      {/* Layout responsive */}
+      {isMobile ? (
+        // Vista mòbil: pantalla completa
+        <Box sx={{ flexGrow: 1, display: 'flex', width: '100%', height: '100%' }}>
           <ChatMiniList 
-            maxHeight="calc(100vh - 180px)"
-            onSelectChat={(chatId) => setSelectedChatId(chatId)}
+            maxHeight="100%"
+            onSelectChat={(chatId) => {
+              // En mòbil, naveguem al xat a pantalla completa
+              navigate(`/chat/${chatId}`);
+            }}
           />
         </Box>
-        
-        {/* Columna xat */}
-        <Box sx={{ flexGrow: 1, minWidth: 0, display: 'flex', position: 'relative'}}>
-          <Box sx={{
-            position: 'absolute',
-            inset: 0,
-            display: selectedChatId ? 'none' : 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            border: `2px dashed ${colors.purple}`,
-            borderRadius: 3,
-            bgcolor: colors.lightColor,
-            opacity: 0.6,
-            p: 3,
-            transition: 'opacity .2s'
-          }}>
-            <Typography variant="h6" color="text.secondary" textAlign="center">
-              {t('chatComponent.selectChat')}
-            </Typography>
+      ) : (
+        // Vista escriptori: dues columnes (llista + xat)
+        <Box sx={{ flexGrow: 1, display: 'flex', width: '100%', height: '100%', p: 0, gap: 0, overflow: 'hidden' }}>
+          {/* Columna llista */}
+          <Box sx={{ width: 360, flexShrink: 0, display: 'flex', height: '100%', borderRight: `1px solid ${colors.border}` }}>
+            <ChatMiniList 
+              maxHeight="100%"
+              onSelectChat={(chatId) => setSelectedChatId(chatId)}
+            />
           </Box>
-          {selectedChatId && (
-            <Box sx={{ flexGrow: 1, minWidth: 0, bgcolor: colors.lightColor, borderRadius: 3, overflow: 'hidden' }}>
-              <Chat chatId={selectedChatId} onClose={() => setSelectedChatId(null)} embedded />
-            </Box>
-          )}
+          
+          {/* Columna xat */}
+          <Box sx={{ flexGrow: 1, minWidth: 0, display: 'flex', position: 'relative', height: '100%', p: 1 }}>
+            {selectedChatId && (
+              <Box sx={{ flexGrow: 1, minWidth: 0, height: '100%', bgcolor: colors.lightColor, overflow: 'hidden', borderRadius: 2 }}>
+                <Chat chatId={selectedChatId} onClose={() => setSelectedChatId(null)} embedded />
+              </Box>
+            )}
+          </Box>
         </Box>
+      )}
       </Box>
-    </Box>
   );
 }

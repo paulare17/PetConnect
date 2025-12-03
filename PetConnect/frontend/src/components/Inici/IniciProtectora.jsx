@@ -7,8 +7,6 @@ import { colors } from "../../constants/colors.jsx";
 import api from "../../api/client.js";
 import ChatMiniList from "../Chat/ChatMiniList.jsx";
 import Chat from "../Chat/Chat.jsx";
-import nikaImg from "../../assets/nika.png";
-import blackImg from "../../assets/black.png";
 
 export default function IniciProtectora() {
   const { t } = useTranslation();
@@ -32,12 +30,7 @@ export default function IniciProtectora() {
       }
     };
     fetchMisMascotas();
-  }, []);
-
-  // Imatge per defecte segons espècie
-  const getDefaultImage = (especie) => {
-    return especie === "perro" ? nikaImg : blackImg;
-  };
+  }, [t]);
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: colors.background }}>

@@ -13,8 +13,8 @@ import MaleIcon from '@mui/icons-material/Male';
 import FemaleIcon from '@mui/icons-material/Female';
 import { useColors } from '../../hooks/useColors';
 import Box from '@mui/material/Box';
-import blackCatImg from '../../assets/black.png';
-import nikaDogImg from '../../assets/nika.png';
+import gatDefecte from "../../assets/gat_defecte.png";
+import gosDefecte from "../../assets/gos_defecte.png";
 
 // El component ara rep també la info de la protectora via props (simulant la futura connexió amb Django REST Framework)
 // protectora = { nombre: string, foto: string }
@@ -34,8 +34,8 @@ export default function CardPet({ animal, isFavorito, onToggleFavorito, sx }) {
   let imageSrc;
   if (!data.foto) {
     imageSrc = data.especie === 'gato'
-      ? blackCatImg
-      : nikaDogImg;
+      ? gatDefecte
+      : gosDefecte;
   } else {
     imageSrc = data.foto;
   }

@@ -49,8 +49,8 @@ export default function ChatMiniList({ maxHeight = 400, onSelectChat }) {
   };
 
   return (
-    <Box sx={{ width: 350, minHeight: '500px', overflowY: 'auto', bgcolor: colors.lightColor, borderRadius: 2, boxShadow: 2 }}>
-      <Box sx={{ p: 2, borderBottom: `1px solid ${colors.orange}` }}>
+    <Box sx={{ width: '100%', height: maxHeight || '500px', minHeight: maxHeight || '500px', overflowY: 'auto', bgcolor: colors.lightColor, borderRadius: 2, boxShadow: 2, display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ p: 2, borderBottom: `1px solid ${colors.orange}`, flexShrink: 0 }}>
         <Typography variant="h6" fontWeight="bold" color={colors.orange}>
           {t('chatComponent.chatsListTitle')}
         </Typography>
@@ -71,7 +71,7 @@ export default function ChatMiniList({ maxHeight = 400, onSelectChat }) {
           {chats.map((chat, idx) => {
             const lastMessage = chat.ultimo_mensaje;
             return (
-              <Box key={chat.id}>
+              <Box key={chat.id} >
                 <ListItem disablePadding>
                   <ListItemButton
                     onClick={() => handleChatClick(chat.id)}
@@ -87,10 +87,10 @@ export default function ChatMiniList({ maxHeight = 400, onSelectChat }) {
                       </Avatar>
                     </ListItemAvatar>
                     <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <Typography variant="body2" fontWeight="bold" noWrap>
+                      <Typography variant="body2" fontWeight="500" fontSize="18px" noWrap color={colors.textDark}>
                         {chat.mascota_nombre}
                       </Typography>
-                      <Typography variant="caption" color="text.secondary" noWrap>
+                      <Typography variant="caption" color="text.secondary" noWrap sx={{fontSize: '14px'}}>
                         {lastMessage ? `${lastMessage.remitente}: ${lastMessage.contenido}` : t('chatComponent.newChat')}
                       </Typography>
                     </Box>
@@ -98,7 +98,7 @@ export default function ChatMiniList({ maxHeight = 400, onSelectChat }) {
                       <Chip
                         label={chat.num_mensajes}
                         size="small"
-                        sx={{ bgcolor: colors.lightColor, color: colors.darkOrange,  minWidth: 24 }}
+                        sx={{ bgcolor: colors.blue, color: colors.lightOrange,  minWidth: 28, height: 28, fontWeight: 'bold' }}
                       />
                     )}
                   </ListItemButton>

@@ -19,10 +19,24 @@ import {
   Divider,
   Alert,
   CircularProgress,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Chip,
+  CardMedia,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import MaleIcon from "@mui/icons-material/Male";
+import FemaleIcon from "@mui/icons-material/Female";
 import CardPet from "../MostraMascotes/CardPet.jsx";
 import { useColors } from "../../hooks/useColors";
 import api from "../../api/client";
+import CardPetDetail from "../MostraMascotes/CardPetDetail.jsx";
+import ProfileMascotaView from "../MostraMascotes/ProfileMascotaView.jsx";
+import gatDefecte from "../../assets/gat_defecte.png";
+import gosDefecte from "../../assets/gos_defecte.png";
+import PreviewDialog from "./PreviewDialog.jsx";
 
 const AddAnimalForm = () => {
   const { t } = useTranslation();
@@ -57,6 +71,7 @@ const AddAnimalForm = () => {
   const [submitting, setSubmitting] = useState(false);
   const [generatingDescription, setGeneratingDescription] = useState(false);
   const [status, setStatus] = useState(null); // {type: 'success'|'error', message: ''}
+  const [openPreviewDialog, setOpenPreviewDialog] = useState(false);
 
   // Sincronizar raza cuando cambia la especie
   useEffect(() => {
@@ -152,11 +167,30 @@ const AddAnimalForm = () => {
       // Crear FormData per pujar imatge
       const formDataToSend = new FormData();
       
+      // Si no hi ha foto, carregar la imatge per defecte segons l'espècie
+      let fotoToUpload = formData.foto;
+      
+      if (!formData.foto) {
+        // Determinar quina imatge per defecte utilitzar
+        const defaultImagePath = formData.especie === 'perro' ? gosDefecte : gatDefecte;
+        const defaultImageName = formData.especie === 'perro' ? 'gos_defecte.png' : 'gat_defecte.png';
+        
+        try {
+          // Carregar la imatge per defecte com a File object
+          const response = await fetch(defaultImagePath);
+          const blob = await response.blob();
+          fotoToUpload = new File([blob], defaultImageName, { type: blob.type });
+        } catch (err) {
+          console.warn('No s\'ha pogut carregar la imatge per defecte:', err);
+        }
+      }
+      
       // Afegir tots els camps del formulari
       Object.keys(formData).forEach(key => {
-        if (key === 'foto' && formData[key]) {
-          // Si hi ha foto (File object)
-          formDataToSend.append(key, formData[key]);
+        if (key === 'foto') {
+          if (fotoToUpload) {
+            formDataToSend.append(key, fotoToUpload);
+          }
         } else {
           formDataToSend.append(key, formData[key]);
         }
@@ -328,16 +362,29 @@ const AddAnimalForm = () => {
                         value={formData.color}
                         onChange={handleInputChange}
                       >
-                        <MenuItem value="negro">{t('addAnimalForm.black')}</MenuItem>
-                        <MenuItem value="blanco">{t('addAnimalForm.white')}</MenuItem>
-                        <MenuItem value="marrón">{t('addAnimalForm.brown')}</MenuItem>
-                        <MenuItem value="gris">{t('addAnimalForm.gray')}</MenuItem>
-                        <MenuItem value="naranja">{t('addAnimalForm.orange')}</MenuItem>
-                        <MenuItem value="dorado">{t('addAnimalForm.golden')}</MenuItem>
-                        <MenuItem value="crema">{t('addAnimalForm.cream')}</MenuItem>
-                        <MenuItem value="bicolor">{t('addAnimalForm.bicolor')}</MenuItem>
-                        <MenuItem value="tricolor">{t('addAnimalForm.tricolor')}</MenuItem>
-                        <MenuItem value="manchado">{t('addAnimalForm.spotted')}</MenuItem>
+                        {formData.especie === 'gato' ? [
+                          <MenuItem key="negro" value="negro">{t('addAnimalForm.black')}</MenuItem>,
+                          <MenuItem key="blanco" value="blanco">{t('addAnimalForm.white')}</MenuItem>,
+                          <MenuItem key="marrón" value="marrón">{t('addAnimalForm.brown')}</MenuItem>,
+                          <MenuItem key="gris" value="gris">{t('addAnimalForm.gray')}</MenuItem>,
+                          <MenuItem key="naranja" value="naranja">{t('addAnimalForm.orange')}</MenuItem>,
+                          <MenuItem key="dorado" value="dorado">{t('addAnimalForm.golden')}</MenuItem>,
+                          <MenuItem key="crema" value="crema">{t('addAnimalForm.cream')}</MenuItem>,
+                          <MenuItem key="bicolor" value="bicolor">{t('addAnimalForm.bicolor')}</MenuItem>,
+                          <MenuItem key="tricolor" value="tricolor">{t('addAnimalForm.tricolor')}</MenuItem>,
+                          <MenuItem key="manchado" value="manchado">{t('addAnimalForm.spotted')}</MenuItem>
+                        ] : [
+                          <MenuItem key="negro" value="negro">{t('addAnimalForm.black')}</MenuItem>,
+                          <MenuItem key="blanco" value="blanco">{t('addAnimalForm.white')}</MenuItem>,
+                          <MenuItem key="marrón" value="marrón">{t('addAnimalForm.brown')}</MenuItem>,
+                          <MenuItem key="gris" value="gris">{t('addAnimalForm.gray')}</MenuItem>,
+                          <MenuItem key="naranja" value="naranja">{t('addAnimalForm.orange')}</MenuItem>,
+                          <MenuItem key="dorado" value="dorado">{t('addAnimalForm.golden')}</MenuItem>,
+                          <MenuItem key="crema" value="crema">{t('addAnimalForm.cream')}</MenuItem>,
+                          <MenuItem key="bicolor" value="bicolor">{t('addAnimalForm.bicolor')}</MenuItem>,
+                          <MenuItem key="tricolor" value="tricolor">{t('addAnimalForm.tricolor')}</MenuItem>,
+                          <MenuItem key="manchado" value="manchado">{t('addAnimalForm.spotted')}</MenuItem>
+                        ]}
                       </Select>
                     </FormControl>
                   </Grid>
@@ -612,15 +659,37 @@ const AddAnimalForm = () => {
                 <Typography variant="h5" sx={{ mb: 2 , maxHeight: "550px",}}>
                   {t('addAnimalForm.previewTitle')}
                 </Typography>
-                <CardPet animal={{
-                  ...formData,
-                  foto: previewUrl || (typeof formData.foto === "string" ? formData.foto : "")
-                }} isFavorito={false} onToggleFavorito={() => {}} />
+                <Typography 
+                  variant="caption" 
+                  sx={{ 
+                    display: 'block',
+                    color: 'text.secondary',
+                    mb: 2,
+                    fontStyle: 'italic',
+                    opacity: 0.7
+                  }}
+                >
+                  {t('addAnimalForm.clickToViewFullProfile')}
+                </Typography>
+                <Box onClick={() => setOpenPreviewDialog(true)} sx={{ cursor: 'pointer' }}>
+                  <CardPet animal={{
+                    ...formData,
+                    foto: previewUrl || (typeof formData.foto === "string" ? formData.foto : "")
+                  }} isFavorito={false} onToggleFavorito={() => {}} />
+                </Box>
               </CardContent>
             </Card>
           </Box>
         </Grid>
       </Grid>
+
+      {/* Dialog de Preview amb dos components */}
+      <PreviewDialog
+        openPreviewDialog={openPreviewDialog}
+        setOpenPreviewDialog={setOpenPreviewDialog}
+        formData={formData}
+        previewUrl={previewUrl}
+      />
     </Box>
   );
 };
