@@ -25,36 +25,38 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import PetsIcon from "@mui/icons-material/Pets";
 import MaleIcon from "@mui/icons-material/Male";
 import FemaleIcon from "@mui/icons-material/Female";
+import { useTranslation } from "react-i18next";
 import { useColors } from "../../hooks/useColors";
 import api from "../../api/client";
 import CardPet from "../MostraMascotes/CardPet";
 import Pagination from "@mui/material/Pagination";
 import { Height } from "@mui/icons-material";
 
-// Opcions de filtre segons el model Mascota
-const FILTROS = {
-  especie: [
-    { value: "todos", label: "Tots" },
-    { value: "perro", label: "Gos" },
-    { value: "gato", label: "Gat" },
-  ],
-  genero: [
-    { value: "todos", label: "Tots" },
-    { value: "macho", label: "Mascle" },
-    { value: "hembra", label: "Femella" },
-  ],
-  tamaño: [
-    { value: "todos", label: "Tots" },
-    { value: "pequeño", label: "Petit" },
-    { value: "mediano", label: "Mitjà" },
-    { value: "grande", label: "Gran" },
-    { value: "gigante", label: "Gegant" },
-  ],
-};
-
 function IniciUsuari() {
+  const { t } = useTranslation();
   const { colors } = useColors();
   const navigate = useNavigate();
+  
+  // Opcions de filtre segons el model Mascota
+  const FILTROS = {
+    especie: [
+      { value: "todos", label: t('iniciUsuari.all') },
+      { value: "perro", label: t('iniciUsuari.dog') },
+      { value: "gato", label: t('iniciUsuari.cat') },
+    ],
+    genero: [
+      { value: "todos", label: t('iniciUsuari.all') },
+      { value: "macho", label: t('iniciUsuari.male') },
+      { value: "hembra", label: t('iniciUsuari.female') },
+    ],
+    tamaño: [
+      { value: "todos", label: t('iniciUsuari.all') },
+      { value: "pequeño", label: t('iniciUsuari.small') },
+      { value: "mediano", label: t('iniciUsuari.medium') },
+      { value: "grande", label: t('iniciUsuari.large') },
+      { value: "gigante", label: t('iniciUsuari.giant') },
+    ],
+  };
   const [animales, setAnimales] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -104,10 +106,8 @@ function IniciUsuari() {
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Error al obtenir el catàleg:", err);
-        setError(
-          "Error al carregar el catàleg. Verifica el servidor de Django i l'API."
-        );
+        console.error(t('iniciUsuari.errorFetch'), err);
+        setError(t('iniciUsuari.errorLoading'));
         setLoading(false);
       });
   }, [filtros, page]);
@@ -195,7 +195,7 @@ function IniciUsuari() {
           }}
         >
           <PetsIcon sx={{ fontSize: 28 }} />
-          PetTinder
+          {t('iniciUsuari.petTinderButton')}
         </Button>
         <Box sx={{ textAlign: "center", mb: 4 }}>
           <Typography
@@ -233,10 +233,10 @@ function IniciUsuari() {
             <Grid container spacing={3} alignItems="center">
               <Grid item xs={12} sm={4}>
                 <FormControl fullWidth>
-                  <InputLabel>Espècie</InputLabel>
+                  <InputLabel>{t('iniciUsuari.filterSpecies')}</InputLabel>
                   <Select
                     value={filtros.especie}
-                    label="Espècie"
+                    label={t('iniciUsuari.filterSpecies')}
                     onChange={(e) =>
                       handleFilterChange("especie", e.target.value)
                     }
@@ -263,10 +263,10 @@ function IniciUsuari() {
 
               <Grid item xs={12} sm={4}>
                 <FormControl fullWidth>
-                  <InputLabel>Sexe</InputLabel>
+                  <InputLabel>{t('iniciUsuari.filterGender')}</InputLabel>
                   <Select
                     value={filtros.genero}
-                    label="Sexe"
+                    label={t('iniciUsuari.filterGender')}
                     onChange={(e) =>
                       handleFilterChange("genero", e.target.value)
                     }
@@ -293,10 +293,10 @@ function IniciUsuari() {
 
               <Grid item xs={12} sm={4}>
                 <FormControl fullWidth>
-                  <InputLabel>Mida</InputLabel>
+                  <InputLabel>{t('iniciUsuari.filterSize')}</InputLabel>
                   <Select
                     value={filtros.tamaño}
-                    label="Mida"
+                    label={t('iniciUsuari.filterSize')}
                     onChange={(e) =>
                       handleFilterChange("tamaño", e.target.value)
                     }
@@ -327,9 +327,7 @@ function IniciUsuari() {
         {/* Comptador d'animals */}
         <Box sx={{ textAlign: "center", mb: 3 }}>
           <Chip
-            label={`${animales.length} animal${
-              animales.length !== 1 ? "s" : ""
-            } trobat${animales.length !== 1 ? "s" : ""}`}
+            label={`${animales.length} ${animales.length !== 1 ? t('iniciUsuari.animalsFoundPlural') : t('iniciUsuari.animalsFound')} ${animales.length !== 1 ? t('iniciUsuari.foundPlural') : t('iniciUsuari.found')}`}
             sx={{
               backgroundColor: colors.orange,
               color: "white",
@@ -397,11 +395,10 @@ function IniciUsuari() {
           <Box sx={{ textAlign: "center", mt: 6 }}>
             <PetsIcon sx={{ fontSize: 80, color: colors.purple, mb: 2 }} />
             <Typography variant="h5" sx={{ color: colors.darkBlue }}>
-              No s'han trobat animals disponibles que coincideixin amb els
-              filtres.
+              {t('iniciUsuari.noAnimalsFound')}
             </Typography>
             <Typography variant="body1" sx={{ color: "text.secondary", mt: 1 }}>
-              Prova amb altres criteris de cerca.
+              {t('iniciUsuari.tryOtherFilters')}
             </Typography>
           </Box>
         )}

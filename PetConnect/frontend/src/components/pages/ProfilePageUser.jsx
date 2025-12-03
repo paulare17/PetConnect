@@ -10,6 +10,7 @@ import {
   Chip,
   CircularProgress,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import { getCurrentUser } from "../../api/client";
 import { useColors } from "../../hooks/useColors";
 import GroupIcon from "@mui/icons-material/Group";
@@ -32,6 +33,7 @@ import {
 } from "../../constants/options.jsx";
 
 const ProfilePage = ({ profileData: initialProfileData }) => {
+  const { t } = useTranslation();
   const { colors } = useColors();
   const [userData, setUserData] = useState(null);
   const [profileData, setProfileData] = useState(initialProfileData);
@@ -117,7 +119,7 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
               {userData.username}
             </Typography>
             <Typography variant="body1" sx={{ color: "text.secondary", mb: 1 }}>
-              {profileData.descripcion || "Sense descripció"}
+              {profileData.descripcion || t('profilePageUser.noDescription')}
             </Typography>
           </Box>
 
@@ -130,7 +132,7 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
                 sx={{ color: colors.orange,  mb: 1 }}
               >
                 <EmailIcon sx={{ mr: 1, verticalAlign: "middle" }} />
-                Email
+                {t('profilePageUser.email')}
               </Typography>
               <Typography variant="body1" sx={{ mb: 2 }}>
                 {userData.email}
@@ -142,7 +144,7 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
                 sx={{ color: colors.orange,  mb: 1 }}
               >
                 <PhoneIcon sx={{ mr: 1, verticalAlign: "middle" }} />
-                Telèfon
+                {t('profilePageUser.phone')}
               </Typography>
               <Typography variant="body1" sx={{ mb: 2 }}>
                 {profileData.telefono || "-"}
@@ -154,7 +156,7 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
                 sx={{ color: colors.orange,  mb: 1 }}
               >
                 <LocationOnIcon sx={{ mr: 1, verticalAlign: "middle" }} />
-                Barri
+                {t('profilePageUser.neighborhood')}
               </Typography>
               <Typography variant="body1" sx={{ mb: 2 }}>
                 {profileData.barrio || "-"}
@@ -166,7 +168,7 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
                 sx={{ color: colors.orange,  mb: 1 }}
               >
                 <FamilyRestroomIcon sx={{ mr: 1, verticalAlign: "middle" }} />
-                Data de naixement
+                {t('profilePageUser.birthDate')}
               </Typography>
               <Typography variant="body1" sx={{ mb: 2 }}>
                 {profileData.fecha_nacimiento || "-"}
@@ -178,7 +180,7 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
                 sx={{ color: colors.orange,  mb: 1 }}
               >
                 <GroupIcon sx={{ mr: 1, verticalAlign: "middle" }} />
-                Gènere
+                {t('profilePageUser.gender')}
               </Typography>
               <Typography variant="body1" sx={{ mb: 2 }}>
                 {labelForValue(generoOptions, profileData.genero) || "-"}
@@ -190,7 +192,7 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
                 sx={{ color: colors.orange,  mb: 1 }}
               >
                 <HomeIcon sx={{ mr: 1, verticalAlign: "middle" }} />
-                Tipus de vivenda
+                {t('profilePageUser.housingType')}
               </Typography>
               <Typography variant="body1" sx={{ mb: 2 }}>
                 {labelForValue(tipoViviendaOptions, profileData.tipo_vivienda) || "-"}
@@ -211,7 +213,7 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
               gap: 1,
             }}
           >
-            <PetsIcon /> Preferències i activitat familiar
+            <PetsIcon /> {t('profilePageUser.preferencesFamily')}
           </Typography>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
@@ -219,7 +221,7 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
                 variant="subtitle2"
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
-                Espècie d'interès
+                {t('profilePageUser.speciesInterest')}
               </Typography>
               <Typography variant="body1" sx={{ mb: 2 }}>
                 {labelForValue(especieOptions, profileData.especie) || "-"}
@@ -230,7 +232,7 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
                 variant="subtitle2"
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
-                Nivell d'activitat familiar
+                {t('profilePageUser.familyActivityLevel')}
               </Typography>
               <Typography variant="body1" sx={{ mb: 2 }}>
                 {profileData.nivel_actividad_familiar || "-"}
@@ -241,10 +243,10 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
                 variant="subtitle2"
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
-                Té nens a casa
+                {t('profilePageUser.hasChildren')}
               </Typography>
               <Typography variant="body1" sx={{ mb: 2 }}>
-                {profileData.tiene_ninos ? "Sí" : "No"}
+                {profileData.tiene_ninos ? t('profilePageUser.yes') : t('profilePageUser.no')}
               </Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -252,7 +254,7 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
                 variant="subtitle2"
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
-                Preferències de mida
+                {t('profilePageUser.sizePreferences')}
               </Typography>
               <Box sx={{ mb: 2 }}>
                 {parsePreferences(profileData.preferencias_tamano).length > 0
@@ -276,7 +278,7 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
                 variant="subtitle2"
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
-                Preferències d'edat
+                {t('profilePageUser.agePreferences')}
               </Typography>
               <Box sx={{ mb: 2 }}>
                 {parsePreferences(profileData.preferencias_edad).length > 0
@@ -300,7 +302,7 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
                 variant="subtitle2"
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
-                Preferències de sexe
+                {t('profilePageUser.genderPreferences')}
               </Typography>
               <Box sx={{ mb: 2 }}>
                 {parsePreferences(profileData.preferencias_sexo).length > 0
@@ -325,7 +327,7 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
                   variant="subtitle2"
                   sx={{ color: colors.orange, fontWeight: "bold" }}
                 >
-                  Esports/activitats oferibles
+                  {t('profilePageUser.sportsActivities')}
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 2 }}>
                   {profileData.deporte_ofrecible || "-"}
@@ -338,7 +340,7 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
                   variant="subtitle2"
                   sx={{ color: colors.orange, fontWeight: "bold" }}
                 >
-                  Temps a casa (gats)
+                  {t('profilePageUser.timeAtHome')}
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 2 }}>
                   {profileData.tiempo_en_casa_para_gatos || "-"}
@@ -359,7 +361,7 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
               gap: 1,
             }}
           >
-            <VolunteerActivismIcon /> Experiència i implicació
+            <VolunteerActivismIcon /> {t('profilePageUser.experienceInvolvement')}
           </Typography>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
@@ -367,10 +369,10 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
                 variant="subtitle2"
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
-                Ha tingut mascotes abans
+                {t('profilePageUser.hadPetsBefore')}
               </Typography>
               <Typography variant="body1" sx={{ mb: 2 }}>
-                {profileData.mascota_previa ? "Sí" : "No"}
+                {profileData.mascota_previa ? t('profilePageUser.yes') : t('profilePageUser.no')}
               </Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -378,10 +380,10 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
                 variant="subtitle2"
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
-                Té mascotes actualment
+                {t('profilePageUser.hasPetsNow')}
               </Typography>
               <Typography variant="body1" sx={{ mb: 2 }}>
-                {profileData.mascota_actual ? "Sí" : "No"}
+                {profileData.mascota_actual ? t('profilePageUser.yes') : t('profilePageUser.no')}
               </Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -389,10 +391,10 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
                 variant="subtitle2"
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
-                Pot ser casa d'acollida
+                {t('profilePageUser.canBeFosterHome')}
               </Typography>
               <Typography variant="body1" sx={{ mb: 2 }}>
-                {profileData.casa_acollida ? "Sí" : "No"}
+                {profileData.casa_acollida ? t('profilePageUser.yes') : t('profilePageUser.no')}
               </Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -400,10 +402,10 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
                 variant="subtitle2"
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
-                Pot cuidar animals amb necessitats especials
+                {t('profilePageUser.canCareSpecialNeeds')}
               </Typography>
               <Typography variant="body1" sx={{ mb: 2 }}>
-                {profileData.necesidades_especiales ? "Sí" : "No"}
+                {profileData.necesidades_especiales ? t('profilePageUser.yes') : t('profilePageUser.no')}
               </Typography>
             </Grid>
           </Grid>
@@ -420,7 +422,7 @@ const ProfilePage = ({ profileData: initialProfileData }) => {
                 fontSize: "1.1rem",
               }}
             >
-              Edita el perfil
+              {t('profilePageUser.editProfile')}
             </button>
           </Box>
         </CardContent>

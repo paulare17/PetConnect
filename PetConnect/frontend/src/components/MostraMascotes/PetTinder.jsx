@@ -11,6 +11,7 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import CloseIcon from "@mui/icons-material/Close";
 import PetsIcon from "@mui/icons-material/Pets";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useColors } from "../../hooks/useColors";
 import api from "../../api/client.js";
 import ChatMiniList from "../Chat/ChatMiniList.jsx";
@@ -19,6 +20,7 @@ import CardPet from "./CardPet.jsx";
 import CardPetDetail from "./CardPetDetail.jsx";
 
 function PetTinder() {
+  const { t } = useTranslation();
   const { colors } = useColors();
   const navigate = useNavigate();
   const [animal, setAnimal] = useState(null);
@@ -47,8 +49,8 @@ function PetTinder() {
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Error al obtenir el següent animal:", err);
-        setError("Error al carregar. Verifica el servidor de Django.");
+        console.error(t('petTinder.errorFetch'), err);
+        setError(t('petTinder.errorLoading'));
         setLoading(false);
       });
   }, []);
@@ -71,9 +73,9 @@ function PetTinder() {
       .post("/pettinder/action/", actionData)
       .then((response) => {
         setMessage(
-          `Acció ${
-            actionType === "like" ? "M'agrada" : "No m'agrada"
-          } registrada per ${animal.nombre}!`
+          `${t('petTinder.action')} ${
+            actionType === "like" ? t('petTinder.actionLike') : t('petTinder.actionDislike')
+          } ${t('petTinder.actionRegistered')} ${animal.nombre}!`
         );
         // Si és un like i el backend retorna chat_id, obrim el xat inline
         if (
@@ -88,7 +90,7 @@ function PetTinder() {
       })
       .catch((err) => {
         console.error(`Error al registrar ${actionType}:`, err);
-        setMessage(`Error: No s'ha pogut registrar l'acció.`);
+        setMessage(t('petTinder.errorAction'));
       });
   };
 
@@ -109,10 +111,10 @@ function PetTinder() {
         }}
       >
         <PetsIcon sx={{ fontSize: 48 }} />
-        PetTinder
+        {t('petTinder.title')}
       </Typography>
       <Typography variant="h6" sx={{ color: colors.darkBlue }}>
-        Troba el teu company perfecte!
+        {t('petTinder.subtitle')}
       </Typography>
     </Box>
   );
@@ -245,7 +247,7 @@ function PetTinder() {
                 transition: "all 0.2s",
               }}
             >
-              No m'agrada
+              {t('petTinder.dislikeButton')}
             </Button>
             <Button
               variant="contained"
@@ -266,7 +268,7 @@ function PetTinder() {
                 transition: "all 0.2s",
               }}
             >
-              M'agrada
+              {t('petTinder.likeButton')}
             </Button>
           </Box>
         </Box>
@@ -319,7 +321,7 @@ function PetTinder() {
           }}
         >
           <PetsIcon sx={{ fontSize: 28 }} />
-          Galeria
+          {t('petTinder.galleryButton')}
         </Button>
     </Box>
   );

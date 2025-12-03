@@ -16,7 +16,6 @@ import AddAnimalForm from "./components/Forms/AddAnimalForm";
 import UserProfile from "./components/pages/UserProfile";
 import ProfilePageProtectora from "./components/pages/ProfilePageProtectora";
 import Footer from "./components/Footer/Footer";
-import FooterLandpage from "./components/Footer/FooterLandpage.jsx";
 import ProtectedRoute, { ProtectoraRoute, UsuarioRoute } from "./components/ProtectedRoute";
 import PetTinder from "./components/MostraMascotes/PetTinder.jsx";
 import IniciUsuari from "./components/Inici/IniciUsuari";
@@ -119,7 +118,6 @@ function App() {
           </Routes>
 
           <Footer />
-          {/* <FooterLandpage></FooterLandpage> */}
         </div>
       </AuthProvider>
 

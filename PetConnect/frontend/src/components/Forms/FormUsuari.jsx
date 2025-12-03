@@ -44,10 +44,12 @@ import {
   sexoOptions,
   tipoViviendaOptions,
 } from "../../constants/options";
+import { useTranslation } from "react-i18next";
 
 export default function FormUsuari({ onProfileCreated, existingProfile }) {
   const navigate = useNavigate();
   const { colors } = useColors();
+  const { t } = useTranslation();
   
   // Normalitzar existingProfile per assegurar que els camps són arrays
   const normalizeProfile = (profile) => {
@@ -129,14 +131,14 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.telefono.trim()) newErrors.telefono = "Telèfon obligatori";
+    if (!formData.telefono.trim()) newErrors.telefono = t('formUsuari.phoneRequired');
     if (!formData.fecha_nacimiento)
-      newErrors.fecha_nacimiento = "Data de naixement obligatòria";
+      newErrors.fecha_nacimiento = t('formUsuari.birthdateRequired');
     if (!formData.descripcion.trim())
-      newErrors.descripcion = "Descripció obligatòria";
-    if (!formData.genero) newErrors.genero = "Gènere obligatori";
+      newErrors.descripcion = t('formUsuari.descriptionRequired');
+    if (!formData.genero) newErrors.genero = t('formUsuari.genderRequired');
     if (!formData.tipo_vivienda)
-      newErrors.tipo_vivienda = "Tipus de vivenda obligatori";
+      newErrors.tipo_vivienda = t('formUsuari.housingTypeRequired');
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -190,7 +192,7 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
       console.error("Error en crear el perfil:", error);
       const errorMsg = error.response?.data?.detail || 
                        error.response?.data?.message || 
-                       "Error en crear el perfil. Intenta-ho de nou.";
+                       t('formUsuari.createError');
       setApiError(errorMsg);
     } finally {
       setLoading(false);
@@ -229,7 +231,7 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
             }}
           >
             <Group />
-            Perfil d'Usuari
+            {t('formUsuari.title')}
           </Typography>
 
           <Typography
@@ -237,16 +239,15 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
             align="center"
             sx={{ mb: 4, color: "text.secondary", lineHeight: 1.6 }}
           >
-            Completa la informació del teu perfil perquè puguem recomanar-te les millors mascotes per a tu.
+            {t('formUsuari.subtitle')}
           </Typography>
 
           <Box component="form" onSubmit={handleSubmit}>
             {/* Alert informatiu si és la primera vegada */}
             {existingProfile && !existingProfile.telefono && (
               <Alert severity="warning" sx={{ mb: 3 }}>
-                <AlertTitle>Completa el teu perfil</AlertTitle>
-                Encara no has completat el teu perfil. Necessitem aquesta informació per poder
-                recomanar-te les mascotes més adequades per a tu. <strong>Pren-te un moment per emplenar el formulari!</strong>
+                <AlertTitle>{t('formUsuari.completeProfileTitle')}</AlertTitle>
+                {t('formUsuari.completeProfileMessage')} <strong>{t('formUsuari.completeProfileAction')}</strong>
               </Alert>
             )}
 
@@ -262,7 +263,7 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
               sx={{ mb: 2, color: colors.blue, fontWeight: "bold" }}
             >
               <Group sx={{ mr: 1, verticalAlign: "middle" }} />
-              Informació Personal
+              {t('formUsuari.personalInfo')}
             </Typography>
 
             <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -271,7 +272,7 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
                   required
                   fullWidth
                   name="telefono"
-                  label="Telèfon de contacte"
+                  label={t('formUsuari.phone')}
                   value={formData.telefono}
                   onChange={handleInputChange}
                   error={!!errors.telefono}
@@ -291,7 +292,7 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
                   required
                   fullWidth
                   name="fecha_nacimiento"
-                  label="Data de naixement"
+                  label={t('formUsuari.birthdate')}
                   type="date"
                   value={formData.fecha_nacimiento}
                   onChange={handleInputChange}
@@ -303,12 +304,12 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
 
               <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth required error={!!errors.genero}>
-                  <InputLabel>Gènere</InputLabel>
+                  <InputLabel>{t('formUsuari.gender')}</InputLabel>
                   <Select
                     name="genero"
                     value={formData.genero}
                     onChange={handleInputChange}
-                    label="Gènere"
+                    label={t('formUsuari.gender')}
                   >
                     {generoOptions.map((option) => (
                       <MenuItem key={option.value} value={option.value}>
@@ -341,8 +342,8 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
                   }}
                 >
                   {formData.foto_perfil
-                    ? "Foto seleccionada"
-                    : "Pujar foto de perfil"}
+                    ? t('formUsuari.photoSelected')
+                    : t('formUsuari.uploadPhoto')}
                   <input
                     type="file"
                     hidden
@@ -359,14 +360,11 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
                   multiline
                   rows={4}
                   name="descripcion"
-                  label="Descripció personal"
+                  label={t('formUsuari.description')}
                   value={formData.descripcion}
                   onChange={handleInputChange}
                   error={!!errors.descripcion}
-                  helperText={
-                    errors.descripcion ||
-                    "Explica una mica sobre tu, els teus interessos i experiència amb animals"
-                  }
+                  helperText={errors.descripcion}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -386,11 +384,11 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
               sx={{ mb: 2, color: colors.blue, fontWeight: "bold" }}
             >
               <Schedule sx={{ mr: 1, verticalAlign: "middle" }} />
-              Preferències de mascota i activitat familiar
+              {t('formUsuari.familyInfo')}
             </Typography>
                     <Grid size={{ xs: 12, sm: 6 }} sx={{ mb: 2 }}>
                       <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                        Espècie d'interès
+                        {t('formUsuari.species')}
                       </Typography>
                       <FormGroup row>
                         {especieOptions.map((opt) => (
@@ -412,12 +410,12 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
             <Grid container spacing={3} sx={{ mb: 4 }}>
               <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth>
-                  <InputLabel>Nivell d'activitat familiar</InputLabel>
+                  <InputLabel>{t('formUsuari.activityLevel')}</InputLabel>
                   <Select
                     name="nivel_actividad_familiar"
                     value={formData.nivel_actividad_familiar}
                     onChange={handleInputChange}
-                    label="Nivell d'activitat familiar"
+                    label={t('formUsuari.activityLevel')}
                   >
                     {actividadOptions.map((opt) => (
                       <MenuItem key={opt.value} value={opt.value}>
@@ -437,13 +435,13 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
                       sx={{ color: colors.blue }}
                     />
                   }
-                  label="Tinc nens a casa"
+                  label={t('formUsuari.hasChildren')}
                 />
               </Grid>
 
               <Grid size={{ xs: 12 }}>
                 <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                  Preferències de mida
+                  {t('formUsuari.sizePreferences')}
                 </Typography>
                 <FormGroup row sx={{ mb: 2 }}>
                   {tamanoOptions.map((opt) => (
@@ -464,7 +462,7 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
 
               <Grid size={{ xs: 12 }}>
                 <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                  Preferències d'edat
+                  {t('formUsuari.agePreferences')}
                 </Typography>
                 <FormGroup row sx={{ mb: 2 }}>
                   {edadOptions.map((opt) => (
@@ -485,7 +483,7 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
 
               <Grid size={{ xs: 12 }}>
                 <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                  Preferències de sexe
+                  {t('formUsuari.sexPreferences')}
                 </Typography>
                 <FormGroup row sx={{ mb: 2 }}>
                   {sexoOptions.map((opt) => (
@@ -509,7 +507,7 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
                   <TextField
                     fullWidth
                     name="deporte_ofrecible"
-                    label="Esports/activitats que puc oferir (gossos)"
+                    label={t('formUsuari.sports')}
                     value={formData.deporte_ofrecible}
                     onChange={handleInputChange}
                   />
@@ -518,7 +516,7 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
                   <TextField
                     fullWidth
                     name="tiempo_en_casa_para_gatos"
-                    label="Temps a casa (útil per gats)"
+                    label={t('formUsuari.timeAtHome')}
                     value={formData.tiempo_en_casa_para_gatos}
                     onChange={handleInputChange}
                   />
@@ -532,18 +530,18 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
               sx={{ mb: 2, color: colors.blue, fontWeight: "bold" }}
             >
               <LocationOn sx={{ mr: 1, verticalAlign: "middle" }} />
-              Situació d'Habitatge
+              {t('formUsuari.housingInfo')}
             </Typography>
 
             <Grid container spacing={3} sx={{ mb: 4 }}>
               <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth required error={!!errors.tipo_vivienda}>
-                  <InputLabel>Tipus d'habitatge</InputLabel>
+                  <InputLabel>{t('formUsuari.housingType')}</InputLabel>
                   <Select
                     name="tipo_vivienda"
                     value={formData.tipo_vivienda}
                     onChange={handleInputChange}
-                    label="Tipus d'habitatge"
+                    label={t('formUsuari.housingType')}
                   >
                     {tipoViviendaOptions.map((option) => (
                       <MenuItem key={option.value} value={option.value}>
@@ -568,7 +566,7 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
               sx={{ mb: 2, color: colors.blue, fontWeight: "bold" }}
             >
               <Pets sx={{ mr: 1, verticalAlign: "middle" }} />
-              Experiència amb animals
+              {t('formUsuari.experienceInfo')}
             </Typography>
 
             <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -582,7 +580,7 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
                         sx={{ color: colors.blue }}
                       />
                     }
-                    label="He tingut mascotes abans"
+                    label={t('formUsuari.hadPetsBefore')}
                   />
                   <FormControlLabel
                     control={
@@ -592,7 +590,7 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
                         sx={{ color: colors.blue }}
                       />
                     }
-                    label="Actualment tinc mascotes a casa"
+                    label={t('formUsuari.currentlyHasPets')}
                   />
                   <FormControlLabel
                     control={
@@ -602,7 +600,7 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
                         sx={{ color: colors.blue }}
                       />
                     }
-                    label="No he tingut mascotes abans"
+                    label={t('formUsuari.neverHadPets')}
                   />
                 </FormGroup>
               </Grid>
@@ -610,13 +608,13 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
 
             <Divider sx={{ my: 3 }} />
 
-            {/* Capacitat d'Involucració */}
+            {/* Capacitat d'Involucràcia */}
             <Typography
               variant="h6"
               sx={{ mb: 2, color: colors.blue, fontWeight: "bold" }}
             >
               <VolunteerActivism sx={{ mr: 1, verticalAlign: "middle" }} />
-              Capacitat d'implicació
+              {t('formUsuari.specialNeeds')}
             </Typography>
 
             <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -629,7 +627,7 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
                       sx={{ color: colors.blue }}
                     />
                   }
-                  label="Tinc els recursos i la capacitat per cuidar animals amb necessitats especials"
+                  label={t('formUsuari.canCareSpecialNeeds')}
                 />
               </Grid>
             </Grid>
@@ -656,7 +654,7 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
                   transition: "all 0.3s ease-in-out",
                 }}
               >
-                Cancel·lar
+                {t('formUsuari.cancelButton')}
               </Button>
 
               <Button
@@ -677,7 +675,7 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
                   transition: "all 0.3s ease-in-out",
                 }}
               >
-                {loading ? "Actualitzant perfil..." : "Actualitza Perfil d'Usuari"}
+                {loading ? t('formUsuari.savingButton') : t('formUsuari.saveButton')}
               </Button>
             </Box>
           </Box>

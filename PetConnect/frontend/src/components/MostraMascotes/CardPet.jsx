@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import Card from '@mui/material/Card';
 import CardMedia from '@mui/material/CardMedia';
 import CardContent from '@mui/material/CardContent';
@@ -19,6 +20,7 @@ import nikaDogImg from '../../assets/nika.png';
 // protectora = { nombre: string, foto: string }
 
 export default function CardPet({ animal, isFavorito, onToggleFavorito, sx }) {
+  const { t } = useTranslation();
   const { colors } = useColors();
   // Exemple per defecte si no hi ha animal
   
@@ -74,7 +76,7 @@ export default function CardPet({ animal, isFavorito, onToggleFavorito, sx }) {
         {/* Chip d'espècie amb icona poteta */}
         <Chip
           icon={<PetsIcon />}
-          label={data.especie === 'perro' ? 'Gos' : 'Gat'}
+          label={data.especie === 'perro' ? t('cardPet.dog') : t('cardPet.cat')}
           sx={{ position: 'absolute', bottom: 8, left: 8, backgroundColor: iconColor, color: 'white', fontWeight: 'bold' }}
         />
       </Box>
@@ -91,7 +93,7 @@ export default function CardPet({ animal, isFavorito, onToggleFavorito, sx }) {
             <FemaleIcon sx={{ color: 'pink', mr: 0.5 }} />
           )}
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            {raza || 'Raça no especificada'}
+            {raza || t('cardPet.breedNotSpecified')}
           </Typography>
         </Box>
         <Box sx={{ mt: 2 }}>
@@ -104,7 +106,7 @@ export default function CardPet({ animal, isFavorito, onToggleFavorito, sx }) {
             textOverflow: 'ellipsis',
             lineHeight: 1.5
           }}>
-            {data.descripcion || 'Sense descripció disponible.'}
+            {data.descripcion || t('cardPet.noDescription')}
           </Typography>
         </Box>
       </CardContent>

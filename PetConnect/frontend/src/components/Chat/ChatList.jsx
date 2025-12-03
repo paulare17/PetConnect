@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Box, Typography, Container } from '@mui/material';
 import { useColors } from '../../hooks/useColors';
 import ChatMiniList from './ChatMiniList';
@@ -6,6 +7,7 @@ import Chat from './Chat';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 
 export default function ChatList() {
+  const { t } = useTranslation();
   const { colors } = useColors();
   const [selectedChatId, setSelectedChatId] = useState(null);
 
@@ -28,7 +30,7 @@ export default function ChatList() {
             }}
           >
             <ChatBubbleOutlineIcon sx={{ fontSize: 48 }} />
-            Els meus xats
+            {t('chatComponent.title')}
           </Typography>
         </Box>
       </Container>
@@ -59,7 +61,7 @@ export default function ChatList() {
             transition: 'opacity .2s'
           }}>
             <Typography variant="h6" color="text.secondary" textAlign="center">
-              Selecciona un xat de la llista per començar a conversar 🐾
+              {t('chatComponent.selectChat')}
             </Typography>
           </Box>
           {selectedChatId && (

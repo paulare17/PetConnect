@@ -1,8 +1,10 @@
 import PetsIcon from "@mui/icons-material/Pets";
 import { useColors } from "../../hooks/useColors";
+import { useTranslation } from "react-i18next";
 
 export default function Footer() {
   const { colors } = useColors();
+  const { t } = useTranslation();
   
   return (
 <footer
@@ -11,19 +13,19 @@ export default function Footer() {
     >
       <div className="container d-flex justify-content-center align-items-center py-4">
         <a href="https://facebook.com" className="footer-link mx-3" aria-label="Facebook" target="_blank" rel="noopener noreferrer">
-      Facebook
+          {t('footer.facebook')}
         </a>
 
         <a href="https://youtube.com" className="footer-link mx-3" aria-label="YouTube" target="_blank" rel="noopener noreferrer">
-          YouTube
+          {t('footer.youtube')}
         </a>
 
         <a href="https://instagram.com" className="footer-link mx-3" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
-          Instagram
+          {t('footer.instagram')}
         </a>
 
         <a href="https://mdbootstrap.com" className="footer-link mx-3" aria-label="MDBootstrap" target="_blank" rel="noopener noreferrer">
-          MDBootstrap
+          {t('footer.mdbootstrap')}
         </a>
       </div>
 
@@ -32,7 +34,7 @@ export default function Footer() {
         style={{ backgroundColor: "rgba(0, 0, 0, 0.2)" }}
       >
         <p className="mb-0">
-          © Made with love in Barcelona <PetsIcon fontSize="small" />
+          {t('footer.madeWith')} <PetsIcon fontSize="16px" />
         </p>
       </div>
     </footer>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     Box,
     Typography,
@@ -14,6 +15,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { useColors } from '../../hooks/useColors';
 
 function CardPetDetail({ animal }) {
+    const { t } = useTranslation();
     const { colors } = useColors();
     if (!animal || animal.message) {
         return (
@@ -30,14 +32,14 @@ function CardPetDetail({ animal }) {
                 }}
             >
                 <Typography variant="body1" color="text.secondary" textAlign="center">
-                    Selecciona una mascota per veure els detalls
+                    {t('cardPetDetail.selectPet')}
                 </Typography>
             </Paper>
         );
     }
 
     const raza = animal.especie === 'perro' ? animal.raza_perro : animal.raza_gato;
-    const especieLabel = animal.especie === 'perro' ? 'Gos' : 'Gat';
+    const especieLabel = animal.especie === 'perro' ? t('cardPetDetail.dog') : t('cardPetDetail.cat');
 
     return (
         <Paper 
@@ -78,7 +80,7 @@ function CardPetDetail({ animal }) {
                         sx={{ backgroundColor: colors.orange, color: 'white' }} 
                     />
                     <Chip 
-                        label={`${animal.edad} any${animal.edad !== 1 ? 's' : ''}`} 
+                        label={`${animal.edad} ${animal.edad !== 1 ? t('cardPetDetail.years') : t('cardPetDetail.year')}`} 
                         size="small"
                         sx={{ backgroundColor: colors.purple, color: 'white' }} 
                     />
@@ -93,7 +95,7 @@ function CardPetDetail({ animal }) {
 
                 {/* Raça */}
                 <Typography variant="body1" sx={{ mb: 2, fontWeight: 500 }}>
-                    {raza || 'Raça no especificada'}
+                    {raza || t('cardPetDetail.breedNotSpecified')}
                 </Typography>
 
                 {/* Ubicació */}
@@ -113,34 +115,34 @@ function CardPetDetail({ animal }) {
 
                 {/* Característiques */}
                 <Typography variant="subtitle2" sx={{ color: colors.orange, mb: 1, fontWeight: 'bold' }}>
-                    Característiques
+                    {t('cardPetDetail.characteristicsTitle')}
                 </Typography>
                 <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, mb: 2 }}>
-                    <InfoItem label="Color" value={animal.color} />
-                    <InfoItem label="Pes" value={animal.peso ? `${animal.peso} kg` : null} />
-                    <InfoItem label="Caràcter" value={animal.caracter} />
-                    <InfoItem label="Amb nens" value={animal.convivencia_ninos ? 'Sí' : 'No'} />
+                    <InfoItem label={t('cardPetDetail.color')} value={animal.color} />
+                    <InfoItem label={t('cardPetDetail.weight')} value={animal.peso ? `${animal.peso} kg` : null} />
+                    <InfoItem label={t('cardPetDetail.character')} value={animal.caracter} />
+                    <InfoItem label={t('cardPetDetail.withChildren')} value={animal.convivencia_ninos ? t('cardPetDetail.yes') : t('cardPetDetail.no')} />
                 </Box>
 
                 {/* Salut */}
                 <Typography variant="subtitle2" sx={{ color: colors.orange, mb: 1, fontWeight: 'bold' }}>
-                    Salut
+                    {t('cardPetDetail.healthTitle')}
                 </Typography>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
-                    {animal.vacunado && <MiniChip label="Vacunat" />}
-                    {animal.esterilizado && <MiniChip label="Esterilitzat" />}
-                    {animal.desparasitado && <MiniChip label="Desparasitat" />}
-                    {animal.con_microchip && <MiniChip label="Microxip" />}
+                    {animal.vacunado && <MiniChip label={t('cardPetDetail.vaccinated')} />}
+                    {animal.esterilizado && <MiniChip label={t('cardPetDetail.sterilized')} />}
+                    {animal.desparasitado && <MiniChip label={t('cardPetDetail.dewormed')} />}
+                    {animal.con_microchip && <MiniChip label={t('cardPetDetail.microchip')} />}
                 </Box>
 
                 {/* Necessitats especials */}
                 {animal.necesidades_especiales && (
                     <Box sx={{ backgroundColor: '#fff3e0', p: 1.5, borderRadius: 2, mb: 2 }}>
                         <Typography variant="body2" sx={{ fontWeight: 'bold', color: colors.darkOrange }}>
-                            ⚠️ Necessitats especials
+                            {t('cardPetDetail.specialNeeds')}
                         </Typography>
                         <Typography variant="body2">
-                            {animal.descripcion_necesidades || 'Consultar amb la protectora'}
+                            {animal.descripcion_necesidades || t('cardPetDetail.consultShelter')}
                         </Typography>
                     </Box>
                 )}
@@ -160,7 +162,7 @@ function CardPetDetail({ animal }) {
                         }
                     }}
                 >
-                    Veure perfil complet
+                    {t('cardPetDetail.viewFullProfile')}
                 </Button>
             </Box>
         </Paper>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   List,
@@ -17,6 +18,7 @@ import { useColors } from '../../hooks/useColors';
 import { useAuthContext } from '../../context/AuthProvider';
 
 export default function ChatMiniList({ maxHeight = 400, onSelectChat }) {
+  const { t } = useTranslation();
   const { user } = useAuthContext();
   const { colors } = useColors();
   const [chats, setChats] = useState([]);
@@ -50,7 +52,7 @@ export default function ChatMiniList({ maxHeight = 400, onSelectChat }) {
     <Box sx={{ width: 350, minHeight: '500px', overflowY: 'auto', bgcolor: colors.lightColor, borderRadius: 2, boxShadow: 2 }}>
       <Box sx={{ p: 2, borderBottom: `1px solid ${colors.orange}` }}>
         <Typography variant="h6" fontWeight="bold" color={colors.orange}>
-          Xats
+          {t('chatComponent.chatsListTitle')}
         </Typography>
       </Box>
       {loading ? (
@@ -61,7 +63,7 @@ export default function ChatMiniList({ maxHeight = 400, onSelectChat }) {
         <Box sx={{ p: 3, textAlign: 'center' }}>
           <PetsIcon sx={{ fontSize: 40, color: colors.orange, opacity: 0.5, mb: 1 }} />
           <Typography variant="body2" color="text.secondary">
-            No tens xats encara
+            {t('chatComponent.noChatsYet')}
           </Typography>
         </Box>
       ) : (
@@ -89,7 +91,7 @@ export default function ChatMiniList({ maxHeight = 400, onSelectChat }) {
                         {chat.mascota_nombre}
                       </Typography>
                       <Typography variant="caption" color="text.secondary" noWrap>
-                        {lastMessage ? `${lastMessage.remitente}: ${lastMessage.contenido}` : 'Nou xat'}
+                        {lastMessage ? `${lastMessage.remitente}: ${lastMessage.contenido}` : t('chatComponent.newChat')}
                       </Typography>
                     </Box>
                     {chat.num_mensajes > 0 && (

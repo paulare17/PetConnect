@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography, Grid, Card, CardContent, Button, Avatar, CircularProgress, Alert } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import PetsIcon from "@mui/icons-material/Pets";
 import { colors } from "../../constants/colors.jsx";
 import api from "../../api/client.js";
@@ -10,6 +11,7 @@ import nikaImg from "../../assets/nika.png";
 import blackImg from "../../assets/black.png";
 
 export default function IniciProtectora() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [mascotas, setMascotas] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,7 +26,7 @@ export default function IniciProtectora() {
         setMascotas(res.data);
       } catch (err) {
         console.error("Error carregant les mascotes:", err);
-        setError(err.response?.data?.detail || "Error carregant les teves mascotes");
+        setError(err.response?.data?.detail || t('iniciProtectora.errorLoading'));
       } finally {
         setLoading(false);
       }
@@ -65,12 +67,12 @@ export default function IniciProtectora() {
                 }}
                 onClick={() => navigate('/afegir-mascota')}
               >
-                Afegeix els teus animals
+                {t('iniciProtectora.addAnimalsButton')}
               </Button>
             </Box>
             <Card sx={{ borderRadius: 4, maxWidth: 520, maxHeight: 570, boxShadow: 3, p: 2, bgcolor: colors.lightColor, border: `2px dashed ${colors.orange}`, minHeight:{ md:440 }, display:'flex', flexDirection:'column' }}>
               <Typography variant="h6" sx={{  mb: 2, textAlign: "center", color: colors.black }}>
-                Les teves adopcions
+                {t('iniciProtectora.yourAdoptions')}
               </Typography>
               <Box sx={{ flexGrow:1, overflowY:'auto', pr:1 }}>
                 {loading ? (
@@ -83,7 +85,7 @@ export default function IniciProtectora() {
                   <Box sx={{ textAlign: "center", py: 4 }}>
                     <PetsIcon sx={{ fontSize: 48, color: colors.orange, mb: 1 }} />
                     <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                      Encara no tens cap mascota penjada.
+                      {t('iniciProtectora.noPetsYet')}
                     </Typography>
                   </Box>
                 ) : (
@@ -138,7 +140,7 @@ export default function IniciProtectora() {
             <Card sx={{ flexGrow:1, borderRadius:4, boxShadow:3, p:3, bgcolor:colors.lightColor, border:`3px solid ${colors.purple}`, minHeight:{ md:685 }, display:'flex', flexDirection:'column', minWidth:0 }}>
               <CardContent sx={{ flexGrow:1, display:'flex', flexDirection:'column', p:0 }}>
                 <Typography variant="h6" sx={{ fontWeight:'bold', mb:2, mt:2, textAlign:'center', color:colors.black, fontSize:{ xs:18, md:22 } }}>
-                  Xats actius
+                  {t('iniciProtectora.activeChats')}
                 </Typography>
                 <Box sx={{ flexGrow:1, display:'flex', gap:2, px:2, pb:2 }}>
                   {/* Columna llista (amplada fixa) */}
@@ -163,7 +165,7 @@ export default function IniciProtectora() {
                       transition:'opacity .2s'
                     }}>
                       <Typography variant="body1" color="text.secondary" textAlign="center">
-                        Selecciona un xat de la llista per començar a conversar 🐾
+                        {t('iniciProtectora.selectChatPrompt')}
                       </Typography>
                     </Box>
                     {selectedChatId && (

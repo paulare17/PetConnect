@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import "./no-scroll-form.css";
 import {
   Box,
@@ -24,6 +25,7 @@ import { useColors } from "../../hooks/useColors";
 import api from "../../api/client";
 
 const AddAnimalForm = () => {
+  const { t } = useTranslation();
   const { colors } = useColors();
   const [previewUrl, setPreviewUrl] = useState("");
   const initialFormData = {
@@ -92,13 +94,6 @@ const AddAnimalForm = () => {
     }
   };
 
-  const handleCaracterChange = (value) => {
-    setFormData((prev) => ({
-      ...prev,
-      caracter: value,
-    }));
-  };
-
   const handleGenerateDescription = async () => {
     setGeneratingDescription(true);
     setStatus(null);
@@ -128,7 +123,7 @@ const AddAnimalForm = () => {
           ...prev,
           descripcion: res.data.descripcion
         }));
-        setStatus({ type: "success", message: "¡Descripción generada con IA! 🤖" });
+        setStatus({ type: "success", message: t('addAnimalForm.successGenerated') });
         setTimeout(() => setStatus(null), 3000);
       } else {
         throw new Error('No se recibió descripción del servidor');
@@ -141,7 +136,7 @@ const AddAnimalForm = () => {
       
       setStatus({
         type: "error",
-        message: `Error: ${errorMsg}. Puedes escribir la descripción manualmente.`
+        message: `${t('addAnimalForm.errorGenerating')}: ${errorMsg}. ${t('addAnimalForm.manualDescription')}`
       });
     } finally {
       setGeneratingDescription(false);
@@ -175,11 +170,11 @@ const AddAnimalForm = () => {
       });
 
       console.log("Mascota creada:", res.data);
-      setStatus({ type: "success", message: "Mascota creada correctament!" });
+      setStatus({ type: "success", message: t('addAnimalForm.successCreated') });
       setFormData(initialFormData);
     } catch (err) {
       console.error("Error creant mascota:", err);
-      const errorMsg = err.response?.data?.detail || err.response?.data || err.message || "Error creant mascota.";
+      const errorMsg = err.response?.data?.detail || err.response?.data || err.message || t('addAnimalForm.errorCreating');
       setStatus({
         type: "error",
         message: typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg),
@@ -237,9 +232,9 @@ const AddAnimalForm = () => {
                 component="h1"
                 gutterBottom
                 align="center"
-                sx={{ mb: 3, fontWeight: "bold" }}
+                sx={{ mb: 3, color: colors.darkBlue, }}
               >
-                Afegir un nou animal
+                {t('addAnimalForm.title')}
               </Typography>
               <Box component="form" onSubmit={handleSubmit}>
                 <Grid container spacing={3}>
@@ -247,56 +242,56 @@ const AddAnimalForm = () => {
                     <TextField
                       fullWidth
                       name="nombre"
-                      label="Nom"
+                      label={t('addAnimalForm.name')}
                       value={formData.nombre}
                       onChange={handleInputChange}
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <FormControl fullWidth>
-                      <InputLabel>Espècie</InputLabel>
+                      <InputLabel>{t('addAnimalForm.species')}</InputLabel>
                       <Select
                         name="especie"
                         value={formData.especie}
                         onChange={handleInputChange}
                       >
-                        <MenuItem value="perro">Perro</MenuItem>
-                        <MenuItem value="gato">Gato</MenuItem>
+                        <MenuItem value="perro">{t('addAnimalForm.dog')}</MenuItem>
+                        <MenuItem value="gato">{t('addAnimalForm.cat')}</MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <FormControl fullWidth>
-                      <InputLabel>Raça</InputLabel>
+                      <InputLabel>{t('addAnimalForm.breed')}</InputLabel>
                       <Select
                         name="raza"
                         value={formData.raza}
                         onChange={handleInputChange}
                       >
                         {formData.especie === 'perro' ? [
-                            <MenuItem key="mestizo" value="mestizo">Mestizo</MenuItem>,
-                            <MenuItem key="labrador" value="labrador">Labrador Retriever</MenuItem>,
-                            <MenuItem key="pastor_aleman" value="pastor_aleman">Pastor Alemán</MenuItem>,
-                            <MenuItem key="bulldog" value="bulldog">Bulldog Inglés</MenuItem>,
-                            <MenuItem key="beagle" value="beagle">Beagle</MenuItem>
+                            <MenuItem key="mestizo" value="mestizo">{t('addAnimalForm.mixed')}</MenuItem>,
+                            <MenuItem key="labrador" value="labrador">{t('addAnimalForm.labrador')}</MenuItem>,
+                            <MenuItem key="pastor_aleman" value="pastor_aleman">{t('addAnimalForm.germanShepherd')}</MenuItem>,
+                            <MenuItem key="bulldog" value="bulldog">{t('addAnimalForm.bulldog')}</MenuItem>,
+                            <MenuItem key="beagle" value="beagle">{t('addAnimalForm.beagle')}</MenuItem>
                         ] : [
-                            <MenuItem key="mestizo" value="mestizo">Mestizo</MenuItem>,
-                            <MenuItem key="siames" value="siames">Siamés</MenuItem>,
-                            <MenuItem key="persa" value="persa">Persa</MenuItem>
+                            <MenuItem key="mestizo" value="mestizo">{t('addAnimalForm.mixed')}</MenuItem>,
+                            <MenuItem key="siames" value="siames">{t('addAnimalForm.siamese')}</MenuItem>,
+                            <MenuItem key="persa" value="persa">{t('addAnimalForm.persian')}</MenuItem>
                         ]}
                       </Select>
                     </FormControl>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <FormControl fullWidth>
-                      <InputLabel>Gènere</InputLabel>
+                      <InputLabel>{t('addAnimalForm.gender')}</InputLabel>
                       <Select
                         name="genero"
                         value={formData.genero}
                         onChange={handleInputChange}
                       >
-                        <MenuItem value="macho">Macho</MenuItem>
-                        <MenuItem value="hembra">Hembra</MenuItem>
+                        <MenuItem value="macho">{t('addAnimalForm.male')}</MenuItem>
+                        <MenuItem value="hembra">{t('addAnimalForm.female')}</MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
@@ -304,7 +299,7 @@ const AddAnimalForm = () => {
                     <TextField
                       fullWidth
                       name="edad"
-                      label="Edat"
+                      label={t('addAnimalForm.age')}
                       type="number"
                       value={formData.edad}
                       onChange={handleInputChange}
@@ -312,37 +307,37 @@ const AddAnimalForm = () => {
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <FormControl fullWidth>
-                      <InputLabel>Mida</InputLabel>
+                      <InputLabel>{t('addAnimalForm.size')}</InputLabel>
                       <Select
                         name="tamaño"
                         value={formData.tamaño}
                         onChange={handleInputChange}
                       >
-                        <MenuItem value="pequeño">Pequeño</MenuItem>
-                        <MenuItem value="mediano">Mediano</MenuItem>
-                        <MenuItem value="grande">Grande</MenuItem>
-                        <MenuItem value="gigante">Gigante</MenuItem>
+                        <MenuItem value="pequeño">{t('addAnimalForm.small')}</MenuItem>
+                        <MenuItem value="mediano">{t('addAnimalForm.medium')}</MenuItem>
+                        <MenuItem value="grande">{t('addAnimalForm.large')}</MenuItem>
+                        <MenuItem value="gigante">{t('addAnimalForm.giant')}</MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <FormControl fullWidth>
-                      <InputLabel>Color</InputLabel>
+                      <InputLabel>{t('addAnimalForm.color')}</InputLabel>
                       <Select
                         name="color"
                         value={formData.color}
                         onChange={handleInputChange}
                       >
-                        <MenuItem value="negro">Negro</MenuItem>
-                        <MenuItem value="blanco">Blanco</MenuItem>
-                        <MenuItem value="marrón">Marrón</MenuItem>
-                        <MenuItem value="gris">Gris</MenuItem>
-                        <MenuItem value="naranja">Naranja/Atigrado</MenuItem>
-                        <MenuItem value="dorado">Dorado</MenuItem>
-                        <MenuItem value="crema">Crema</MenuItem>
-                        <MenuItem value="bicolor">Bicolor</MenuItem>
-                        <MenuItem value="tricolor">Tricolor</MenuItem>
-                        <MenuItem value="manchado">Manchado</MenuItem>
+                        <MenuItem value="negro">{t('addAnimalForm.black')}</MenuItem>
+                        <MenuItem value="blanco">{t('addAnimalForm.white')}</MenuItem>
+                        <MenuItem value="marrón">{t('addAnimalForm.brown')}</MenuItem>
+                        <MenuItem value="gris">{t('addAnimalForm.gray')}</MenuItem>
+                        <MenuItem value="naranja">{t('addAnimalForm.orange')}</MenuItem>
+                        <MenuItem value="dorado">{t('addAnimalForm.golden')}</MenuItem>
+                        <MenuItem value="crema">{t('addAnimalForm.cream')}</MenuItem>
+                        <MenuItem value="bicolor">{t('addAnimalForm.bicolor')}</MenuItem>
+                        <MenuItem value="tricolor">{t('addAnimalForm.tricolor')}</MenuItem>
+                        <MenuItem value="manchado">{t('addAnimalForm.spotted')}</MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
@@ -353,7 +348,7 @@ const AddAnimalForm = () => {
                         fullWidth
                         sx={{ mb: 2 }}
                       >
-                        Pujar foto
+                        {t('addAnimalForm.uploadPhoto')}
                         <input
                           type="file"
                           accept="image/*"
@@ -387,7 +382,7 @@ const AddAnimalForm = () => {
                           }
                         />
                       }
-                      label="Necessitats especials"
+                      label={t('addAnimalForm.specialNeeds')}
                     />
                   </Grid>
                   <Grid size={{ xs: 12 }}>
@@ -396,67 +391,67 @@ const AddAnimalForm = () => {
                       multiline
                       rows={3}
                       name="descripcion_necesidades"
-                      label="Descripció de necessitats especials"
+                      label={t('addAnimalForm.specialNeedsDescription')}
                       value={formData.descripcion_necesidades}
                       onChange={handleInputChange}
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <FormControl fullWidth>
-                      <InputLabel>Convivència amb altres animals</InputLabel>
+                      <InputLabel>{t('addAnimalForm.coexistenceAnimals')}</InputLabel>
                       <Select
                         name="convivencia_animales"
                         value={formData.convivencia_animales}
                         onChange={handleInputChange}
                       >
                         <MenuItem value="no">
-                          No pot conviure amb altres animals
+                          {t('addAnimalForm.noAnimals')}
                         </MenuItem>
                         <MenuItem value="misma_especie">
-                          Només amb animals de la mateixa espècie
+                          {t('addAnimalForm.sameSpecies')}
                         </MenuItem>
                         <MenuItem value="cualquier_especie">
-                          Pot conviure amb qualsevol animal
+                          {t('addAnimalForm.anyAnimal')}
                         </MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <FormControl fullWidth>
-                      <InputLabel>Convivència amb nens</InputLabel>
+                      <InputLabel>{t('addAnimalForm.coexistenceChildren')}</InputLabel>
                       <Select
                         name="convivencia_ninos"
                         value={formData.convivencia_ninos}
                         onChange={handleInputChange}
                       >
-                        <MenuItem value={true}>Sí</MenuItem>
-                        <MenuItem value={false}>No</MenuItem>
+                        <MenuItem value={true}>{t('addAnimalForm.yes')}</MenuItem>
+                        <MenuItem value={false}>{t('addAnimalForm.no')}</MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
                   <Grid size={{ xs: 12 }}>
                     <FormControl fullWidth>
-                      <InputLabel>Caràcter principal</InputLabel>
+                      <InputLabel>{t('addAnimalForm.mainCharacter')}</InputLabel>
                       <Select
                         name="caracter"
                         value={formData.caracter}
                         onChange={handleInputChange}
                       >
-                        <MenuItem value="cariñoso">Cariñoso</MenuItem>
-                        <MenuItem value="jugueton">Juguetón</MenuItem>
-                        <MenuItem value="tranquilo">Tranquilo</MenuItem>
-                        <MenuItem value="activo">Activo</MenuItem>
-                        <MenuItem value="sociable">Sociable</MenuItem>
-                        <MenuItem value="independiente">Independiente</MenuItem>
-                        <MenuItem value="protector">Protector</MenuItem>
-                        <MenuItem value="timido">Tímido</MenuItem>
-                        <MenuItem value="obediente">Obediente</MenuItem>
+                        <MenuItem value="cariñoso">{t('addAnimalForm.affectionate')}</MenuItem>
+                        <MenuItem value="jugueton">{t('addAnimalForm.playful')}</MenuItem>
+                        <MenuItem value="tranquilo">{t('addAnimalForm.calm')}</MenuItem>
+                        <MenuItem value="activo">{t('addAnimalForm.active')}</MenuItem>
+                        <MenuItem value="sociable">{t('addAnimalForm.sociable')}</MenuItem>
+                        <MenuItem value="independiente">{t('addAnimalForm.independent')}</MenuItem>
+                        <MenuItem value="protector">{t('addAnimalForm.protective')}</MenuItem>
+                        <MenuItem value="timido">{t('addAnimalForm.shy')}</MenuItem>
+                        <MenuItem value="obediente">{t('addAnimalForm.obedient')}</MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
                   <Grid size={{ xs: 12 }}>
                     <Typography variant="body2" sx={{ mb: 1, fontWeight: 'bold' }}>
-                      Estat de salut:
+                      {t('addAnimalForm.healthStatus')}
                     </Typography>
                     <FormGroup>
                       <FormControlLabel
@@ -471,7 +466,7 @@ const AddAnimalForm = () => {
                             }
                           />
                         }
-                        label="Desparasitat"
+                        label={t('addAnimalForm.dewormed')}
                       />
                       <FormControlLabel
                         control={
@@ -485,7 +480,7 @@ const AddAnimalForm = () => {
                             }
                           />
                         }
-                        label="Esterilitzat"
+                        label={t('addAnimalForm.sterilized')}
                       />
                       <FormControlLabel
                         control={
@@ -499,7 +494,7 @@ const AddAnimalForm = () => {
                             }
                           />
                         }
-                        label="Amb microxip"
+                        label={t('addAnimalForm.microchipped')}
                       />
                       <FormControlLabel
                         control={
@@ -513,14 +508,14 @@ const AddAnimalForm = () => {
                             }
                           />
                         }
-                        label="Vacunat"
+                        label={t('addAnimalForm.vaccinated')}
                       />
                     </FormGroup>
                   </Grid>
                   <Grid size={{ xs: 12 }}>
                     <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 1 }}>
                       <Typography variant="body2">
-                        Descripció de la mascota
+                        {t('addAnimalForm.petDescription')}
                       </Typography>
                       <Button
                         variant="outlined"
@@ -534,7 +529,7 @@ const AddAnimalForm = () => {
                           fontSize: '0.75rem'
                         }}
                       >
-                        {generatingDescription ? 'Generant amb IA...' : '✨ Generar amb IA'}
+                        {generatingDescription ? t('addAnimalForm.generating') : t('addAnimalForm.generateWithAI')}
                       </Button>
                     </Box>
                     <TextField
@@ -542,11 +537,11 @@ const AddAnimalForm = () => {
                       multiline
                       rows={8}
                       name="descripcion"
-                      label="Descripció"
-                      placeholder="Escriu una descripció o genera-la automàticament amb IA"
+                      label={t('addAnimalForm.description')}
+                      placeholder={t('addAnimalForm.descriptionPlaceholder')}
                       value={formData.descripcion}
                       onChange={handleInputChange}
-                      helperText="Pots generar una descripció automàtica amb IA o escriure-la tu mateix/a"
+                      helperText={t('addAnimalForm.descriptionHelper')}
                     />
                   </Grid>
                 </Grid>
@@ -558,10 +553,10 @@ const AddAnimalForm = () => {
                     color="primary"
                     disabled={submitting}
                   >
-                    {submitting ? "Enviant..." : "Afegir animal"}
+                    {submitting ? t('addAnimalForm.submitting') : t('addAnimalForm.addAnimal')}
                   </Button>
                   <Button variant="outlined" color="secondary">
-                    Cancel·lar
+                    {t('addAnimalForm.cancel')}
                   </Button>
                 </Box>
               </Box>
@@ -615,7 +610,7 @@ const AddAnimalForm = () => {
             >
               <CardContent sx={{ }}>
                 <Typography variant="h5" sx={{ mb: 2 , maxHeight: "550px",}}>
-                  Com queda el teu anunci:
+                  {t('addAnimalForm.previewTitle')}
                 </Typography>
                 <CardPet animal={{
                   ...formData,
