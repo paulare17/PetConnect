@@ -16,3 +16,5 @@ tzdata==2025.2
 wheel==0.45.1
 python-dotenv==1.0.1
 django-filter==24.3
+gunicorn==23.0.0
+whitenoise==6.8.2
