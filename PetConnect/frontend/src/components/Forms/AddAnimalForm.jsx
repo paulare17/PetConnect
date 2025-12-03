@@ -41,7 +41,7 @@ import PreviewDialog from "./PreviewDialog.jsx";
 const AddAnimalForm = () => {
   const { t } = useTranslation();
   const { colors } = useColors();
-  const [previewUrl, setPreviewUrl] = useState("");
+  const [previewUrls, setPreviewUrls] = useState(["", "", ""]);
   const initialFormData = {
     nombre: "",
     especie: "gato",
@@ -53,6 +53,8 @@ const AddAnimalForm = () => {
     tamaño: "",
     color: "",
     foto: "",
+    foto2: "",
+    foto3: "",
     caracter: "",
     convivencia_animales: "",
     convivencia_ninos: "",
@@ -206,6 +208,7 @@ const AddAnimalForm = () => {
       console.log("Mascota creada:", res.data);
       setStatus({ type: "success", message: t('addAnimalForm.successCreated') });
       setFormData(initialFormData);
+      setPreviewUrls(["", "", ""]);
     } catch (err) {
       console.error("Error creant mascota:", err);
       const errorMsg = err.response?.data?.detail || err.response?.data || err.message || t('addAnimalForm.errorCreating');
@@ -389,32 +392,99 @@ const AddAnimalForm = () => {
                     </FormControl>
                   </Grid>
                   <Grid size={{ xs: 12 }}>
-                      <Button
-                        variant="outlined"
-                        component="label"
-                        fullWidth
-                        sx={{ mb: 2 }}
-                      >
-                        {t('addAnimalForm.uploadPhoto')}
-                        <input
-                          type="file"
-                          accept="image/*"
-                          name="foto"
-                          hidden
-                          onChange={e => {
-                            const file = e.target.files[0];
-                            setFormData(prev => ({
-                              ...prev,
-                              foto: file || ""
-                            }));
-                            if (file) {
-                              setPreviewUrl(URL.createObjectURL(file));
-                            } else {
-                              setPreviewUrl("");
-                            }
-                          }}
-                        />
-                      </Button>
+                    <Typography variant="body2" sx={{ mb: 1, fontWeight: 'bold' }}>
+                      {t('addAnimalForm.photos')} (màxim 3)
+                    </Typography>
+                    <Grid container spacing={2}>
+                      {[0, 1, 2].map((index) => {
+                        const fotoKey = index === 0 ? 'foto' : `foto${index + 1}`;
+                        return (
+                          <Grid size={{ xs: 12, sm: 4 }} key={index}>
+                            <Box sx={{ position: 'relative' }}>
+                              <Button
+                                variant="outlined"
+                                component="label"
+                                fullWidth
+                                sx={{ 
+                                  mb: 1,
+                                  height: 120,
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  justifyContent: 'center',
+                                  overflow: 'hidden',
+                                  position: 'relative'
+                                }}
+                              >
+                                {previewUrls[index] ? (
+                                  <Box
+                                    component="img"
+                                    src={previewUrls[index]}
+                                    sx={{
+                                      position: 'absolute',
+                                      top: 0,
+                                      left: 0,
+                                      width: '100%',
+                                      height: '100%',
+                                      objectFit: 'cover'
+                                    }}
+                                  />
+                                ) : (
+                                  <Typography variant="caption">
+                                    {t('addAnimalForm.uploadPhoto')} {index + 1}
+                                  </Typography>
+                                )}
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  name={fotoKey}
+                                  hidden
+                                  onChange={e => {
+                                    const file = e.target.files[0];
+                                    setFormData(prev => ({
+                                      ...prev,
+                                      [fotoKey]: file || ""
+                                    }));
+                                    if (file) {
+                                      const newPreviewUrls = [...previewUrls];
+                                      newPreviewUrls[index] = URL.createObjectURL(file);
+                                      setPreviewUrls(newPreviewUrls);
+                                    } else {
+                                      const newPreviewUrls = [...previewUrls];
+                                      newPreviewUrls[index] = "";
+                                      setPreviewUrls(newPreviewUrls);
+                                    }
+                                  }}
+                                />
+                              </Button>
+                              {previewUrls[index] && (
+                                <IconButton
+                                  size="small"
+                                  sx={{
+                                    position: 'absolute',
+                                    top: 4,
+                                    right: 4,
+                                    bgcolor: 'background.paper',
+                                    '&:hover': { bgcolor: 'error.light' }
+                                  }}
+                                  onClick={() => {
+                                    const fotoKey = index === 0 ? 'foto' : `foto${index + 1}`;
+                                    setFormData(prev => ({
+                                      ...prev,
+                                      [fotoKey]: ""
+                                    }));
+                                    const newPreviewUrls = [...previewUrls];
+                                    newPreviewUrls[index] = "";
+                                    setPreviewUrls(newPreviewUrls);
+                                  }}
+                                >
+                                  <CloseIcon fontSize="small" />
+                                </IconButton>
+                              )}
+                            </Box>
+                          </Grid>
+                        );
+                      })}
+                    </Grid>
                   </Grid>
                   <Grid size={{ xs: 12 }}>
                     <FormControlLabel
@@ -674,7 +744,7 @@ const AddAnimalForm = () => {
                 <Box onClick={() => setOpenPreviewDialog(true)} sx={{ cursor: 'pointer' }}>
                   <CardPet animal={{
                     ...formData,
-                    foto: previewUrl || (typeof formData.foto === "string" ? formData.foto : "")
+                    foto: previewUrls[0] || (typeof formData.foto === "string" ? formData.foto : "")
                   }} isFavorito={false} onToggleFavorito={() => {}} />
                 </Box>
               </CardContent>
@@ -688,7 +758,7 @@ const AddAnimalForm = () => {
         openPreviewDialog={openPreviewDialog}
         setOpenPreviewDialog={setOpenPreviewDialog}
         formData={formData}
-        previewUrl={previewUrl}
+        previewUrl={previewUrls[0]}
       />
     </Box>
   );
