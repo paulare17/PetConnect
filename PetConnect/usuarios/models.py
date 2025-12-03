@@ -1,12 +1,9 @@
 from django.db import models
-# Create your models here.
-from django.db import models
 from django.contrib.auth.models import AbstractUser
 from multiselectfield import MultiSelectField
-# Hace falta instalar django-multiselectfield para poder seleccionar múltiples opciones en un campo
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from mascotas.models import (
+from mascotas.constants import (
     TAMANO_CHOICES,
     EDAD_CHOICES,
     SEXO_CHOICES,

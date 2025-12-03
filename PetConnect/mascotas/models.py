@@ -2,7 +2,6 @@ from django.db import models
 from django.db import models
 from django.conf import settings
 from multiselectfield import MultiSelectField 
-from usuarios.models import PerfilProtectora
 
 class Mascota(models.Model):
 
