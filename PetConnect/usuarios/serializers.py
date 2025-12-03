@@ -7,8 +7,11 @@ class UsuarioSerializer(serializers.ModelSerializer):
     """Serializer básico para Usuario"""
     class Meta:
         model = Usuario
-        fields = ('id', 'username', 'email', 'role', 'date_joined')
+        fields = ('id', 'username', 'email', 'role', 'city', 'date_joined')
         read_only_fields = ('id', 'date_joined')
+        extra_kwargs = {
+            'email': {'required': False}  # No obligatorio en actualizaciones
+        }
 
 class UsuarioCreateSerializer(serializers.ModelSerializer):
     """Para crear nuevos usuarios"""
@@ -38,11 +41,13 @@ class UsuarioCreateSerializer(serializers.ModelSerializer):
 class PerfilUsuarioSerializer(serializers.ModelSerializer):
     """Serializer para perfil de usuario"""
     usuario = serializers.StringRelatedField(read_only=True)
+    usuario_id = serializers.IntegerField(source='usuario.id', read_only=True)
+    username = serializers.CharField(source='usuario.username', read_only=True)
     
     class Meta:
         model = PerfilUsuario
         fields = '__all__'
-        read_only_fields = ('usuario','role')
+        read_only_fields = ('usuario', 'usuario_id', 'username', 'role')
         
     def create(self, validated_data):
         request = self.context.get('request')
@@ -56,11 +61,13 @@ class PerfilUsuarioSerializer(serializers.ModelSerializer):
 class PerfilProtectoraSerializer(serializers.ModelSerializer):
     """Serializer para perfil de protectora"""
     usuario = serializers.StringRelatedField(read_only=True)
+    usuario_id = serializers.IntegerField(source='usuario.id', read_only=True)
+    username = serializers.CharField(source='usuario.username', read_only=True)
     
     class Meta:
         model = PerfilProtectora
         fields = '__all__'
-        read_only_fields = ('usuario','role')
+        read_only_fields = ('usuario', 'usuario_id', 'username', 'role')
         
     def create(self, validated_data):
         request = self.context.get('request')
@@ -81,3 +88,25 @@ class LoginSerializer(serializers.Serializer):
     """Serializer para login"""
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)
+    
+    def validate(self, attrs):
+        username = attrs.get('username')
+        password = attrs.get('password')
+        
+        if not username:
+            raise serializers.ValidationError({'username': 'Aquest camp és obligatori.'})
+        if not password:
+            raise serializers.ValidationError({'password': 'Aquest camp és obligatori.'})
+        
+        # Comprova si l'usuari existeix
+        try:
+            user = Usuario.objects.get(username=username)
+        except Usuario.DoesNotExist:
+            raise serializers.ValidationError({'username': 'Usuari no trobat.'})
+        
+        # Comprova la contrasenya
+        if not user.check_password(password):
+            raise serializers.ValidationError({'password': 'Contrasenya incorrecta.'})
+        
+        attrs['user'] = user
+        return attrs

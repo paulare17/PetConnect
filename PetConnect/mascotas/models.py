@@ -1,5 +1,4 @@
 from django.db import models
-from django.db import models
 from django.conf import settings
 from usuarios.models import PerfilProtectora
 
@@ -39,8 +38,7 @@ class Mascota(models.Model):
         ('mediano', 'Mediano (10-25kg)'),
         ('grande', 'Grande (25-45kg)'),
         ('gigante', 'Gigante (+45kg)'),
-    ]
-    
+    ]    
     # Carácter (ejemplos, ampliar)
     CARACTER = [
         ('cariñoso', 'Cariñoso'),
@@ -74,7 +72,7 @@ class Mascota(models.Model):
     # características físicas
     tamaño = models.CharField(max_length=20, choices=TAMAÑO, default='mediano', verbose_name="Tamaño")
     color = models.CharField(max_length=100, default='marrón', verbose_name="Color")
-    foto = models.ImageField(upload_to='mascotas/', verbose_name="Foto")
+    foto = models.ImageField(upload_to='mascotas/', verbose_name="Foto") # Se sobreescribe la definición anterior linea 65. Esto es problemático y puede causar errores en la base de datos o en la lógica de Django
 
     # Carácter
     caracter = models.CharField(max_length=20, choices=CARACTER, default='cariñoso', verbose_name="Carácter")
@@ -93,6 +91,14 @@ class Mascota(models.Model):
     # Necesidades especiales
     necesidades_especiales = models.BooleanField(default=False, verbose_name="¿Tiene necesidades especiales?")
     descripcion_necesidades = models.TextField(blank=True, null=True, verbose_name="Descripción de necesidades especiales")
+    
+    # Biografía generada por IA
+    descripcion = models.TextField(blank=True, null=True, verbose_name="Biografía de la mascota", 
+                                   help_text="Descripción generada automáticamente o personalizada")
+    
+    # Ubicación (heredada de la protectora)
+    ubicacion = models.CharField(max_length=100, default="Barcelona", verbose_name="Ubicación", 
+                                 help_text="Ciudad/ubicación heredada de la protectora")
 
     #estado del perfil
     adoptado = models.BooleanField(default=False)
@@ -121,3 +127,48 @@ class Mascota(models.Model):
         verbose_name = "Mascota"
         verbose_name_plural = "Mascotas"
         ordering = ['-fecha_creacion']
+        
+        
+
+# Clase para registrar las interacciones de swipe (like/dislike)
+
+class Interaccion(models.Model):
+    LIKE = 'L'
+    DISLIKE = 'D'
+    
+    CHOICES = [
+        (LIKE, 'Me interesa'),
+        (DISLIKE, 'No me interesa'),
+    ]
+
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.CASCADE, 
+        related_name='interacciones_realizadas',
+        help_text="Usuario adoptante que realiza la acción."
+    )
+    
+    mascota = models.ForeignKey(
+        Mascota, 
+        on_delete=models.CASCADE, 
+        related_name='interacciones_recibidas'
+    )
+    
+    accion = models.CharField(
+        max_length=1, 
+        choices=CHOICES, 
+        verbose_name="Acción (L/D)"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        # Crucial para evitar que un usuario haga swipe dos veces en la misma mascota
+        unique_together = ('usuario', 'mascota') 
+        db_table = 'interacciones_swipe'
+        verbose_name = "Interacción de Swipe"
+        verbose_name_plural = "Interacciones de Swipes"
+
+    def __str__(self):
+        accion_display = dict(self.CHOICES).get(self.accion, self.accion)
+        return f"{self.usuario.username} - {accion_display} -> {self.mascota.nombre}"

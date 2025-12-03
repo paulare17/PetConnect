@@ -1,11 +1,24 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from . import views
+from .views import UsuarioViewSet, PerfilUsuarioViewSet, PerfilProtectoraViewSet 
+
+# Inicializamos el router
+router = DefaultRouter()
+
+# 1. Registramos el ViewSet principal de Usuarios (ya estaba)
+router.register(r'usuarios', UsuarioViewSet, basename='usuario') 
+
+# 2. Registramos el ViewSet de Perfiles de Usuario
+router.register(r'perfil-usuario', PerfilUsuarioViewSet, basename='perfil-usuario') 
+
+# 3. Registramos el ViewSet de Perfiles de Protectora
+router.register(r'perfil-protectora', PerfilProtectoraViewSet, basename='perfil-protectora') 
+
 
 urlpatterns = [
-    # Rutes específiques no basades en ViewSets, si n'hi ha.
-    # Exemple:
-    # path('custom-login/', views.custom_login, name='custom-login'),
+    # Incluimos todas las rutas generadas por el Router
+    # Esto creará rutas como /usuarios/, /perfil-usuario/, /perfil-protectora/
+    path('', include(router.urls)),
 ]
 
 
