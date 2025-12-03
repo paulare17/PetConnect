@@ -22,6 +22,7 @@ import { useAuthContext } from "../../context/AuthProvider";
 import { useDarkMode } from "../../context/darkModeContext";
 import { Divider, useTheme } from "@mui/material";
 import "flag-icons/css/flag-icons.min.css";
+import { useTranslation } from "react-i18next";
 
 function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -31,6 +32,7 @@ function ResponsiveAppBar() {
   const { user, logout } = useAuthContext();
   const { isDarkMode, toggleDarkMode } = useDarkMode();
   const theme = useTheme();
+  const { t, i18n } = useTranslation();
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -57,8 +59,8 @@ function ResponsiveAppBar() {
 
   const handleLanguageChange = (language) => {
     handleCloseLanguageMenu();
-    // Aquí va la funcionalidad de cambio de idioma
-    console.log('Cambiar a:', language);
+    i18n.changeLanguage(language);
+    localStorage.setItem('language', language);
   };
 
   const handleUserMenuAction = (setting) => {
@@ -76,15 +78,15 @@ function ResponsiveAppBar() {
   };
 
   // Handler per a les pages
-  const handlePageAction = (page) => {
+  const handlePageAction = (pageKey) => {
     handleCloseNavMenu();
-    if (page === "Adopta" || page === "Dóna en adopció") {
+    if (pageKey === "adopt" || pageKey === "giveAdoption") {
       if (user?.role === ROLES.PROTECTORA) {
         navigate("/afegir-mascota");
       } else {
-        navigate("/inici-usuari");
+        navigate("/inici-usuari-galeria");
       }
-    } else if (page === "Xateja") {
+    } else if (pageKey === "chat") {
       navigate("/chats");
     } else {
       //  afegir més rutes aquí
@@ -94,8 +96,20 @@ function ResponsiveAppBar() {
 
   // Determinar les pàgines dinàmicament segons el rol
   const dynamicPages = user?.role === ROLES.PROTECTORA 
-    ? ["Sobre nosaltres", "Perduts", "Contacte", "Dóna en adopció", "Xateja"]
-    : ["Sobre nosaltres", "Perduts", "Contacte", "Adopta", "Xateja"];
+    ? [
+        { key: "aboutUs", label: t('navbar.aboutUs') },
+        { key: "lost", label: t('navbar.lost') },
+        { key: "contact", label: t('navbar.contact') },
+        { key: "giveAdoption", label: t('navbar.giveAdoption') },
+        { key: "chat", label: t('navbar.chat') }
+      ]
+    : [
+        { key: "aboutUs", label: t('navbar.aboutUs') },
+        { key: "lost", label: t('navbar.lost') },
+        { key: "contact", label: t('navbar.contact') },
+        { key: "adopt", label: t('navbar.adopt') },
+        { key: "chat", label: t('navbar.chat') }
+      ];
 
   return (
     <AppBar
@@ -132,7 +146,7 @@ function ResponsiveAppBar() {
                 navigate(
                   user?.role === ROLES.PROTECTORA
                     ? "/inici-protectora"
-                    : "/inici-usuari"
+                    : "/inici-usuari-galeria"
                 )
               }
               className="animation-nav"
@@ -155,7 +169,7 @@ function ResponsiveAppBar() {
                 navigate(
                   user?.role === ROLES.PROTECTORA
                     ? "/inici-protectora"
-                    : "/inici-usuari"
+                    : "/inici-usuari-galeria"
                 )
               }
               className="animation-nav"
@@ -222,8 +236,8 @@ function ResponsiveAppBar() {
               {/* Pages de navegació */}
               {dynamicPages.map((page) => (
                 <MenuItem
-                  key={page}
-                  onClick={() => handlePageAction(page)}
+                  key={page.key}
+                  onClick={() => handlePageAction(page.key)}
                   sx={{
                     py: 1.5,
                     px: 2.5,
@@ -238,7 +252,7 @@ function ResponsiveAppBar() {
                       color: colors.textDark,
                     }}
                   >
-                    {page}
+                    {page.label}
                   </Typography>
                 </MenuItem>
               ))}
@@ -273,17 +287,14 @@ function ResponsiveAppBar() {
                   <Typography
                     sx={{ fontSize: "1rem", color: colors.textDark }}
                   >
-                    Mode fosc
+                    {isDarkMode ? t('navbar.lightMode') : t('navbar.darkMode')}
                   </Typography>
                 </Box>
               </MenuItem>
 
               <MenuItem
                 key="language"
-                onClick={() => {
-                  handleCloseNavMenu();
-                  // handleLanguageChange(); // Funció per canviar idioma
-                }}
+                onClick={handleOpenLanguageMenu}
                 sx={{
                   py: 1.5,
                   px: 2.5,
@@ -302,7 +313,7 @@ function ResponsiveAppBar() {
                       <Typography
                         sx={{ fontSize: "1rem", color: colors.textDark }}
                       >
-                        Idioma: Català
+                        {i18n.language === 'ca' ? 'Idioma: Català' : i18n.language === 'es' ? 'Idioma: Español' : 'Language: English'}
                       </Typography>
                     </Box>
                   </MenuItem>
@@ -358,10 +369,10 @@ function ResponsiveAppBar() {
           >
             {dynamicPages.map((page) => (
               <Button
-                key={page}
-                onClick={() => handlePageAction(page)}
+                key={page.key}
+                onClick={() => handlePageAction(page.key)}
                 sx={{
-                  ...(page === "Xateja" && {
+                  ...(page.key === "chat" && {
                     color: "white",
                     fontSize: { xs: "1.05rem", md: "1.15rem" },
                     px: 3.5,
@@ -375,7 +386,7 @@ function ResponsiveAppBar() {
                       boxShadow: `0 8px 16px ${colors.blue}60`,
                     },
                   }),
-                  ...(page !== "Xateja" && {
+                  ...(page.key !== "chat" && {
                     color: isDarkMode ? theme.palette.text.primary : colors.lightColor,
                     fontSize: { xs: "1rem", md: "1.1rem" },
                     px: 3,
@@ -396,7 +407,7 @@ function ResponsiveAppBar() {
                   textTransform: "none",
                 }}
               >
-                {page}
+                {page.label}
               </Button>
             ))}
           </Box>
@@ -413,7 +424,7 @@ function ResponsiveAppBar() {
   {/* Botons sempre visibles (DarkMode i Traducció) - només en desktop */}
   <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1, mr: user ? 3 : 0, }}>
     {/* Botó DarkMode */}
-    <Tooltip title={isDarkMode ? "Modo claro" : "Modo fosc"}>
+    <Tooltip title={isDarkMode ? t('navbar.lightMode') : t('navbar.darkMode')}>
       <IconButton
         onClick={() => {
           toggleDarkMode();
@@ -436,7 +447,7 @@ function ResponsiveAppBar() {
     </Tooltip>
 
     {/* Botó Traducció */}
-    <Tooltip title="Canviar idioma">
+    <Tooltip title={t('navbar.changeLanguage')}>
       <IconButton
         onClick={handleOpenLanguageMenu}
         sx={{
@@ -630,7 +641,7 @@ function ResponsiveAppBar() {
             },
           }}
         >
-          <Typography sx={{ fontSize: "0.95rem" }}>Perfil</Typography>
+          <Typography sx={{ fontSize: "0.95rem" }}>{t('menu.profile')}</Typography>
         </MenuItem>
 
         <MenuItem
@@ -642,7 +653,7 @@ function ResponsiveAppBar() {
             },
           }}
         >
-          <Typography sx={{ fontSize: "0.95rem" }}>Inici</Typography>
+          <Typography sx={{ fontSize: "0.95rem" }}>{t('menu.home')}</Typography>
         </MenuItem>
 
         <Divider sx={{ my: 0.5 }} />
@@ -658,7 +669,7 @@ function ResponsiveAppBar() {
           }}
         >
           <Typography sx={{ fontSize: "0.95rem", color: "#d32f2f" }}>
-            Sortir
+            {t('menu.logout')}
           </Typography>
         </MenuItem>
       </Menu>

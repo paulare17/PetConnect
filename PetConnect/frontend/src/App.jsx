@@ -87,12 +87,12 @@ function App() {
                 <UserProfile />
               </UsuarioRoute>
             } />
-            <Route path="/inici-usuari" element={
+            <Route path="/inici-usuari-galeria" element={
               <UsuarioRoute>
                 <IniciUsuari />
               </UsuarioRoute>
             } />
-            <Route path="/pettinder" element={
+            <Route path="/inici-usuari-pettinder" element={
               <UsuarioRoute>
                 <PetTinder />
               </UsuarioRoute>

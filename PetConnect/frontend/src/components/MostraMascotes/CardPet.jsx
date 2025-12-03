@@ -27,7 +27,7 @@ export default function CardPet({ animal, isFavorito, onToggleFavorito, sx }) {
   if (!data) return null;
 
   // Colors i icones segons espècie
-  const cardColor = data.especie === 'perro' ? colors.background : colors.backgroundBlue;
+  const cardColor = data.especie === 'perro' ? colors.lightOrange : colors.lightBlue;
   const iconColor = data.especie === 'perro' ? colors.darkOrange : colors.darkBlue;
   let imageSrc;
   if (!data.foto) {
@@ -55,10 +55,10 @@ export default function CardPet({ animal, isFavorito, onToggleFavorito, sx }) {
       <Box sx={{ position: 'relative' }}>
         <CardMedia
           component="img"
-          height="220"
+          height="270px"
           image={imageSrc}
           alt={data.nombre}
-          sx={{ objectFit: 'cover' }}
+          sx={{ objectFit: 'cover', objectPosition: 'center center' }}
         />
         {/* Botó favorit */}
         <IconButton

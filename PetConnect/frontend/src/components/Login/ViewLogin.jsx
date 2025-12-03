@@ -50,7 +50,7 @@ export default function ViewLogin() {
       
       // Redirigir segons el rol
       if (loginResult?.user?.role === 'usuario') {
-        navigate('/inici-usuari');
+        navigate('/inici-usuari-pettinder');
       } else if (loginResult?.user?.role === 'protectora') {
         navigate('/inici-protectora');
       } else {

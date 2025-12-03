@@ -23,10 +23,11 @@ import MaleIcon from '@mui/icons-material/Male';
 import FemaleIcon from '@mui/icons-material/Female';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import { colors } from '../../constants/colors';
+import { useColors } from '../../hooks/useColors';
 import api from '../../api/client';
 
 function ProfileAnimal() {
+  const { colors } = useColors();
   const { id } = useParams();
   const [animal, setAnimal] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -72,8 +73,6 @@ function ProfileAnimal() {
 
   // Imatge principal
   const imageSrc = animal.foto || 'https://via.placeholder.com/400x300?text=Sense+imatge';
-  const cardColor = animal.especie === 'perro' ? colors.background : colors.backgroundBlue;
-  const iconColor = animal.especie === 'perro' ? colors.darkOrange : colors.darkBlue;
   const raza = animal.especie === 'perro' ? animal.raza_perro : animal.raza_gato;
 
   return (
@@ -90,40 +89,53 @@ function ProfileAnimal() {
           {/* Capçalera amb imatge i nom */}
           <Grid container spacing={4} alignItems="center">
             <Grid item xs={12} md={5}>
-              <Card sx={{ boxShadow: 3, borderRadius: 3, background: 'white', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <Card sx={{ boxShadow: 3, borderRadius: 3,  display: 'flex', justifyContent: 'center', alignItems: 'center', width: 300, height: 300, }}>
                 <CardMedia
                   component="img"
                   image={imageSrc}
                   alt={animal.nombre}
-                  sx={{ objectFit: 'cover', width: '100%', height: 220, borderRadius: 3, mt: 2, mb: 2 }}
+                  sx={{ objectFit: 'cover', objectPosition: 'center center', width: 300, height: 300, borderRadius: 3, mt: 2, mb: 2 }}
                 />
               </Card>
             </Grid>
             <Grid item xs={12} md={7}>
-              <Typography variant="h2" sx={{ color: colors.black, mb: 2 }}>
+              <Typography variant="h2" sx={{ color: colors.textDark, mb: 2 }}>
                 {animal.nombre}
               </Typography>
               {/* Quadre lila per característiques destacades */}
-              <Box sx={{ border: `2px solid ${colors.purple}`, borderRadius: 2, p: 2, mb: 2, background: '#f6f6ff' }}>
-                <Typography variant="body1" sx={{ mb: 1 }}><strong>{raza || 'Raça no especificada'}</strong></Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-                  {animal.genero === 'macho' ? <MaleIcon sx={{ color: colors.blue }} /> : <FemaleIcon sx={{ color: 'pink' }} />}
-                  <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                    {animal.genero === 'macho' ? 'Mascle' : 'Femella'}
-                  </Typography>
-                  <Divider orientation="vertical" flexItem />
-                  <Typography variant="body1">
-                    <strong>Edat:</strong> {animal.edad} any{animal.edad !== 1 ? 's' : ''}
-                  </Typography>
-                  <Divider orientation="vertical" flexItem />
-                  <Typography variant="body1">
-                    <strong>Mida:</strong> {animal.tamaño || 'No especificat'}
-                  </Typography>
-                  {animal.peso && <><Divider orientation="vertical" flexItem /><Typography variant="body1"><strong>Pes:</strong> {animal.peso} kg</Typography></>}
+              <Box sx={{ border: `3px solid ${colors.darkPurple}`, borderRadius: 2, p: 2, mb: 2, background: colors.purple, width: '400px' }}>
+                <Chip 
+                  label={raza || 'Raça no especificada'} 
+                  sx={{ backgroundColor: colors.lightPurple, color: colors.textDark, fontWeight: 'bold', mb: 1 }} 
+                />
+                <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 1, mb: 1 }}>
+                  <Chip 
+                    icon={animal.genero === 'macho' ? <MaleIcon /> : <FemaleIcon />}
+                    label={animal.genero === 'macho' ? 'Mascle' : 'Femella'}
+                    sx={{ 
+                      backgroundColor: colors.darkPurple, 
+                      color: 'white',
+                      '& .MuiChip-icon': { color: animal.genero === 'macho' ? colors.blue : 'pink' }
+                    }} 
+                  />
+                  <Chip 
+                    label={`${animal.edad} any${animal.edad !== 1 ? 's' : ''}`}
+                    sx={{ backgroundColor: colors.darkPurple, color: 'white' }} 
+                  />
+                  <Chip 
+                    label={animal.tamaño || 'Mida no especificada'}
+                    sx={{ backgroundColor: colors.darkPurple, color: 'white' }} 
+                  />
+                  {animal.peso && (
+                    <Chip 
+                      label={`${animal.peso} kg`}
+                      sx={{ backgroundColor: colors.darkPurple, color: 'white' }} 
+                    />
+                  )}
                 </Box>
                 <Chip
                   label={animal.adoptado ? 'ADOPTAT' : 'DISPONIBLE'}
-                  sx={{ backgroundColor: animal.adoptado ? colors.purple : colors.orange, color: 'white', mt: 1 }}
+                  sx={{ backgroundColor: animal.adoptado ? colors.purple : colors.orange, color: 'white', mt: 1, fontWeight: 'bold' }}
                 />
               </Box>
             </Grid>
@@ -185,24 +197,78 @@ function ProfileAnimal() {
             <IconButton onClick={() => setGaleriaIndex(i => Math.max(i - 1, 0))} disabled={galeriaIndex === 0}>
               <ArrowBackIosIcon />
             </IconButton>
-            {altres.slice(galeriaIndex, galeriaIndex + 4).map(a => (
-              <Card key={a.id} sx={{ width: 180, background: colors.yellow, borderRadius: 3, boxShadow: 2, mx: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', p: 2 }}>
-                <CardMedia
-                  component="img"
-                  image={a.foto || 'https://via.placeholder.com/120x100?text=Sense+imatge'}
-                  alt={a.nombre}
-                  sx={{ objectFit: 'cover', width: 120, height: 100, borderRadius: 2, mb: 1 }}
-                />
-                <Typography variant="subtitle1" sx={{ color: colors.black }}>
-                  {a.nombre}
-                </Typography>
-                <Typography variant="body2" sx={{ color: colors.black }}>
-                  {a.raza_perro || a.raza_gato || 'Raça'}
-                </Typography>
-                <Chip icon={<PetsIcon />} label={a.especie === 'perro' ? 'Gos' : 'Gat'} sx={{ backgroundColor: colors.orange, color: 'white',  mt: 1 }} />
-                <IconButton sx={{ mt: 1 }}><FavoriteBorderIcon sx={{ color: 'red' }} /></IconButton>
-              </Card>
-            ))}
+            {altres.slice(galeriaIndex, galeriaIndex + 4).map((a, index) => {
+              const cardColor = a.especie === 'perro' ? colors.background : colors.backgroundBlue;
+              const iconColor = a.especie === 'perro' ? colors.darkOrange : colors.darkBlue;
+              const raza = a.especie === 'perro' ? a.raza_perro : a.raza_gato;
+              return (
+                <Card 
+                  key={a.id} 
+                  sx={{ 
+                    width: 200, 
+                    backgroundColor: cardColor, 
+                    borderRadius: 2, 
+                    boxShadow: 2, 
+                    mx: 1, 
+                    overflow: 'hidden',
+                    transition: 'all 0.3s ease-in-out',
+                    opacity: 1,
+                    transform: 'translateY(0) scale(1)',
+                    animation: `fadeInUp 0.3s ease-out ${index * 0.1}s both`,
+                    '@keyframes fadeInUp': {
+                      '0%': {
+                        opacity: 0,
+                        transform: 'translateY(20px) scale(0.95)',
+                      },
+                      '100%': {
+                        opacity: 1,
+                        transform: 'translateY(0) scale(1)',
+                      },
+                    },
+                    '&:hover': { 
+                      transform: 'translateY(-8px) scale(1.02)', 
+                      boxShadow: 8,
+                    },
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => window.location.href = `/mascotes/${a.id}`}
+                >
+                  {/* Imatge */}
+                  <Box sx={{ position: 'relative' }}>
+                    <CardMedia
+                      component="img"
+                      height="140"
+                      image={a.foto || 'https://via.placeholder.com/200x140?text=Sense+imatge'}
+                      alt={a.nombre}
+                      sx={{ objectFit: 'cover', objectPosition: 'center center' }}
+                    />
+                    {/* Chip d'espècie */}
+                    <Chip
+                      icon={<PetsIcon />}
+                      label={a.especie === 'perro' ? 'Gos' : 'Gat'}
+                      size="small"
+                      sx={{ position: 'absolute', bottom: 8, left: 8, backgroundColor: iconColor, color: 'white', fontWeight: 'bold' }}
+                    />
+                  </Box>
+                  {/* Contingut */}
+                  <Box sx={{ p: 1.5 }}>
+                    <Typography variant="subtitle1" sx={{ color: colors.textDark, fontWeight: 'bold', textAlign: 'center' }}>
+                      {a.nombre}
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
+                      {a.genero === 'macho' ? (
+                        <MaleIcon sx={{ color: colors.blue, fontSize: 18 }} />
+                      ) : (
+                        <FemaleIcon sx={{ color: 'pink', fontSize: 18 }} />
+                      )}
+                      <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.8rem' }}>
+                        {raza || 'Raça no especificada'}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Card>
+              );
+            })}
             <IconButton onClick={() => setGaleriaIndex(i => Math.min(i + 1, Math.max(altres.length - 4, 0)))} disabled={galeriaIndex >= Math.max(altres.length - 4, 0)}>
               <ArrowForwardIosIcon />
             </IconButton>

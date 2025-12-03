@@ -6,6 +6,7 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./index.css";
 import App from "./App.jsx";
 import { DarkModeProvider } from "./context/DarkModeProvider";
+import "./i18n"; // Inicialitza i18next
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

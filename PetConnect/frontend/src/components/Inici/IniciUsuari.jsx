@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Container,
@@ -18,48 +19,50 @@ import {
   CircularProgress,
   Alert,
   Paper,
-} from '@mui/material';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import PetsIcon from '@mui/icons-material/Pets';
-import MaleIcon from '@mui/icons-material/Male';
-import FemaleIcon from '@mui/icons-material/Female';
-import { useColors } from '../../hooks/useColors';
-import api from '../../api/client';
-import CardPet from '../MostraMascotes/CardPet';
-import Pagination from '@mui/material/Pagination';
+} from "@mui/material";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import PetsIcon from "@mui/icons-material/Pets";
+import MaleIcon from "@mui/icons-material/Male";
+import FemaleIcon from "@mui/icons-material/Female";
+import { useColors } from "../../hooks/useColors";
+import api from "../../api/client";
+import CardPet from "../MostraMascotes/CardPet";
+import Pagination from "@mui/material/Pagination";
+import { Height } from "@mui/icons-material";
 
 // Opcions de filtre segons el model Mascota
 const FILTROS = {
   especie: [
-    { value: 'todos', label: 'Tots' },
-    { value: 'perro', label: 'Gos' },
-    { value: 'gato', label: 'Gat' },
+    { value: "todos", label: "Tots" },
+    { value: "perro", label: "Gos" },
+    { value: "gato", label: "Gat" },
   ],
   genero: [
-    { value: 'todos', label: 'Tots' },
-    { value: 'macho', label: 'Mascle' },
-    { value: 'hembra', label: 'Femella' },
+    { value: "todos", label: "Tots" },
+    { value: "macho", label: "Mascle" },
+    { value: "hembra", label: "Femella" },
   ],
   tamaño: [
-    { value: 'todos', label: 'Tots' },
-    { value: 'pequeño', label: 'Petit' },
-    { value: 'mediano', label: 'Mitjà' },
-    { value: 'grande', label: 'Gran' },
-    { value: 'gigante', label: 'Gegant' },
+    { value: "todos", label: "Tots" },
+    { value: "pequeño", label: "Petit" },
+    { value: "mediano", label: "Mitjà" },
+    { value: "grande", label: "Gran" },
+    { value: "gigante", label: "Gegant" },
   ],
 };
 
 function IniciUsuari() {
   const { colors } = useColors();
+  const navigate = useNavigate();
   const [animales, setAnimales] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [favoritos, setFavoritos] = useState([]);
   const [filtros, setFiltros] = useState({
-    especie: 'todos',
-    genero: 'todos',
-    tamaño: 'todos',
+    especie: "todos",
+    genero: "todos",
+    tamaño: "todos",
   });
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
@@ -80,23 +83,31 @@ function IniciUsuari() {
 
     // Construir la URL amb paràmetres de consulta
     const params = new URLSearchParams();
-    if (filtros.especie !== 'todos') params.append('especie', filtros.especie);
-    if (filtros.genero !== 'todos') params.append('genero', filtros.genero);
-    if (filtros.tamaño !== 'todos') params.append('tamaño', filtros.tamaño);
+    if (filtros.especie !== "todos") params.append("especie", filtros.especie);
+    if (filtros.genero !== "todos") params.append("genero", filtros.genero);
+    if (filtros.tamaño !== "todos") params.append("tamaño", filtros.tamaño);
     // Afegim la paginació
-    params.append('limit', itemsPerPage);
-    params.append('offset', (page - 1) * itemsPerPage);
+    params.append("limit", itemsPerPage);
+    params.append("offset", (page - 1) * itemsPerPage);
 
     // Cridar l'API
-    api.get(`/mascota/?${params.toString()}`)
-      .then(response => {
+    api
+      .get(`/mascota/?${params.toString()}`)
+      .then((response) => {
         setAnimales(response.data.results || response.data);
-        setTotalCount(response.data.count || (response.data.results ? response.data.results.length : response.data.length));
+        setTotalCount(
+          response.data.count ||
+            (response.data.results
+              ? response.data.results.length
+              : response.data.length)
+        );
         setLoading(false);
       })
-      .catch(err => {
-        console.error('Error al obtenir el catàleg:', err);
-        setError('Error al carregar el catàleg. Verifica el servidor de Django i l\'API.');
+      .catch((err) => {
+        console.error("Error al obtenir el catàleg:", err);
+        setError(
+          "Error al carregar el catàleg. Verifica el servidor de Django i l'API."
+        );
         setLoading(false);
       });
   }, [filtros, page]);
@@ -104,7 +115,7 @@ function IniciUsuari() {
   // Gestió de favorits
   const toggleFavorito = (id) => {
     if (favoritos.includes(id)) {
-      setFavoritos(favoritos.filter(fav => fav !== id));
+      setFavoritos(favoritos.filter((fav) => fav !== id));
     } else {
       setFavoritos([...favoritos, id]);
     }
@@ -114,10 +125,10 @@ function IniciUsuari() {
     return (
       <Box
         sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: '80vh',
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "80vh",
         }}
       >
         <CircularProgress sx={{ color: colors.orange }} size={60} />
@@ -137,23 +148,65 @@ function IniciUsuari() {
     <Box
       sx={{
         backgroundColor: colors.background,
-        minHeight: '100vh',
+        minHeight: "100vh",
         py: 4,
       }}
     >
       <Container maxWidth="xl">
         {/* Capçalera */}
-        <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <Button
+          variant="contained"
+          onClick={() => navigate("/inici-usuari-pettinder")}
+          sx={{
+            position: "fixed",
+            top: 125,
+            right: 60,
+            backgroundColor: colors.blue,
+            color: "white",
+            px: 4,
+            py: 3,
+            fontSize: "1.1rem",
+            fontWeight: "bold",
+            borderRadius: 50,
+            display: "flex",
+            gap: 1.5,
+            alignItems: "center",
+            boxShadow: `0 6px 20px ${colors.blue}60`,
+            zIndex: 1000,
+            animation: "pulse 2s ease-in-out infinite",
+            "@keyframes pulse": {
+              "0%, 100%": { transform: "scale(1)" },
+              "50%": { transform: "scale(1.20)" },
+            },
+            "&:hover": {
+              backgroundColor: colors.darkBlue,
+              transform: "translateY(-2px) scale(1.05)",
+              boxShadow: `0 8px 25px ${colors.orange}80`,
+            },
+            transition: "all 0.3s ease",
+            // Responsive
+            "@media (max-width: 600px)": {
+              px: 2.5,
+              py: 1.2,
+              fontSize: "0.95rem",
+              top: 16,
+              right: 16,
+            },
+          }}
+        >
+          <PetsIcon sx={{ fontSize: 28 }} />
+          PetTinder
+        </Button>
+        <Box sx={{ textAlign: "center", mb: 4 }}>
           <Typography
             variant="h3"
             component="h1"
             sx={{
-              
               color: colors.orange,
               mb: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
               gap: 2,
             }}
           >
@@ -166,110 +219,121 @@ function IniciUsuari() {
         </Box>
 
         {/* Filtres */}
-        <Paper
-          elevation={3}
-          sx={{
-            p: 3,
-            mb: 4,
-            backgroundColor: 'white',
-            borderRadius: 2,
-          }}
-        >
-          <Grid container spacing={3} alignItems="center">
-            <Grid item xs={12} sm={4}>
-              <FormControl fullWidth>
-                <InputLabel>Espècie</InputLabel>
-                <Select
-                  value={filtros.especie}
-                  label="Espècie"
-                  onChange={(e) => handleFilterChange('especie', e.target.value)}
-                  sx={{
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: colors.orange,
-                    },
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: colors.darkOrange,
-                    },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: colors.orange,
-                    },
-                  }}
-                >
-                  {FILTROS.especie.map((opt) => (
-                    <MenuItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
+        <Box sx={{ mb: 4 }}>
+          {/* Filtres */}
+          <Paper
+            elevation={3}
+            sx={{
+              p: 3,
+              flex: 1,
+              backgroundColor: "white",
+              borderRadius: 2,
+            }}
+          >
+            <Grid container spacing={3} alignItems="center">
+              <Grid item xs={12} sm={4}>
+                <FormControl fullWidth>
+                  <InputLabel>Espècie</InputLabel>
+                  <Select
+                    value={filtros.especie}
+                    label="Espècie"
+                    onChange={(e) =>
+                      handleFilterChange("especie", e.target.value)
+                    }
+                    sx={{
+                      "& .MuiOutlinedInput-notchedOutline": {
+                        borderColor: colors.orange,
+                      },
+                      "&:hover .MuiOutlinedInput-notchedOutline": {
+                        borderColor: colors.darkOrange,
+                      },
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: colors.orange,
+                      },
+                    }}
+                  >
+                    {FILTROS.especie.map((opt) => (
+                      <MenuItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
 
-            <Grid item xs={12} sm={4}>
-              <FormControl fullWidth>
-                <InputLabel>Sexe</InputLabel>
-                <Select
-                  value={filtros.genero}
-                  label="Sexe"
-                  onChange={(e) => handleFilterChange('genero', e.target.value)}
-                  sx={{
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: colors.blue,
-                    },
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: colors.darkBlue,
-                    },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: colors.blue,
-                    },
-                  }}
-                >
-                  {FILTROS.genero.map((opt) => (
-                    <MenuItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
+              <Grid item xs={12} sm={4}>
+                <FormControl fullWidth>
+                  <InputLabel>Sexe</InputLabel>
+                  <Select
+                    value={filtros.genero}
+                    label="Sexe"
+                    onChange={(e) =>
+                      handleFilterChange("genero", e.target.value)
+                    }
+                    sx={{
+                      "& .MuiOutlinedInput-notchedOutline": {
+                        borderColor: colors.blue,
+                      },
+                      "&:hover .MuiOutlinedInput-notchedOutline": {
+                        borderColor: colors.darkBlue,
+                      },
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: colors.blue,
+                      },
+                    }}
+                  >
+                    {FILTROS.genero.map((opt) => (
+                      <MenuItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
 
-            <Grid item xs={12} sm={4}>
-              <FormControl fullWidth>
-                <InputLabel>Mida</InputLabel>
-                <Select
-                  value={filtros.tamaño}
-                  label="Mida"
-                  onChange={(e) => handleFilterChange('tamaño', e.target.value)}
-                  sx={{
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: colors.yellow,
-                    },
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: colors.yellow,
-                    },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: colors.yellow,
-                    },
-                  }}
-                >
-                  {FILTROS.tamaño.map((opt) => (
-                    <MenuItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              <Grid item xs={12} sm={4}>
+                <FormControl fullWidth>
+                  <InputLabel>Mida</InputLabel>
+                  <Select
+                    value={filtros.tamaño}
+                    label="Mida"
+                    onChange={(e) =>
+                      handleFilterChange("tamaño", e.target.value)
+                    }
+                    sx={{
+                      "& .MuiOutlinedInput-notchedOutline": {
+                        borderColor: colors.yellow,
+                      },
+                      "&:hover .MuiOutlinedInput-notchedOutline": {
+                        borderColor: colors.yellow,
+                      },
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: colors.yellow,
+                      },
+                    }}
+                  >
+                    {FILTROS.tamaño.map((opt) => (
+                      <MenuItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
             </Grid>
-          </Grid>
-        </Paper>
+          </Paper>
+        </Box>
 
         {/* Comptador d'animals */}
-        <Box sx={{ textAlign: 'center', mb: 3 }}>
+        <Box sx={{ textAlign: "center", mb: 3 }}>
           <Chip
-            label={`${animales.length} animal${animales.length !== 1 ? 's' : ''} trobat${animales.length !== 1 ? 's' : ''}`}
+            label={`${animales.length} animal${
+              animales.length !== 1 ? "s" : ""
+            } trobat${animales.length !== 1 ? "s" : ""}`}
             sx={{
               backgroundColor: colors.orange,
-              color: 'white',
-              fontSize: '1.1rem',
+              color: "white",
+              fontSize: "1.1rem",
 
               py: 2,
               px: 1,
@@ -283,30 +347,43 @@ function IniciUsuari() {
             <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3 } }}>
               <Box
                 sx={{
-                  display: 'grid',
+                  display: "grid",
                   gridTemplateColumns: {
-                    xs: 'repeat(1, 1fr)',
-                    sm: 'repeat(2, 1fr)',
-                    md: 'repeat(3, 1fr)',
-                    lg: 'repeat(4, 1fr)'
+                    xs: "repeat(1, 1fr)",
+                    sm: "repeat(2, 1fr)",
+                    md: "repeat(3, 1fr)",
+                    lg: "repeat(4, 1fr)",
                   },
                   gap: { xs: 2, sm: 3 },
-                  mx: 'auto'
+                  mx: "auto",
                 }}
               >
                 {animales.map((animal) => (
-                  <Box key={animal.id} sx={{ display: 'flex', justifyContent: 'center' }}>
+                  <Box
+                    key={animal.id}
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                      pb: 5,
+                    }}
+                    onClick={() => navigate(`/mascotes/${animal.id}`)}
+                  >
                     <CardPet
                       animal={animal}
                       isFavorito={favoritos.includes(animal.id)}
                       onToggleFavorito={() => toggleFavorito(animal.id)}
-                      sx={{ width: { xs: '100%', sm: 300, md: 300 }, maxWidth: 300, }}
+                      sx={{
+                        width: { xs: "100%", sm: 300, md: 300 },
+                        maxWidth: 300,
+                        height: 450,
+                      }}
                     />
                   </Box>
                 ))}
               </Box>
             </Container>
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
               <Pagination
                 count={Math.ceil(totalCount / itemsPerPage)}
                 page={page}
@@ -317,12 +394,13 @@ function IniciUsuari() {
             </Box>
           </>
         ) : (
-          <Box sx={{ textAlign: 'center', mt: 6 }}>
+          <Box sx={{ textAlign: "center", mt: 6 }}>
             <PetsIcon sx={{ fontSize: 80, color: colors.purple, mb: 2 }} />
             <Typography variant="h5" sx={{ color: colors.darkBlue }}>
-              No s'han trobat animals disponibles que coincideixin amb els filtres.
+              No s'han trobat animals disponibles que coincideixin amb els
+              filtres.
             </Typography>
-            <Typography variant="body1" sx={{ color: 'text.secondary', mt: 1 }}>
+            <Typography variant="body1" sx={{ color: "text.secondary", mt: 1 }}>
               Prova amb altres criteris de cerca.
             </Typography>
           </Box>

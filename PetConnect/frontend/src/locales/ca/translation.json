@@ -1,0 +1,38 @@
+{
+  "welcome": "Benvingut a PetConnect",
+  "login": "Inicia sessió",
+  "logout": "Tanca sessió",
+  "register": "Registra't",
+  "home": "Inici",
+  "pets": "Mascotes",
+  "profile": "Perfil",
+  "chat": "Xat",
+  "search": "Cerca",
+  "settings": "Configuració",
+  "about": "Sobre nosaltres",
+  "contact": "Contacte",
+  "save": "Desar",
+  "cancel": "Cancel·lar",
+  "delete": "Eliminar",
+  "edit": "Editar",
+  "back": "Tornar",
+  "next": "Següent",
+  "submit": "Enviar",
+  "navbar": {
+    "aboutUs": "Sobre nosaltres",
+    "lost": "Perduts",
+    "contact": "Contacte",
+    "adopt": "Adopta",
+    "giveAdoption": "Dóna en adopció",
+    "chat": "Xateja",
+    "darkMode": "Mode fosc",
+    "lightMode": "Mode clar",
+    "changeLanguage": "Canviar idioma",
+    "language": "Idioma"
+  },
+  "menu": {
+    "profile": "Perfil",
+    "home": "Inici",
+    "logout": "Sortir"
+  }
+}

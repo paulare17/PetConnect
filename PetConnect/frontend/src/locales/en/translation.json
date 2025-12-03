@@ -1,0 +1,38 @@
+{
+  "welcome": "Welcome to PetConnect",
+  "login": "Login",
+  "logout": "Logout",
+  "register": "Register",
+  "home": "Home",
+  "pets": "Pets",
+  "profile": "Profile",
+  "chat": "Chat",
+  "search": "Search",
+  "settings": "Settings",
+  "about": "About us",
+  "contact": "Contact",
+  "save": "Save",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "edit": "Edit",
+  "back": "Back",
+  "next": "Next",
+  "submit": "Submit",
+  "navbar": {
+    "aboutUs": "About us",
+    "lost": "Lost",
+    "contact": "Contact",
+    "adopt": "Adopt",
+    "giveAdoption": "Give for adoption",
+    "chat": "Chat",
+    "darkMode": "Dark mode",
+    "lightMode": "Light mode",
+    "changeLanguage": "Change language",
+    "language": "Language"
+  },
+  "menu": {
+    "profile": "Profile",
+    "home": "Home",
+    "logout": "Logout"
+  }
+}

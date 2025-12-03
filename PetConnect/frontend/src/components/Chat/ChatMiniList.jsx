@@ -47,7 +47,7 @@ export default function ChatMiniList({ maxHeight = 400, onSelectChat }) {
   };
 
   return (
-    <Box sx={{ width: 260, maxHeight, overflowY: 'auto', bgcolor: colors.lightColor, borderRadius: 2, boxShadow: 2 }}>
+    <Box sx={{ width: 350, minHeight: '500px', overflowY: 'auto', bgcolor: colors.lightColor, borderRadius: 2, boxShadow: 2 }}>
       <Box sx={{ p: 2, borderBottom: `1px solid ${colors.orange}` }}>
         <Typography variant="h6" fontWeight="bold" color={colors.orange}>
           Xats

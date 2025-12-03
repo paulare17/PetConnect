@@ -11,9 +11,10 @@ import MaleIcon from '@mui/icons-material/Male';
 import FemaleIcon from '@mui/icons-material/Female';
 import PetsIcon from '@mui/icons-material/Pets';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import { colors } from '../../constants/colors';
+import { useColors } from '../../hooks/useColors';
 
 function CardPetDetail({ animal }) {
+    const { colors } = useColors();
     if (!animal || animal.message) {
         return (
             <Paper 
@@ -56,7 +57,7 @@ function CardPetDetail({ animal }) {
             <Box sx={{ p: 3, flex: 1, overflowY: 'auto' }}>
                 {/* Nom i badges */}
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                    <Typography variant="h5" sx={{ color: colors.black, fontWeight: 'bold' }}>
+                    <Typography variant="h5" sx={{ color: colors.textDark, fontWeight: 'bold' }}>
                         {animal.nombre}
                     </Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
