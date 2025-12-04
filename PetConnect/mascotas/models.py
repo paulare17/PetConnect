@@ -405,7 +405,6 @@ class Mascota(models.Model):
             verbose_name="Fecha de Adopción"
         )
         
-    # Opcional: Usar el método save para actualizar la fecha automáticamente
     def save(self, *args, **kwargs):
             # Si se marca como adoptado y aún no tiene fecha, establece la fecha actual
             if self.adoptado and not self.fecha_adopcion:
