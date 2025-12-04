@@ -79,29 +79,29 @@ const AddAnimalForm = () => {
   useEffect(() => {
     setFormData((prev) => ({
       ...prev,
-      raza: ''
+      raza: "",
     }));
   }, [formData.especie]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Si cambia la especie, resetear la raza
-    if (name === 'especie') {
+    if (name === "especie") {
       setFormData((prev) => ({
         ...prev,
         especie: value,
-        raza: 'mestizo',
-        raza_perro: value === 'perro' ? 'mestizo' : prev.raza_perro,
-        raza_gato: value === 'gato' ? 'mestizo' : prev.raza_gato,
+        raza: "mestizo",
+        raza_perro: value === "perro" ? "mestizo" : prev.raza_perro,
+        raza_gato: value === "gato" ? "mestizo" : prev.raza_gato,
       }));
-    } else if (name === 'raza') {
+    } else if (name === "raza") {
       // Sincronizar raza con el campo correcto según especie
       setFormData((prev) => ({
         ...prev,
         raza: value,
-        raza_perro: prev.especie === 'perro' ? value : prev.raza_perro,
-        raza_gato: prev.especie === 'gato' ? value : prev.raza_gato,
+        raza_perro: prev.especie === "perro" ? value : prev.raza_perro,
+        raza_gato: prev.especie === "gato" ? value : prev.raza_gato,
       }));
     } else {
       setFormData((prev) => ({
@@ -114,46 +114,58 @@ const AddAnimalForm = () => {
   const handleGenerateDescription = async () => {
     setGeneratingDescription(true);
     setStatus(null);
-    
+
     try {
       // Preparar los datos para enviar a la IA
       const dataForIA = {
         nombre: formData.nombre || "Mascota",
         especie: formData.especie,
-        raza_perro: formData.especie === 'perro' ? formData.raza : undefined,
-        raza_gato: formData.especie === 'gato' ? formData.raza : undefined,
+        raza_perro: formData.especie === "perro" ? formData.raza : undefined,
+        raza_gato: formData.especie === "gato" ? formData.raza : undefined,
         edad: parseInt(formData.edad) || 1,
         genero: formData.genero,
         tamaño: formData.tamaño,
-        caracter: formData.caracter || 'cariñoso',
-        convivencia_ninos: formData.convivencia_ninos === "" ? undefined : formData.convivencia_ninos,
+        caracter: formData.caracter || "cariñoso",
+        convivencia_ninos:
+          formData.convivencia_ninos === ""
+            ? undefined
+            : formData.convivencia_ninos,
         convivencia_animales: formData.convivencia_animales,
-        descripcion_necesidades: formData.descripcion_necesidades
+        descripcion_necesidades: formData.descripcion_necesidades,
       };
 
-      console.log('📤 Enviando datos a IA:', dataForIA);
+      console.log("📤 Enviando datos a IA:", dataForIA);
       const res = await api.post("/generate-description/", dataForIA);
-      console.log('📥 Respuesta de IA:', res.data);
-      
+      console.log("📥 Respuesta de IA:", res.data);
+
       if (res.data.success && res.data.descripcion) {
-        setFormData(prev => ({
+        setFormData((prev) => ({
           ...prev,
-          descripcion: res.data.descripcion
+          descripcion: res.data.descripcion,
         }));
-        setStatus({ type: "success", message: t('addAnimalForm.successGenerated') });
+        setStatus({
+          type: "success",
+          message: t("addAnimalForm.successGenerated"),
+        });
         setTimeout(() => setStatus(null), 3000);
       } else {
-        throw new Error('No se recibió descripción del servidor');
+        throw new Error("No se recibió descripción del servidor");
       }
     } catch (err) {
       console.error("❌ Error generant descripció amb IA:", err);
       console.error("Error details:", err.response?.data || err.message);
-      
-      const errorMsg = err.response?.data?.error || err.response?.data?.detail || err.message || "Error desconocido";
-      
+
+      const errorMsg =
+        err.response?.data?.error ||
+        err.response?.data?.detail ||
+        err.message ||
+        "Error desconocido";
+
       setStatus({
         type: "error",
-        message: `${t('addAnimalForm.errorGenerating')}: ${errorMsg}. ${t('addAnimalForm.manualDescription')}`
+        message: `${t("addAnimalForm.errorGenerating")}: ${errorMsg}. ${t(
+          "addAnimalForm.manualDescription"
+        )}`,
       });
     } finally {
       setGeneratingDescription(false);
@@ -168,28 +180,32 @@ const AddAnimalForm = () => {
     try {
       // Crear FormData per pujar imatge
       const formDataToSend = new FormData();
-      
+
       // Si no hi ha foto, carregar la imatge per defecte segons l'espècie
       let fotoToUpload = formData.foto;
-      
+
       if (!formData.foto) {
         // Determinar quina imatge per defecte utilitzar
-        const defaultImagePath = formData.especie === 'perro' ? gosDefecte : gatDefecte;
-        const defaultImageName = formData.especie === 'perro' ? 'gos_defecte.png' : 'gat_defecte.png';
-        
+        const defaultImagePath =
+          formData.especie === "perro" ? gosDefecte : gatDefecte;
+        const defaultImageName =
+          formData.especie === "perro" ? "gos_defecte.png" : "gat_defecte.png";
+
         try {
           // Carregar la imatge per defecte com a File object
           const response = await fetch(defaultImagePath);
           const blob = await response.blob();
-          fotoToUpload = new File([blob], defaultImageName, { type: blob.type });
+          fotoToUpload = new File([blob], defaultImageName, {
+            type: blob.type,
+          });
         } catch (err) {
-          console.warn('No s\'ha pogut carregar la imatge per defecte:', err);
+          console.warn("No s'ha pogut carregar la imatge per defecte:", err);
         }
       }
-      
+
       // Afegir tots els camps del formulari
-      Object.keys(formData).forEach(key => {
-        if (key === 'foto') {
+      Object.keys(formData).forEach((key) => {
+        if (key === "foto") {
           if (fotoToUpload) {
             formDataToSend.append(key, fotoToUpload);
           }
@@ -201,20 +217,28 @@ const AddAnimalForm = () => {
       // Usar axios amb l'API client (afegeix token automàticament)
       const res = await api.post("/mascota/", formDataToSend, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
       });
 
       console.log("Mascota creada:", res.data);
-      setStatus({ type: "success", message: t('addAnimalForm.successCreated') });
+      setStatus({
+        type: "success",
+        message: t("addAnimalForm.successCreated"),
+      });
       setFormData(initialFormData);
       setPreviewUrls(["", "", ""]);
     } catch (err) {
       console.error("Error creant mascota:", err);
-      const errorMsg = err.response?.data?.detail || err.response?.data || err.message || t('addAnimalForm.errorCreating');
+      const errorMsg =
+        err.response?.data?.detail ||
+        err.response?.data ||
+        err.message ||
+        t("addAnimalForm.errorCreating");
       setStatus({
         type: "error",
-        message: typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg),
+        message:
+          typeof errorMsg === "string" ? errorMsg : JSON.stringify(errorMsg),
       });
     } finally {
       setSubmitting(false);
@@ -223,15 +247,15 @@ const AddAnimalForm = () => {
 
   return (
     <Box
-    //   className="no-scroll-form"
+      //   className="no-scroll-form"
       sx={{
-          backgroundColor: colors.background,
-          padding: 3,
-          minHeight: 'calc(100vh - 90px)',
+        backgroundColor: colors.background,
+        padding: 3,
+        minHeight: "calc(100vh - 90px)",
         // minHeight: "100vh",
         width: "100%",
         justifyContent: "center",
-        transition: 'background-color 0.3s ease',
+        transition: "background-color 0.3s ease",
       }}
     >
       <Grid
@@ -242,36 +266,41 @@ const AddAnimalForm = () => {
           alignItems: "flex-start",
           justifyContent: "center",
           flexWrap: "nowrap",
-           borderRadius:5,
+          borderRadius: 5,
         }}
-        >
+      >
         {/* esquerra: Formulari */}
         <Grid
           size={{ xs: 12, md: 6 }}
           sx={{
-            borderRadius:5,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "flex-start",
-              maxHeight: "600px", 
-              overflowY: "auto", // ⬅️ CANVI: scroll només aquí
-              paddingRight: 1,
+            borderRadius: 5,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "flex-start",
+            maxHeight: "600px",
+            overflowY: "auto", // ⬅️ CANVI: scroll només aquí
+            paddingRight: 1,
+          }}
+        >
+          <Card
+            sx={{
+              borderRadius: 5,
+              width: "100%",
+
+              bgcolor: colors.lightColor,
+              transition: "background-color 0.3s ease",
+              maxWidth: 800,
             }}
-            >
-          <Card sx={{ borderRadius: 5, width: "100%",
-            
-            bgcolor: colors.lightColor,
-            transition: 'background-color 0.3s ease',
-            maxWidth: 800 }}>
+          >
             <CardContent>
               <Typography
                 variant="h4"
                 component="h1"
                 gutterBottom
                 align="center"
-                sx={{ mb: 3, color: colors.darkBlue, }}
+                sx={{ mb: 3, color: colors.darkBlue }}
               >
-                {t('addAnimalForm.title')}
+                {t("addAnimalForm.title")}
               </Typography>
               <Box component="form" onSubmit={handleSubmit}>
                 <Grid container spacing={3}>
@@ -279,56 +308,85 @@ const AddAnimalForm = () => {
                     <TextField
                       fullWidth
                       name="nombre"
-                      label={t('addAnimalForm.name')}
+                      label={t("addAnimalForm.name")}
                       value={formData.nombre}
                       onChange={handleInputChange}
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <FormControl fullWidth>
-                      <InputLabel>{t('addAnimalForm.species')}</InputLabel>
+                      <InputLabel>{t("addAnimalForm.species")}</InputLabel>
                       <Select
                         name="especie"
                         value={formData.especie}
                         onChange={handleInputChange}
                       >
-                        <MenuItem value="perro">{t('addAnimalForm.dog')}</MenuItem>
-                        <MenuItem value="gato">{t('addAnimalForm.cat')}</MenuItem>
+                        <MenuItem value="perro">
+                          {t("addAnimalForm.dog")}
+                        </MenuItem>
+                        <MenuItem value="gato">
+                          {t("addAnimalForm.cat")}
+                        </MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <FormControl fullWidth>
-                      <InputLabel>{t('addAnimalForm.breed')}</InputLabel>
+                      <InputLabel>{t("addAnimalForm.breed")}</InputLabel>
                       <Select
                         name="raza"
                         value={formData.raza}
                         onChange={handleInputChange}
                       >
-                        {formData.especie === 'perro' ? [
-                            <MenuItem key="mestizo" value="mestizo">{t('addAnimalForm.mixed')}</MenuItem>,
-                            <MenuItem key="labrador" value="labrador">{t('addAnimalForm.labrador')}</MenuItem>,
-                            <MenuItem key="pastor_aleman" value="pastor_aleman">{t('addAnimalForm.germanShepherd')}</MenuItem>,
-                            <MenuItem key="bulldog" value="bulldog">{t('addAnimalForm.bulldog')}</MenuItem>,
-                            <MenuItem key="beagle" value="beagle">{t('addAnimalForm.beagle')}</MenuItem>
-                        ] : [
-                            <MenuItem key="mestizo" value="mestizo">{t('addAnimalForm.mixed')}</MenuItem>,
-                            <MenuItem key="siames" value="siames">{t('addAnimalForm.siamese')}</MenuItem>,
-                            <MenuItem key="persa" value="persa">{t('addAnimalForm.persian')}</MenuItem>
-                        ]}
+                        {formData.especie === "perro"
+                          ? [
+                              <MenuItem key="mestizo" value="mestizo">
+                                {t("addAnimalForm.mixed")}
+                              </MenuItem>,
+                              <MenuItem key="labrador" value="labrador">
+                                {t("addAnimalForm.labrador")}
+                              </MenuItem>,
+                              <MenuItem
+                                key="pastor_aleman"
+                                value="pastor_aleman"
+                              >
+                                {t("addAnimalForm.germanShepherd")}
+                              </MenuItem>,
+                              <MenuItem key="bulldog" value="bulldog">
+                                {t("addAnimalForm.bulldog")}
+                              </MenuItem>,
+                              <MenuItem key="beagle" value="beagle">
+                                {t("addAnimalForm.beagle")}
+                              </MenuItem>,
+                            ]
+                          : [
+                              <MenuItem key="mestizo" value="mestizo">
+                                {t("addAnimalForm.mixed")}
+                              </MenuItem>,
+                              <MenuItem key="siames" value="siames">
+                                {t("addAnimalForm.siamese")}
+                              </MenuItem>,
+                              <MenuItem key="persa" value="persa">
+                                {t("addAnimalForm.persian")}
+                              </MenuItem>,
+                            ]}
                       </Select>
                     </FormControl>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <FormControl fullWidth>
-                      <InputLabel>{t('addAnimalForm.gender')}</InputLabel>
+                      <InputLabel>{t("addAnimalForm.gender")}</InputLabel>
                       <Select
                         name="genero"
                         value={formData.genero}
                         onChange={handleInputChange}
                       >
-                        <MenuItem value="macho">{t('addAnimalForm.male')}</MenuItem>
-                        <MenuItem value="hembra">{t('addAnimalForm.female')}</MenuItem>
+                        <MenuItem value="macho">
+                          {t("addAnimalForm.male")}
+                        </MenuItem>
+                        <MenuItem value="hembra">
+                          {t("addAnimalForm.female")}
+                        </MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
@@ -336,7 +394,7 @@ const AddAnimalForm = () => {
                     <TextField
                       fullWidth
                       name="edad"
-                      label={t('addAnimalForm.age')}
+                      label={t("addAnimalForm.age")}
                       type="number"
                       value={formData.edad}
                       onChange={handleInputChange}
@@ -344,147 +402,218 @@ const AddAnimalForm = () => {
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <FormControl fullWidth>
-                      <InputLabel>{t('addAnimalForm.size')}</InputLabel>
+                      <InputLabel>{t("addAnimalForm.size")}</InputLabel>
                       <Select
                         name="tamaño"
                         value={formData.tamaño}
                         onChange={handleInputChange}
                       >
-                        <MenuItem value="pequeño">{t('addAnimalForm.small')}</MenuItem>
-                        <MenuItem value="mediano">{t('addAnimalForm.medium')}</MenuItem>
-                        <MenuItem value="grande">{t('addAnimalForm.large')}</MenuItem>
-                        <MenuItem value="gigante">{t('addAnimalForm.giant')}</MenuItem>
+                        <MenuItem value="pequeño">
+                          {t("addAnimalForm.small")}
+                        </MenuItem>
+                        <MenuItem value="mediano">
+                          {t("addAnimalForm.medium")}
+                        </MenuItem>
+                        <MenuItem value="grande">
+                          {t("addAnimalForm.large")}
+                        </MenuItem>
+                        <MenuItem value="gigante">
+                          {t("addAnimalForm.giant")}
+                        </MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <FormControl fullWidth>
-                      <InputLabel>{t('addAnimalForm.color')}</InputLabel>
+                      <InputLabel>{t("addAnimalForm.color")}</InputLabel>
                       <Select
                         name="color"
                         value={formData.color}
                         onChange={handleInputChange}
                       >
-                        {formData.especie === 'gato' ? [
-                          <MenuItem key="negro" value="negro">{t('addAnimalForm.black')}</MenuItem>,
-                          <MenuItem key="blanco" value="blanco">{t('addAnimalForm.white')}</MenuItem>,
-                          <MenuItem key="marrón" value="marrón">{t('addAnimalForm.brown')}</MenuItem>,
-                          <MenuItem key="gris" value="gris">{t('addAnimalForm.gray')}</MenuItem>,
-                          <MenuItem key="naranja" value="naranja">{t('addAnimalForm.orange')}</MenuItem>,
-                          <MenuItem key="dorado" value="dorado">{t('addAnimalForm.golden')}</MenuItem>,
-                          <MenuItem key="crema" value="crema">{t('addAnimalForm.cream')}</MenuItem>,
-                          <MenuItem key="bicolor" value="bicolor">{t('addAnimalForm.bicolor')}</MenuItem>,
-                          <MenuItem key="tricolor" value="tricolor">{t('addAnimalForm.tricolor')}</MenuItem>,
-                          <MenuItem key="manchado" value="manchado">{t('addAnimalForm.spotted')}</MenuItem>
-                        ] : [
-                          <MenuItem key="negro" value="negro">{t('addAnimalForm.black')}</MenuItem>,
-                          <MenuItem key="blanco" value="blanco">{t('addAnimalForm.white')}</MenuItem>,
-                          <MenuItem key="marrón" value="marrón">{t('addAnimalForm.brown')}</MenuItem>,
-                          <MenuItem key="gris" value="gris">{t('addAnimalForm.gray')}</MenuItem>,
-                          <MenuItem key="naranja" value="naranja">{t('addAnimalForm.orange')}</MenuItem>,
-                          <MenuItem key="dorado" value="dorado">{t('addAnimalForm.golden')}</MenuItem>,
-                          <MenuItem key="crema" value="crema">{t('addAnimalForm.cream')}</MenuItem>,
-                          <MenuItem key="bicolor" value="bicolor">{t('addAnimalForm.bicolor')}</MenuItem>,
-                          <MenuItem key="tricolor" value="tricolor">{t('addAnimalForm.tricolor')}</MenuItem>,
-                          <MenuItem key="manchado" value="manchado">{t('addAnimalForm.spotted')}</MenuItem>
-                        ]}
+                        {formData.especie === "gato"
+                          ? [
+                              <MenuItem key="negro" value="negro">
+                                {t("addAnimalForm.black")}
+                              </MenuItem>,
+                              <MenuItem key="blanco" value="blanco">
+                                {t("addAnimalForm.white")}
+                              </MenuItem>,
+                              <MenuItem key="marrón" value="marrón">
+                                {t("addAnimalForm.brown")}
+                              </MenuItem>,
+                              <MenuItem key="gris" value="gris">
+                                {t("addAnimalForm.gray")}
+                              </MenuItem>,
+                              <MenuItem key="naranja" value="naranja">
+                                {t("addAnimalForm.orange")}
+                              </MenuItem>,
+                              <MenuItem key="dorado" value="dorado">
+                                {t("addAnimalForm.golden")}
+                              </MenuItem>,
+                              <MenuItem key="crema" value="crema">
+                                {t("addAnimalForm.cream")}
+                              </MenuItem>,
+                              <MenuItem key="bicolor" value="bicolor">
+                                {t("addAnimalForm.bicolor")}
+                              </MenuItem>,
+                              <MenuItem key="tricolor" value="tricolor">
+                                {t("addAnimalForm.tricolor")}
+                              </MenuItem>,
+                              <MenuItem key="manchado" value="manchado">
+                                {t("addAnimalForm.spotted")}
+                              </MenuItem>,
+                            ]
+                          : [
+                              <MenuItem key="negro" value="negro">
+                                {t("addAnimalForm.black")}
+                              </MenuItem>,
+                              <MenuItem key="blanco" value="blanco">
+                                {t("addAnimalForm.white")}
+                              </MenuItem>,
+                              <MenuItem key="marrón" value="marrón">
+                                {t("addAnimalForm.brown")}
+                              </MenuItem>,
+                              <MenuItem key="gris" value="gris">
+                                {t("addAnimalForm.gray")}
+                              </MenuItem>,
+                              <MenuItem key="naranja" value="naranja">
+                                {t("addAnimalForm.orange")}
+                              </MenuItem>,
+                              <MenuItem key="dorado" value="dorado">
+                                {t("addAnimalForm.golden")}
+                              </MenuItem>,
+                              <MenuItem key="crema" value="crema">
+                                {t("addAnimalForm.cream")}
+                              </MenuItem>,
+                              <MenuItem key="bicolor" value="bicolor">
+                                {t("addAnimalForm.bicolor")}
+                              </MenuItem>,
+                              <MenuItem key="tricolor" value="tricolor">
+                                {t("addAnimalForm.tricolor")}
+                              </MenuItem>,
+                              <MenuItem key="manchado" value="manchado">
+                                {t("addAnimalForm.spotted")}
+                              </MenuItem>,
+                            ]}
                       </Select>
                     </FormControl>
                   </Grid>
                   <Grid size={{ xs: 12 }}>
-                    <Typography variant="body2" sx={{ mb: 1, fontWeight: 'bold' }}>
-                      {t('addAnimalForm.photos')} (màxim 3)
+                    <Typography
+                      variant="body2"
+                      sx={{ mb: 1, fontWeight: "bold" }}
+                    >
+                      {t("addAnimalForm.photos")} (màxim 3)
                     </Typography>
-                    <Grid container spacing={2}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-around",
+                        alignItems: "center",
+                        width: "100%",
+                      }}
+                    >
                       {[0, 1, 2].map((index) => {
-                        const fotoKey = index === 0 ? 'foto' : `foto${index + 1}`;
+                        const fotoKey =
+                          index === 0 ? "foto" : `foto${index + 1}`;
                         return (
-                          <Grid size={{ xs: 12, sm: 4 }} key={index}>
-                            <Box sx={{ position: 'relative' }}>
-                              <Button
-                                variant="outlined"
-                                component="label"
-                                fullWidth
-                                sx={{ 
-                                  mb: 1,
-                                  height: 120,
-                                  display: 'flex',
-                                  flexDirection: 'column',
-                                  justifyContent: 'center',
-                                  overflow: 'hidden',
-                                  position: 'relative'
-                                }}
-                              >
-                                {previewUrls[index] ? (
-                                  <Box
-                                    component="img"
-                                    src={previewUrls[index]}
-                                    sx={{
-                                      position: 'absolute',
-                                      top: 0,
-                                      left: 0,
-                                      width: '100%',
-                                      height: '100%',
-                                      objectFit: 'cover'
-                                    }}
-                                  />
-                                ) : (
-                                  <Typography variant="caption">
-                                    {t('addAnimalForm.uploadPhoto')} {index + 1}
-                                  </Typography>
-                                )}
-                                <input
-                                  type="file"
-                                  accept="image/*"
-                                  name={fotoKey}
-                                  hidden
-                                  onChange={e => {
-                                    const file = e.target.files[0];
-                                    setFormData(prev => ({
-                                      ...prev,
-                                      [fotoKey]: file || ""
-                                    }));
-                                    if (file) {
-                                      const newPreviewUrls = [...previewUrls];
-                                      newPreviewUrls[index] = URL.createObjectURL(file);
-                                      setPreviewUrls(newPreviewUrls);
-                                    } else {
-                                      const newPreviewUrls = [...previewUrls];
-                                      newPreviewUrls[index] = "";
-                                      setPreviewUrls(newPreviewUrls);
-                                    }
+                          <Box
+                            key={index}
+                            sx={{
+                              position: "relative",
+                              width: 96,
+                              height: 96,
+                            }}
+                          >
+                            <Button
+                              variant="outlined"
+                              component="label"
+                              sx={{
+                                width: "100%",
+                                height: "100%",
+                                minWidth: 0,
+                                p: 0,
+                                display: "flex",
+                                flexDirection: "column",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                overflow: "hidden",
+                                borderRadius: 2,
+                              }}
+                            >
+                              {previewUrls[index] ? (
+                                <Box
+                                  component="img"
+                                  src={previewUrls[index]}
+                                  sx={{
+                                    width: "100%",
+                                    height: "100%",
+                                    objectFit: "cover",
                                   }}
                                 />
-                              </Button>
-                              {previewUrls[index] && (
-                                <IconButton
-                                  size="small"
-                                  sx={{
-                                    position: 'absolute',
-                                    top: 4,
-                                    right: 4,
-                                    bgcolor: 'background.paper',
-                                    '&:hover': { bgcolor: 'error.light' }
-                                  }}
-                                  onClick={() => {
-                                    const fotoKey = index === 0 ? 'foto' : `foto${index + 1}`;
-                                    setFormData(prev => ({
-                                      ...prev,
-                                      [fotoKey]: ""
-                                    }));
+                              ) : (
+                                <Typography
+                                  variant="caption"
+                                  sx={{ textAlign: "center", px: 1 }}
+                                >
+                                  {t("addAnimalForm.uploadPhoto")} {index + 1}
+                                </Typography>
+                              )}
+                              <input
+                                type="file"
+                                accept="image/*"
+                                name={fotoKey}
+                                hidden
+                                onChange={(e) => {
+                                  const file = e.target.files[0];
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    [fotoKey]: file || "",
+                                  }));
+                                  if (file) {
+                                    const newPreviewUrls = [...previewUrls];
+                                    newPreviewUrls[index] =
+                                      URL.createObjectURL(file);
+                                    setPreviewUrls(newPreviewUrls);
+                                  } else {
                                     const newPreviewUrls = [...previewUrls];
                                     newPreviewUrls[index] = "";
                                     setPreviewUrls(newPreviewUrls);
-                                  }}
-                                >
-                                  <CloseIcon fontSize="small" />
-                                </IconButton>
-                              )}
-                            </Box>
-                          </Grid>
+                                  }
+                                }}
+                              />
+                            </Button>
+                            {previewUrls[index] && (
+                              <IconButton
+                                size="small"
+                                sx={{
+                                  position: "absolute",
+                                  top: 4,
+                                  right: 4,
+                                  p: 0.5,
+                                  bgcolor: "rgba(255,255,255,0.9)",
+                                  "&:hover": { bgcolor: "error.light" },
+                                }}
+                                onClick={() => {
+                                  const fotoKey =
+                                    index === 0 ? "foto" : `foto${index + 1}`;
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    [fotoKey]: "",
+                                  }));
+                                  const newPreviewUrls = [...previewUrls];
+                                  newPreviewUrls[index] = "";
+                                  setPreviewUrls(newPreviewUrls);
+                                }}
+                              >
+                                <CloseIcon sx={{ fontSize: 16 }} />
+                              </IconButton>
+                            )}
+                          </Box>
                         );
                       })}
-                    </Grid>
+                    </Box>
                   </Grid>
                   <Grid size={{ xs: 12 }}>
                     <FormControlLabel
@@ -499,7 +628,7 @@ const AddAnimalForm = () => {
                           }
                         />
                       }
-                      label={t('addAnimalForm.specialNeeds')}
+                      label={t("addAnimalForm.specialNeeds")}
                     />
                   </Grid>
                   <Grid size={{ xs: 12 }}>
@@ -508,67 +637,98 @@ const AddAnimalForm = () => {
                       multiline
                       rows={3}
                       name="descripcion_necesidades"
-                      label={t('addAnimalForm.specialNeedsDescription')}
+                      label={t("addAnimalForm.specialNeedsDescription")}
                       value={formData.descripcion_necesidades}
                       onChange={handleInputChange}
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <FormControl fullWidth>
-                      <InputLabel>{t('addAnimalForm.coexistenceAnimals')}</InputLabel>
+                      <InputLabel>
+                        {t("addAnimalForm.coexistenceAnimals")}
+                      </InputLabel>
                       <Select
                         name="convivencia_animales"
                         value={formData.convivencia_animales}
                         onChange={handleInputChange}
                       >
                         <MenuItem value="no">
-                          {t('addAnimalForm.noAnimals')}
+                          {t("addAnimalForm.noAnimals")}
                         </MenuItem>
                         <MenuItem value="misma_especie">
-                          {t('addAnimalForm.sameSpecies')}
+                          {t("addAnimalForm.sameSpecies")}
                         </MenuItem>
                         <MenuItem value="cualquier_especie">
-                          {t('addAnimalForm.anyAnimal')}
+                          {t("addAnimalForm.anyAnimal")}
                         </MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <FormControl fullWidth>
-                      <InputLabel>{t('addAnimalForm.coexistenceChildren')}</InputLabel>
+                      <InputLabel>
+                        {t("addAnimalForm.coexistenceChildren")}
+                      </InputLabel>
                       <Select
                         name="convivencia_ninos"
                         value={formData.convivencia_ninos}
                         onChange={handleInputChange}
                       >
-                        <MenuItem value={true}>{t('addAnimalForm.yes')}</MenuItem>
-                        <MenuItem value={false}>{t('addAnimalForm.no')}</MenuItem>
+                        <MenuItem value={true}>
+                          {t("addAnimalForm.yes")}
+                        </MenuItem>
+                        <MenuItem value={false}>
+                          {t("addAnimalForm.no")}
+                        </MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
                   <Grid size={{ xs: 12 }}>
                     <FormControl fullWidth>
-                      <InputLabel>{t('addAnimalForm.mainCharacter')}</InputLabel>
+                      <InputLabel>
+                        {t("addAnimalForm.mainCharacter")}
+                      </InputLabel>
                       <Select
                         name="caracter"
                         value={formData.caracter}
                         onChange={handleInputChange}
                       >
-                        <MenuItem value="cariñoso">{t('addAnimalForm.affectionate')}</MenuItem>
-                        <MenuItem value="jugueton">{t('addAnimalForm.playful')}</MenuItem>
-                        <MenuItem value="tranquilo">{t('addAnimalForm.calm')}</MenuItem>
-                        <MenuItem value="activo">{t('addAnimalForm.active')}</MenuItem>
-                        <MenuItem value="sociable">{t('addAnimalForm.sociable')}</MenuItem>
-                        <MenuItem value="independiente">{t('addAnimalForm.independent')}</MenuItem>
-                        <MenuItem value="protector">{t('addAnimalForm.protective')}</MenuItem>
-                        <MenuItem value="timido">{t('addAnimalForm.shy')}</MenuItem>
-                        <MenuItem value="obediente">{t('addAnimalForm.obedient')}</MenuItem>
+                        <MenuItem value="cariñoso">
+                          {t("addAnimalForm.affectionate")}
+                        </MenuItem>
+                        <MenuItem value="jugueton">
+                          {t("addAnimalForm.playful")}
+                        </MenuItem>
+                        <MenuItem value="tranquilo">
+                          {t("addAnimalForm.calm")}
+                        </MenuItem>
+                        <MenuItem value="activo">
+                          {t("addAnimalForm.active")}
+                        </MenuItem>
+                        <MenuItem value="sociable">
+                          {t("addAnimalForm.sociable")}
+                        </MenuItem>
+                        <MenuItem value="independiente">
+                          {t("addAnimalForm.independent")}
+                        </MenuItem>
+                        <MenuItem value="protector">
+                          {t("addAnimalForm.protective")}
+                        </MenuItem>
+                        <MenuItem value="timido">
+                          {t("addAnimalForm.shy")}
+                        </MenuItem>
+                        <MenuItem value="obediente">
+                          {t("addAnimalForm.obedient")}
+                        </MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
                   <Grid size={{ xs: 12 }}>
-                    <Typography variant="body2" sx={{ mb: 1, fontWeight: 'bold' }}>
-                      {t('addAnimalForm.healthStatus')}
+                    <Typography
+                      variant="body2"
+                      sx={{ mb: 1, fontWeight: "bold" }}
+                    >
+                      {t("addAnimalForm.healthStatus")}
                     </Typography>
                     <FormGroup>
                       <FormControlLabel
@@ -583,7 +743,7 @@ const AddAnimalForm = () => {
                             }
                           />
                         }
-                        label={t('addAnimalForm.dewormed')}
+                        label={t("addAnimalForm.dewormed")}
                       />
                       <FormControlLabel
                         control={
@@ -597,7 +757,7 @@ const AddAnimalForm = () => {
                             }
                           />
                         }
-                        label={t('addAnimalForm.sterilized')}
+                        label={t("addAnimalForm.sterilized")}
                       />
                       <FormControlLabel
                         control={
@@ -611,7 +771,7 @@ const AddAnimalForm = () => {
                             }
                           />
                         }
-                        label={t('addAnimalForm.microchipped')}
+                        label={t("addAnimalForm.microchipped")}
                       />
                       <FormControlLabel
                         control={
@@ -625,28 +785,41 @@ const AddAnimalForm = () => {
                             }
                           />
                         }
-                        label={t('addAnimalForm.vaccinated')}
+                        label={t("addAnimalForm.vaccinated")}
                       />
                     </FormGroup>
                   </Grid>
                   <Grid size={{ xs: 12 }}>
-                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 1 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        gap: 2,
+                        alignItems: "center",
+                        mb: 1,
+                      }}
+                    >
                       <Typography variant="body2">
-                        {t('addAnimalForm.petDescription')}
+                        {t("addAnimalForm.petDescription")}
                       </Typography>
                       <Button
                         variant="outlined"
                         size="small"
                         onClick={handleGenerateDescription}
                         disabled={generatingDescription || !formData.nombre}
-                        startIcon={generatingDescription ? <CircularProgress size={16} /> : null}
-                        sx={{ 
-                          textTransform: 'none',
+                        startIcon={
+                          generatingDescription ? (
+                            <CircularProgress size={16} />
+                          ) : null
+                        }
+                        sx={{
+                          textTransform: "none",
                           borderRadius: 2,
-                          fontSize: '0.75rem'
+                          fontSize: "0.75rem",
                         }}
                       >
-                        {generatingDescription ? t('addAnimalForm.generating') : t('addAnimalForm.generateWithAI')}
+                        {generatingDescription
+                          ? t("addAnimalForm.generating")
+                          : t("addAnimalForm.generateWithAI")}
                       </Button>
                     </Box>
                     <TextField
@@ -654,11 +827,11 @@ const AddAnimalForm = () => {
                       multiline
                       rows={8}
                       name="descripcion"
-                      label={t('addAnimalForm.description')}
-                      placeholder={t('addAnimalForm.descriptionPlaceholder')}
+                      label={t("addAnimalForm.description")}
+                      placeholder={t("addAnimalForm.descriptionPlaceholder")}
                       value={formData.descripcion}
                       onChange={handleInputChange}
-                      helperText={t('addAnimalForm.descriptionHelper')}
+                      helperText={t("addAnimalForm.descriptionHelper")}
                     />
                   </Grid>
                 </Grid>
@@ -670,10 +843,12 @@ const AddAnimalForm = () => {
                     color="primary"
                     disabled={submitting}
                   >
-                    {submitting ? t('addAnimalForm.submitting') : t('addAnimalForm.addAnimal')}
+                    {submitting
+                      ? t("addAnimalForm.submitting")
+                      : t("addAnimalForm.addAnimal")}
                   </Button>
                   <Button variant="outlined" color="secondary">
-                    {t('addAnimalForm.cancel')}
+                    {t("addAnimalForm.cancel")}
                   </Button>
                 </Box>
               </Box>
@@ -702,7 +877,6 @@ const AddAnimalForm = () => {
             alignItems: "flex-start",
             height: "60vh",
             position: "relative",
-            
           }}
         >
           <Box
@@ -721,31 +895,41 @@ const AddAnimalForm = () => {
                 p: 5,
                 display: "flex",
                 flexDirection: "column",
-                // justifyContent: "center",
                 alignItems: "center",
               }}
             >
-              <CardContent sx={{ }}>
-                <Typography variant="h5" sx={{ mb: 2 , maxHeight: "550px",}}>
-                  {t('addAnimalForm.previewTitle')}
+              <CardContent sx={{}}>
+                <Typography variant="h5" sx={{ mb: 2, maxHeight: "550px" }}>
+                  {t("addAnimalForm.previewTitle")}
                 </Typography>
-                <Typography 
-                  variant="caption" 
-                  sx={{ 
-                    display: 'block',
-                    color: 'text.secondary',
+                <Typography
+                  variant="caption"
+                  sx={{
+                    display: "block",
+                    color: "text.secondary",
                     mb: 2,
-                    fontStyle: 'italic',
-                    opacity: 0.7
+                    fontStyle: "italic",
+                    opacity: 0.7,
                   }}
                 >
-                  {t('addAnimalForm.clickToViewFullProfile')}
+                  {t("addAnimalForm.clickToViewFullProfile")}
                 </Typography>
-                <Box onClick={() => setOpenPreviewDialog(true)} sx={{ cursor: 'pointer' }}>
-                  <CardPet animal={{
-                    ...formData,
-                    foto: previewUrls[0] || (typeof formData.foto === "string" ? formData.foto : "")
-                  }} isFavorito={false} onToggleFavorito={() => {}} />
+                <Box
+                  onClick={() => setOpenPreviewDialog(true)}
+                  sx={{ cursor: "pointer" }}
+                >
+                  <CardPet
+                    animal={{
+                      ...formData,
+                      foto:
+                        previewUrls[0] ||
+                        (typeof formData.foto === "string"
+                          ? formData.foto
+                          : ""),
+                    }}
+                    isFavorito={false}
+                    onToggleFavorito={() => {}}
+                  />
                 </Box>
               </CardContent>
             </Card>

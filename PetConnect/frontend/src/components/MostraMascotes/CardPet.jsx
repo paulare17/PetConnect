@@ -104,7 +104,8 @@ export default function CardPet({ animal, isFavorito, onToggleFavorito, sx }) {
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
-            lineHeight: 1.5
+            lineHeight: 1.5,
+            width: '1'
           }}>
             {data.descripcion || t('cardPet.noDescription')}
           </Typography>
