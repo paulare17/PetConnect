@@ -4,14 +4,31 @@ const http = require('http');
 
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocketServer({ server });
+
+// Leer orígenes permitidos desde variable de entorno
+const allowedOrigins = (process.env.CORS_ALLOWED_ORIGINS || 'http://localhost:5173,http://localhost:3000').split(',');
+
+const wss = new WebSocketServer({ 
+  server,
+  verifyClient: (info) => {
+    const origin = info.origin || info.req.headers.origin;
+    if (!origin || !allowedOrigins.includes(origin)) {
+      console.warn(`Conexión rechazada desde origen: ${origin}`);
+      return false;
+    }
+    return true;
+  }
+});
 
 // Almacena las conexiones activas por usuario
 const connections = new Map();
 
 // Configurar CORS para el frontend
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
 });
