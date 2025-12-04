@@ -1,6 +1,7 @@
 from django.db import models
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 from multiselectfield import MultiSelectField 
 
 class Mascota(models.Model):
@@ -394,8 +395,26 @@ class Mascota(models.Model):
     foto = models.ImageField(upload_to='mascotas/', verbose_name="Foto")
 
     #estado del perfil
-    adoptado = models.BooleanField(default=False)
     oculto = models.BooleanField(default=False)
+    adoptado = models.BooleanField(default=False)
+        
+    # Campo crucial: registra cuándo se marcó la adopción
+    fecha_adopcion = models.DateField(
+            null=True, 
+            blank=True,
+            verbose_name="Fecha de Adopción"
+        )
+        
+    # Opcional: Usar el método save para actualizar la fecha automáticamente
+    def save(self, *args, **kwargs):
+            # Si se marca como adoptado y aún no tiene fecha, establece la fecha actual
+            if self.adoptado and not self.fecha_adopcion:
+                self.fecha_adopcion = timezone.now().date()
+            # Si se desmarca como adoptado, limpia la fecha
+            elif not self.adoptado and self.fecha_adopcion:
+                self.fecha_adopcion = None
+                
+            super().save(*args, **kwargs)    
 
     # Fechas
     fecha_creacion = models.DateTimeField(auto_now_add=True)
