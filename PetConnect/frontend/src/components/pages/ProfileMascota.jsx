@@ -42,6 +42,7 @@ function ProfileAnimal() {
   const [altres, setAltres] = useState([]);
   const [galeriaIndex, setGaleriaIndex] = useState(0);
   const [updatingAdoption, setUpdatingAdoption] = useState(false);
+  const [updatingVisibility, setUpdatingVisibility] = useState(false);
   const [startingChat, setStartingChat] = useState(false);
 
   useEffect(() => {
@@ -191,44 +192,108 @@ function ProfileAnimal() {
 
           <Box sx={{ textAlign: 'center', mt: 6 }}>
             {user?.role === ROLES.PROTECTORA ? (
-              <Button 
-                variant="contained" 
-                disabled={updatingAdoption}
-                onClick={async () => {
-                  setUpdatingAdoption(true);
-                  try {
-                    const res = await api.patch(`/mascota/${id}/`, {
-                      adoptado: !animal.adoptado
-                    });
-                    setAnimal(res.data);
-                  } catch (err) {
-                    console.error('Error actualitzant estat d\'adopció:', err);
-                    alert(t('profileMascota.errorUpdatingAdoption'));
-                  } finally {
-                    setUpdatingAdoption(false);
-                  }
-                }}
-                sx={{ 
-                  backgroundColor: animal.adoptado ? colors.purple : colors.green, 
-                  color: 'white', 
-                  px: 6, 
-                  py: 2, 
-                  fontSize: '1.2rem', 
-                  '&:hover': { 
-                    backgroundColor: animal.adoptado ? colors.darkPurple : colors.darkGreen 
-                  },
-                  '&:disabled': {
-                    backgroundColor: colors.lightColor,
-                  }
-                }}
-              >
-                {updatingAdoption 
-                  ? t('profileMascota.updating') 
-                  : animal.adoptado 
-                    ? t('profileMascota.markAsAvailable') 
-                    : t('profileMascota.markAsAdopted')
-                }
-              </Button>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center' }}>
+                {/* Indicador d'estat */}
+                {(animal.oculto || animal.adoptado) && (
+                  <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+                    {animal.oculto && (
+                      <Chip 
+                        label={t('profileMascota.hidden')} 
+                        sx={{ backgroundColor: colors.darkBlue, color: 'white', fontWeight: 'bold' }} 
+                      />
+                    )}
+                    {animal.adoptado && (
+                      <Chip 
+                        label={t('profileMascota.adopted')} 
+                        sx={{ backgroundColor: colors.purple, color: 'white', fontWeight: 'bold' }} 
+                      />
+                    )}
+                  </Box>
+                )}
+                
+                {/* Botons d'acció */}
+                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center' }}>
+                  {/* Botó Adoptat/Disponible */}
+                  <Button 
+                    variant="contained" 
+                    disabled={updatingAdoption}
+                    onClick={async () => {
+                      setUpdatingAdoption(true);
+                      try {
+                        const res = await api.patch(`/mascota/${id}/`, {
+                          adoptado: !animal.adoptado
+                        });
+                        setAnimal(res.data);
+                      } catch (err) {
+                        console.error('Error actualitzant estat d\'adopció:', err);
+                        alert(t('profileMascota.errorUpdatingAdoption'));
+                      } finally {
+                        setUpdatingAdoption(false);
+                      }
+                    }}
+                    sx={{ 
+                      backgroundColor: animal.adoptado ? colors.purple : colors.green, 
+                      color: 'white', 
+                      px: 4, 
+                      py: 1.5, 
+                      fontSize: '1rem', 
+                      '&:hover': { 
+                        backgroundColor: animal.adoptado ? colors.darkPurple : colors.darkGreen 
+                      },
+                      '&:disabled': {
+                        backgroundColor: colors.lightColor,
+                      }
+                    }}
+                  >
+                    {updatingAdoption 
+                      ? t('profileMascota.updating') 
+                      : animal.adoptado 
+                        ? t('profileMascota.markAsAvailable') 
+                        : t('profileMascota.markAsAdopted')
+                    }
+                  </Button>
+
+                  {/* Botó Ocultar/Mostrar */}
+                  <Button 
+                    variant="contained" 
+                    disabled={updatingVisibility}
+                    onClick={async () => {
+                      setUpdatingVisibility(true);
+                      try {
+                        const res = await api.patch(`/mascota/${id}/`, {
+                          oculto: !animal.oculto
+                        });
+                        setAnimal(res.data);
+                      } catch (err) {
+                        console.error('Error actualitzant visibilitat:', err);
+                        alert(t('profileMascota.errorUpdatingVisibility'));
+                      } finally {
+                        setUpdatingVisibility(false);
+                      }
+                    }}
+                    sx={{ 
+                      backgroundColor: animal.oculto ? colors.darkBlue : colors.orange, 
+                      color: 'white', 
+                      px: 4, 
+                      py: 1.5, 
+                      fontSize: '1rem', 
+                      '&:hover': { 
+                        backgroundColor: animal.oculto ? colors.blue : colors.darkOrange 
+                      },
+                      '&:disabled': {
+                        backgroundColor: colors.lightColor,
+                      }
+                    }}
+                  >
+                    {updatingVisibility 
+                      ? t('profileMascota.updating') 
+                      : animal.oculto 
+                        ? t('profileMascota.showPet') 
+                        : t('profileMascota.hidePet')
+                    }
+                  </Button>
+                </Box>
+              </Box>
             ) : (
               <Button 
                 variant="contained" 
