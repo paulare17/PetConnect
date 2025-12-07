@@ -1,3 +1,8 @@
+ESPECIE_CHOICES = [
+    ('PERRO', 'Perro'),
+    ('GATO', 'Gato'),
+]
+
 TAMANO_CHOICES = [
     ('PEQUENO', 'Pequeño (Hasta 10kg)'),
     ('MEDIANO', 'Mediano (10-25kg)'),

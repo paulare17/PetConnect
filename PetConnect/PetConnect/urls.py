@@ -20,6 +20,7 @@ urlpatterns = [
     # Rutas API: Router (CRUD básico y /mascota/mis_mascotas/)
     path('api/', include(router.urls)),
     
+    path('api/ia/', include('ai_service.urls')),
     # Rutas API: Manuales de la aplicación 'mascotas' (Swipe/Feed/Upload)
     path('api/', include('mascotas.urls')), 
     

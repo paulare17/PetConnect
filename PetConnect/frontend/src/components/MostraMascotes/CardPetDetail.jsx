@@ -15,6 +15,47 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { useColors } from '../../hooks/useColors';
 
 function CardPetDetail({ animal }) {
+            // Mapeig de caràcters backend -> clau traducció
+            const CHARACTER_TRANSLATION_MAP = {
+                CARINOSO: 'affectionate',
+                FALDERO: 'lapDog',
+                DEPENDIENTE: 'dependent',
+                DUO_INSEPARABLE: 'inseparableDuo',
+                TIMIDO: 'shy',
+                MIEDOSO: 'fearful',
+                JUGUETON: 'playful',
+                ACTIVO_ENERGICO: 'activeEnergetic',
+                TRANQUILO: 'calm',
+                TRABAJADOR: 'hardWorking',
+                SOCIABLE: 'sociable',
+                PROTECTOR_GUARDIAN: 'protectiveGuardian',
+                DOMINANTE_PERROS: 'dominantWithDogs',
+                REACTIVO: 'reactive',
+                LIDERAZGO: 'leadership',
+                DESCONFIADO_EXTRANOS: 'distrustfulOfStrangers',
+                OBEDIENTE: 'obedient',
+                OLAFATEADOR: 'sniffer',
+                LADRADOR: 'barker',
+                ESCAPISTA: 'escapist',
+                EXCAVADOR: 'digger',
+                GLOTON: 'glutton',
+                CABEZOTA: 'stubborn',
+                INTELIGENTE: 'intelligent',
+                SENSIBLE: 'sensitive',
+                LEAL: 'loyal',
+                INDEPENDIENTE: 'independent',
+                ASUSTADIZO: 'skittish',
+                JUGUETON_INTENSO: 'intenselyPlayful',
+                ACTIVO: 'active',
+                CAZADOR: 'hunter',
+                AFECTIVO_CONOCIDOS: 'affectionateWithFamiliar',
+                TERRITORIAL: 'territorial',
+                SEMIFERAL: 'semiFeral',
+                OBSERVADOR: 'observer',
+                ADAPTABLE: 'adaptable',
+                DIVA: 'diva',
+                LIMPIO: 'clean'
+            };
     const { t } = useTranslation();
     const { colors } = useColors();
     if (!animal || animal.message) {
@@ -38,8 +79,28 @@ function CardPetDetail({ animal }) {
         );
     }
 
-    const raza = animal.especie === 'perro' ? animal.raza_perro : animal.raza_gato;
-    const especieLabel = animal.especie === 'perro' ? t('cardPetDetail.dog') : t('cardPetDetail.cat');
+    // Normalitzar camps del backend (venen en majúscules)
+    const especieLower = (animal.especie || '').toLowerCase();
+    const generoLower = (animal.genero || '').toLowerCase();
+    const raza = especieLower === 'perro' 
+        ? (animal.raza_perro_display || animal.raza_perro) 
+        : (animal.raza_gato_display || animal.raza_gato);
+    const especieLabel = especieLower === 'perro' ? t('cardPetDetail.dog') : t('cardPetDetail.cat');
+    const tamanoDisplay = animal.tamano_display || animal.tamano;
+    
+    // Camp de caràcter segons espècie
+    const caracter = especieLower === 'perro' ? animal.caracter_perro : animal.caracter_gato;
+    
+    // Camps d'estat de salut (ara és un array estado_legal_salud)
+    const estadoSalud = animal.estado_legal_salud || [];
+    const vacunado = estadoSalud.includes('VACUNADO');
+    const esterilizado = estadoSalud.includes('ESTERILIZADO');
+    const desparasitado = estadoSalud.includes('DESPARASITADO');
+    const con_microchip = estadoSalud.includes('MICROCHIP');
+    
+    // Condicions especials segons espècie
+    const condicionEspecial = especieLower === 'perro' ? animal.condicion_especial_perro : animal.condicion_especial_gato;
+    const tieneNecesidadesEspeciales = condicionEspecial && condicionEspecial.length > 0;
 
     return (
         <Paper 
@@ -63,7 +124,7 @@ function CardPetDetail({ animal }) {
                         {animal.nombre}
                     </Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        {animal.genero === 'macho' ? (
+                        {generoLower === 'macho' ? (
                             <MaleIcon sx={{ color: colors.blue, fontSize: 28 }} />
                         ) : (
                             <FemaleIcon sx={{ color: 'pink', fontSize: 28 }} />
@@ -84,9 +145,9 @@ function CardPetDetail({ animal }) {
                         size="small"
                         sx={{ backgroundColor: colors.purple, color: 'white' }} 
                     />
-                    {animal.tamaño && (
+                    {tamanoDisplay && (
                         <Chip 
-                            label={animal.tamaño} 
+                            label={tamanoDisplay} 
                             size="small"
                             sx={{ backgroundColor: colors.darkBlue, color: 'white' }} 
                         />
@@ -118,10 +179,13 @@ function CardPetDetail({ animal }) {
                     {t('cardPetDetail.characteristicsTitle')}
                 </Typography>
                 <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, mb: 2 }}>
-                    <InfoItem label={t('cardPetDetail.color')} value={animal.color} />
-                    <InfoItem label={t('cardPetDetail.weight')} value={animal.peso ? `${animal.peso} kg` : null} />
-                    <InfoItem label={t('cardPetDetail.character')} value={animal.caracter} />
-                    <InfoItem label={t('cardPetDetail.withChildren')} value={animal.convivencia_ninos ? t('cardPetDetail.yes') : t('cardPetDetail.no')} />
+                                        <InfoItem 
+                                            label={t('cardPetDetail.character')} 
+                                            value={Array.isArray(caracter)
+                                                ? caracter.map((c) => t(`character.${CHARACTER_TRANSLATION_MAP[c] || c.toLowerCase()}`)).join(', ')
+                                                : caracter || '-'} 
+                                        />
+                    <InfoItem label={t('cardPetDetail.size')} value={tamanoDisplay} />
                 </Box>
 
                 {/* Salut */}
@@ -129,20 +193,20 @@ function CardPetDetail({ animal }) {
                     {t('cardPetDetail.healthTitle')}
                 </Typography>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
-                    {animal.vacunado && <MiniChip label={t('cardPetDetail.vaccinated')} />}
-                    {animal.esterilizado && <MiniChip label={t('cardPetDetail.sterilized')} />}
-                    {animal.desparasitado && <MiniChip label={t('cardPetDetail.dewormed')} />}
-                    {animal.con_microchip && <MiniChip label={t('cardPetDetail.microchip')} />}
+                    {vacunado && <MiniChip label={t('cardPetDetail.vaccinated')} />}
+                    {esterilizado && <MiniChip label={t('cardPetDetail.sterilized')} />}
+                    {desparasitado && <MiniChip label={t('cardPetDetail.dewormed')} />}
+                    {con_microchip && <MiniChip label={t('cardPetDetail.microchip')} />}
                 </Box>
 
                 {/* Necessitats especials */}
-                {animal.necesidades_especiales && (
+                {tieneNecesidadesEspeciales && (
                     <Box sx={{ backgroundColor: '#fff3e0', p: 1.5, borderRadius: 2, mb: 2 }}>
                         <Typography variant="body2" sx={{ fontWeight: 'bold', color: colors.darkOrange }}>
                             {t('cardPetDetail.specialNeeds')}
                         </Typography>
                         <Typography variant="body2">
-                            {animal.descripcion_necesidades || t('cardPetDetail.consultShelter')}
+                            {Array.isArray(condicionEspecial) ? condicionEspecial.join(', ') : t('cardPetDetail.consultShelter')}
                         </Typography>
                     </Box>
                 )}

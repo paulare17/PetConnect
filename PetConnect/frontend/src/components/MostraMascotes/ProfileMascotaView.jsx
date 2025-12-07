@@ -16,6 +16,47 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import MaleIcon from '@mui/icons-material/Male';
 import FemaleIcon from '@mui/icons-material/Female';
 import { useTranslation } from 'react-i18next';
+// Mapeig de caràcters backend -> clau traducció
+const CHARACTER_TRANSLATION_MAP = {
+  CARINOSO: 'affectionate',
+  FALDERO: 'lapDog',
+  DEPENDIENTE: 'dependent',
+  DUO_INSEPARABLE: 'inseparableDuo',
+  TIMIDO: 'shy',
+  MIEDOSO: 'fearful',
+  JUGUETON: 'playful',
+  ACTIVO_ENERGICO: 'activeEnergetic',
+  TRANQUILO: 'calm',
+  TRABAJADOR: 'hardWorking',
+  SOCIABLE: 'sociable',
+  PROTECTOR_GUARDIAN: 'protectiveGuardian',
+  DOMINANTE_PERROS: 'dominantWithDogs',
+  REACTIVO: 'reactive',
+  LIDERAZGO: 'leadership',
+  DESCONFIADO_EXTRANOS: 'distrustfulOfStrangers',
+  OBEDIENTE: 'obedient',
+  OLAFATEADOR: 'sniffer',
+  LADRADOR: 'barker',
+  ESCAPISTA: 'escapist',
+  EXCAVADOR: 'digger',
+  GLOTON: 'glutton',
+  CABEZOTA: 'stubborn',
+  INTELIGENTE: 'intelligent',
+  SENSIBLE: 'sensitive',
+  LEAL: 'loyal',
+  INDEPENDIENTE: 'independent',
+  ASUSTADIZO: 'skittish',
+  JUGUETON_INTENSO: 'intenselyPlayful',
+  ACTIVO: 'active',
+  CAZADOR: 'hunter',
+  AFECTIVO_CONOCIDOS: 'affectionateWithFamiliar',
+  TERRITORIAL: 'territorial',
+  SEMIFERAL: 'semiFeral',
+  OBSERVADOR: 'observer',
+  ADAPTABLE: 'adaptable',
+  DIVA: 'diva',
+  LIMPIO: 'clean'
+};
 import { useColors } from '../../hooks/useColors';
 import gatDefecte from '../../assets/gat_defecte.png';
 import gosDefecte from '../../assets/gos_defecte.png';
@@ -27,13 +68,36 @@ function ProfileMascotaView({ animal, showAdoptButton = true }) {
 
   if (!animal) return null;
 
+  // Normalitzar camps del backend (venen en majúscules)
+  const especieLower = (animal.especie || '').toLowerCase();
+  const generoLower = (animal.genero || '').toLowerCase();
+  
   // Si no hi ha foto, mostrar la imatge per defecte segons l'espècie
   let imageSrc = animal.foto;
   if (!imageSrc) {
-    imageSrc = animal.especie === 'perro' ? gosDefecte : gatDefecte;
+    imageSrc = especieLower === 'perro' ? gosDefecte : gatDefecte;
   }
   
-  const raza = animal.especie === 'perro' ? animal.raza_perro : animal.raza_gato;
+  // Raça i altres camps segons espècie
+  const raza = especieLower === 'perro' 
+    ? (animal.raza_perro_display || animal.raza_perro) 
+    : (animal.raza_gato_display || animal.raza_gato);
+  const tamanoDisplay = animal.tamano_display || animal.tamano;
+  const caracter = especieLower === 'perro' ? animal.caracter_perro : animal.caracter_gato;
+  
+  // Camps d'estat de salut (ara és un array estado_legal_salud)
+  const estadoSalud = animal.estado_legal_salud || [];
+  const vacunado = estadoSalud.includes('VACUNADO');
+  const esterilizado = estadoSalud.includes('ESTERILIZADO');
+  const desparasitado = estadoSalud.includes('DESPARASITADO');
+  const con_microchip = estadoSalud.includes('MICROCHIP');
+  
+  // Condicions especials segons espècie
+  const condicionEspecial = especieLower === 'perro' ? animal.condicion_especial_perro : animal.condicion_especial_gato;
+  const tieneNecesidadesEspeciales = condicionEspecial && condicionEspecial.length > 0;
+  
+  // Apto con (convivència)
+  const aptoCon = animal.apto_con || [];
 
   return (
     <Box sx={{ py: 2 , width: '1000px', justifyContent: 'center', display: 'flex' }}>
@@ -70,12 +134,12 @@ function ProfileMascotaView({ animal, showAdoptButton = true }) {
               />
               <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 1, mb: 1 }}>
                 <Chip 
-                  icon={animal.genero === 'macho' ? <MaleIcon /> : <FemaleIcon />}
-                  label={animal.genero === 'macho' ? t('profileMascota.male') : t('profileMascota.female')}
+                  icon={generoLower === 'macho' ? <MaleIcon /> : <FemaleIcon />}
+                  label={generoLower === 'macho' ? t('profileMascota.male') : t('profileMascota.female')}
                   sx={{ 
                     backgroundColor: colors.darkPurple, 
                     color: 'white',
-                    '& .MuiChip-icon': { color: animal.genero === 'macho' ? colors.blue : 'pink' }
+                    '& .MuiChip-icon': { color: generoLower === 'macho' ? colors.blue : 'pink' }
                   }} 
                 />
                 <Chip 
@@ -83,15 +147,9 @@ function ProfileMascotaView({ animal, showAdoptButton = true }) {
                   sx={{ backgroundColor: colors.darkPurple, color: 'white' }} 
                 />
                 <Chip 
-                  label={animal.tamaño || t('profileMascota.sizeNotSpecified')}
+                  label={tamanoDisplay || t('profileMascota.sizeNotSpecified')}
                   sx={{ backgroundColor: colors.darkPurple, color: 'white' }} 
                 />
-                {animal.peso && (
-                  <Chip 
-                    label={`${animal.peso} kg`}
-                    sx={{ backgroundColor: colors.darkPurple, color: 'white' }} 
-                  />
-                )}
               </Box>
               <Chip
                 label={animal.adoptado ? t('profileMascota.adopted') : t('profileMascota.available')}
@@ -109,36 +167,38 @@ function ProfileMascotaView({ animal, showAdoptButton = true }) {
           <Divider sx={{ my: 2 }} />
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
-              <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.color')}</strong> {animal.color}</Typography>
-              <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.character')}</strong> {animal.caracter}</Typography>
-              <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.coexistenceAnimals')}</strong> {animal.convivencia_animales}</Typography>
-              <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.coexistenceChildren')}</strong> {animal.convivencia_ninos ? t('profileMascota.yes') : t('profileMascota.no')}</Typography>
-              <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.dewormed')}</strong> {animal.desparasitado ? t('profileMascota.yes') : t('profileMascota.no')}</Typography>
-              <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.sterilized')}</strong> {animal.esterilizado ? t('profileMascota.yes') : t('profileMascota.no')}</Typography>
-              <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.microchip')}</strong> {animal.con_microchip ? t('profileMascota.yes') : t('profileMascota.no')}</Typography>
-              <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.vaccinated')}</strong> {animal.vacunado ? t('profileMascota.yes') : t('profileMascota.no')}</Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                <strong>{t('profileMascota.character')}</strong>
+                {Array.isArray(caracter)
+                  ? caracter.map((c) => t(`character.${CHARACTER_TRANSLATION_MAP[c] || c.toLowerCase()}`)).join(', ')
+                  : caracter || '-'}
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.compatibility')}</strong> {aptoCon.length > 0 ? aptoCon.join(', ') : '-'}</Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.dewormed')}</strong> {desparasitado ? t('profileMascota.yes') : t('profileMascota.no')}</Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.sterilized')}</strong> {esterilizado ? t('profileMascota.yes') : t('profileMascota.no')}</Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.microchip')}</strong> {con_microchip ? t('profileMascota.yes') : t('profileMascota.no')}</Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.vaccinated')}</strong> {vacunado ? t('profileMascota.yes') : t('profileMascota.no')}</Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.specialNeeds')}</strong> {animal.necesidades_especiales ? t('profileMascota.yes') : t('profileMascota.no')}</Typography>
-              {animal.necesidades_especiales && (
-                <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.needsDescription')}</strong> {animal.descripcion_necesidades}</Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.specialNeeds')}</strong> {tieneNecesidadesEspeciales ? t('profileMascota.yes') : t('profileMascota.no')}</Typography>
+              {tieneNecesidadesEspeciales && (
+                <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.needsDescription')}</strong> {Array.isArray(condicionEspecial) ? condicionEspecial.join(', ') : condicionEspecial}</Typography>
               )}
-              {animal.ubicacion && (
-                <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.location')}</strong> {animal.ubicacion}</Typography>
+              {animal.protectora_ciudad && (
+                <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.location')}</strong> {animal.protectora_ciudad}</Typography>
               )}
             </Grid>
           </Grid>
         </Box>
 
         {/* Dades de la protectora */}
-        {animal.protectora && (
+        {(animal.protectora || animal.protectora_nombre) && (
           <Box sx={{ mt: 4 }}>
             <Typography variant="h6" sx={{ color: colors.orange, mb: 1 }}>
               {t('profileMascota.shelterInCharge')}
             </Typography>
-            <Typography variant="body2"><strong>{t('profileMascota.name')}</strong> {animal.protectora.nombre || animal.protectora}</Typography>
-            {animal.protectora.email && <Typography variant="body2"><strong>{t('profileMascota.email')}</strong> {animal.protectora.email}</Typography>}
-            {animal.protectora.ciudad && <Typography variant="body2"><strong>{t('profileMascota.city')}</strong> {animal.protectora.ciudad}</Typography>}
+            <Typography variant="body2"><strong>{t('profileMascota.name')}</strong> {animal.protectora_nombre || animal.protectora?.nombre || animal.protectora}</Typography>
+            {animal.protectora_ciudad && <Typography variant="body2"><strong>{t('profileMascota.city')}</strong> {animal.protectora_ciudad}</Typography>}
           </Box>
         )}
 

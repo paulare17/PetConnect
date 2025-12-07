@@ -105,14 +105,14 @@ class MascotaViewSet(viewsets.ModelViewSet):
     - POST create: solo autenticados (IsAuthenticated)
     - Paginación: 12 por página
     - Orden por defecto: -fecha_creacion
-    - Filtros básicos por query params: edad rango (edad_min, edad_max), especie, tamaño, convivencia_animales, convivencia_ninos, caracter
+    - Filtros básicos por query params: especie, tamano, genero, edad_clasificacion, apto_con
     """
     queryset = Mascota.objects.all().order_by('-fecha_creacion')
     serializer_class = MascotaSerializer
     pagination_class = MascotaPagination
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_fields = ['especie', 'tamaño', 'convivencia_animales', 'convivencia_ninos', 'caracter']
-    search_fields = ['nombre', 'descripcion', 'color']
+    filterset_fields = ['especie', 'tamano', 'genero', 'edad_clasificacion', 'raza_perro', 'raza_gato']
+    search_fields = ['nombre']
     permission_classes = [MascotaPermissions]
 
     def get_permissions(self):
@@ -204,50 +204,52 @@ class MascotaViewSet(viewsets.ModelViewSet):
 # ======================================================================
 # Vista para generar/regenerar descripción con IA
 # ======================================================================
-from ai_service.description_generator import DescriptionGenerator
-from rest_framework.decorators import permission_classes
-from rest_framework.permissions import AllowAny
+# from ai_service.description_generator import DescriptionGenerator
+# from rest_framework.decorators import permission_classes
+# from rest_framework.permissions import AllowAny
 
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def generate_description(request):
-    """
-    Endpoint para generar una descripción de mascota usando IA.
-    POST /api/mascotas/generate-description/
+# @api_view(['POST'])
+# @permission_classes([AllowAny])
+# def generate_description(request):
+#     """
+#     Endpoint para generar una descripción de mascota usando IA.
+#     POST /api/mascotas/generate-description/
     
-    Body (JSON):
-    {
-        "nombre": "Luna",
-        "especie": "gato",
-        "raza_gato": "Siamés",
-        "edad": 2,
-        "genero": "hembra",
-        "tamaño": "mediano",
-        "caracter": "jugueton",
-        "convivencia_ninos": true,
-        "convivencia_animales": "cualquier_especie",
-        "descripcion_necesidades": ""
-    }
+#     Body (JSON):
+#     {
+#         "nombre": "Luna",
+#         "especie": "gato",
+#         "raza_gato": "Siamés",
+#         "edad": 2,
+#         "genero": "hembra",
+#         "tamaño": "mediano",
+#         "caracter": "jugueton",
+#         "convivencia_ninos": true,
+#         "convivencia_animales": "cualquier_especie",
+#         "descripcion_necesidades": ""
+#     }
     
-    Response:
-    {
-        "descripcion": "¡Conoce a Luna, una preciosa gato Siamés!..."
-    }
-    """
-    try:
-        print("📥 Datos recibidos en generate_description:", request.data)
-        generator = DescriptionGenerator()
-        descripcion = generator.generate_description(request.data)
-        print("✅ Descripción generada:", descripcion[:100] + "...")
-        return Response({
-            "descripcion": descripcion,
-            "success": True
-        }, status=status.HTTP_200_OK)
-    except Exception as e:
-        print("❌ Error en generate_description:", str(e))
-        import traceback
-        traceback.print_exc()
-        return Response({
-            "error": str(e),
-            "success": False
-        }, status=status.HTTP_400_BAD_REQUEST)
+#     Response:
+#     {
+#         "descripcion": "¡Conoce a Luna, una preciosa gato Siamés!..."
+#     }
+#     """
+#     try:
+#         print("📥 Datos recibidos en generate_description:", request.data)
+#         generator = DescriptionGenerator()
+#         descripcion = generator.generate_description(request.data)
+#         print("✅ Descripción generada:", descripcion[:100] + "...")
+#         return Response({
+#             "descripcion": descripcion,
+#             "success": True
+#         }, status=status.HTTP_200_OK)
+#     except Exception as e:
+#         print("❌ Error en generate_description:", str(e))
+#         import traceback
+#         traceback.print_exc()
+#         return Response({
+#             "error": str(e),
+#             "success": False
+#         }, status=status.HTTP_400_BAD_REQUEST)
+
+

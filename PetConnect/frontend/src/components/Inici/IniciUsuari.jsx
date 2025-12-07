@@ -85,9 +85,9 @@ function IniciUsuari() {
 
     // Construir la URL amb paràmetres de consulta
     const params = new URLSearchParams();
-    if (filtros.especie !== "todos") params.append("especie", filtros.especie);
-    if (filtros.genero !== "todos") params.append("genero", filtros.genero);
-    if (filtros.tamaño !== "todos") params.append("tamaño", filtros.tamaño);
+    if (filtros.especie !== "todos") params.append("especie", filtros.especie.toUpperCase());
+    if (filtros.genero !== "todos") params.append("genero", filtros.genero.toUpperCase());
+    if (filtros.tamaño !== "todos") params.append("tamano", filtros.tamaño.toUpperCase());
     // Afegim la paginació
     params.append("limit", itemsPerPage);
     params.append("offset", (page - 1) * itemsPerPage);

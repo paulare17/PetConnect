@@ -42,20 +42,132 @@ const AddAnimalForm = () => {
   const { t } = useTranslation();
   const { colors } = useColors();
   const [previewUrls, setPreviewUrls] = useState(["", "", ""]);
+  // Totes les races de gos del backend
+  const RAZAS_PERRO = [
+    { value: "MESTIZO", label: t("breeds.mixed") },
+    { value: "LABRADOR", label: t("breeds.labrador") },
+    { value: "GOLDEN_RETRIEVER", label: t("breeds.goldenRetriever") },
+    { value: "PASTOR_ALEMAN", label: t("breeds.germanShepherd") },
+    { value: "HUSKY", label: t("breeds.husky") },
+    { value: "BEAGLE", label: t("breeds.beagle") },
+    { value: "BORDER_COLLIE", label: t("breeds.borderCollie") },
+    { value: "ROTTWEILER", label: t("breeds.rottweiler") },
+    { value: "PITBULL", label: t("breeds.pitbull") },
+    { value: "TECKEL", label: t("breeds.teckel") },
+    { value: "POODLE", label: t("breeds.poodle") },
+    { value: "BICHON", label: t("breeds.bichon") },
+    { value: "CHIHUAHUA", label: t("breeds.chihuahua") },
+    { value: "YORKSHIRE_TERRIER", label: t("breeds.yorkshireTerrier") },
+    { value: "POMERANIA", label: t("breeds.pomeranian") },
+    { value: "MASTIN", label: t("breeds.mastiff") },
+    { value: "BULLDOG_FRANCES", label: t("breeds.frenchBulldog") },
+    { value: "AKITA_INU", label: t("breeds.akitaInu") },
+    { value: "DOBERMAN", label: t("breeds.doberman") },
+    { value: "BOXER", label: t("breeds.boxer") },
+    { value: "COCKER_SPANIEL", label: t("breeds.cockerSpaniel") },
+    { value: "GALGO", label: t("breeds.greyhound") },
+    { value: "DOGO_ARGENTINO", label: t("breeds.dogoArgentino") },
+    { value: "SAN_BERNARDO", label: t("breeds.saintBernard") },
+    { value: "CAREA", label: t("breeds.carea") },
+    { value: "PODENCO", label: t("breeds.podenco") },
+    { value: "GRAN_DANES", label: t("breeds.greatDane") },
+    { value: "CORGI", label: t("breeds.corgi") },
+    { value: "SHIH_TZU", label: t("breeds.shihTzu") },
+    { value: "SAMOYEDO", label: t("breeds.samoyed") },
+    { value: "MALINOIS", label: t("breeds.malinois") },
+    { value: "JACK_RUSSELL", label: t("breeds.jackRussell") },
+    { value: "SETTER_INGLES", label: t("breeds.englishSetter") },
+    { value: "PEKINES", label: t("breeds.pekingese") },
+  ];
+
+  // Totes les races de gat del backend
+  const RAZAS_GATO = [
+    { value: "MESTIZO", label: t("breeds.mixed") },
+    { value: "SPHYNX", label: t("breeds.sphynx") },
+    { value: "EUROPEO", label: t("breeds.european") },
+    { value: "ANGORA_TURCO", label: t("breeds.turkishAngora") },
+    { value: "SIAMES", label: t("breeds.siamese") },
+    { value: "PERSA", label: t("breeds.persian") },
+    { value: "BENGAL", label: t("breeds.bengal") },
+    { value: "SIBERIANO", label: t("breeds.siberian") },
+    { value: "SCOTTISH_FOLD", label: t("breeds.scottishFold") },
+    { value: "AZUL_RUSO", label: t("breeds.russianBlue") },
+    { value: "MAINE_COON", label: t("breeds.maineCoon") },
+    { value: "BOSQUE_NORUEGA", label: t("breeds.norwegianForest") },
+    { value: "TAILANDES", label: t("breeds.thai") },
+    { value: "DEVON_REX", label: t("breeds.devonRex") },
+    { value: "RAGDOLL", label: t("breeds.ragdoll") },
+    { value: "ORIENTAL", label: t("breeds.oriental") },
+    { value: "ABISINIO", label: t("breeds.abyssinian") },
+  ];
+
+  // Caràcters de gos del backend
+  const CARACTER_PERRO = [
+    { value: "CARINOSO", label: t("character.affectionate") },
+    { value: "FALDERO", label: t("character.lapDog") },
+    { value: "DEPENDIENTE", label: t("character.dependent") },
+    { value: "DUO_INSEPARABLE", label: t("character.inseparableDuo") },
+    { value: "TIMIDO", label: t("character.shy") },
+    { value: "MIEDOSO", label: t("character.fearful") },
+    { value: "JUGUETON", label: t("character.playful") },
+    { value: "ACTIVO_ENERGICO", label: t("character.activeEnergetic") },
+    { value: "TRANQUILO", label: t("character.calm") },
+    { value: "TRABAJADOR", label: t("character.hardWorking") },
+    { value: "SOCIABLE", label: t("character.sociable") },
+    { value: "PROTECTOR_GUARDIAN", label: t("character.protectiveGuardian") },
+    { value: "DOMINANTE_PERROS", label: t("character.dominantWithDogs") },
+    { value: "REACTIVO", label: t("character.reactive") },
+    { value: "LIDERAZGO", label: t("character.leadership") },
+    { value: "DESCONFIADO_EXTRANOS", label: t("character.distrustfulOfStrangers") },
+    { value: "OBEDIENTE", label: t("character.obedient") },
+    { value: "OLAFATEADOR", label: t("character.sniffer") },
+    { value: "LADRADOR", label: t("character.barker") },
+    { value: "ESCAPISTA", label: t("character.escapist") },
+    { value: "EXCAVADOR", label: t("character.digger") },
+    { value: "GLOTON", label: t("character.glutton") },
+    { value: "CABEZOTA", label: t("character.stubborn") },
+    { value: "INTELIGENTE", label: t("character.intelligent") },
+    { value: "SENSIBLE", label: t("character.sensitive") },
+    { value: "LEAL", label: t("character.loyal") },
+  ];
+
+  // Caràcters de gat del backend
+  const CARACTER_GATO = [
+    { value: "CARINOSO", label: t("character.affectionate") },
+    { value: "FALDERO", label: t("character.lapCat") },
+    { value: "DEPENDIENTE", label: t("character.dependent") },
+    { value: "INDEPENDIENTE", label: t("character.independent") },
+    { value: "TIMIDO", label: t("character.shy") },
+    { value: "ASUSTADIZO", label: t("character.skittish") },
+    { value: "JUGUETON", label: t("character.playful") },
+    { value: "JUGUETON_INTENSO", label: t("character.intenselyPlayful") },
+    { value: "ACTIVO", label: t("character.active") },
+    { value: "TRANQUILO", label: t("character.calm") },
+    { value: "CAZADOR", label: t("character.hunter") },
+    { value: "SOCIABLE", label: t("character.sociable") },
+    { value: "AFECTIVO_CONOCIDOS", label: t("character.affectionateWithFamiliar") },
+    { value: "TERRITORIAL", label: t("character.territorial") },
+    { value: "SEMIFERAL", label: t("character.semiFeral") },
+    { value: "OBSERVADOR", label: t("character.observer") },
+    { value: "ADAPTABLE", label: t("character.adaptable") },
+    { value: "DIVA", label: t("character.diva") },
+    { value: "LIMPIO", label: t("character.clean") },
+  ];
+
   const initialFormData = {
     nombre: "",
-    especie: "gato",
+    especie: "",
     raza: "",
     raza_perro: "",
     raza_gato: "",
-    genero: "hembra",
+    genero: "",
     edad: "",
     tamaño: "",
     color: "",
     foto: "",
     foto2: "",
     foto3: "",
-    caracter: "",
+    caracter: [], // Ara és un array per multiselect
     convivencia_animales: "",
     convivencia_ninos: "",
     desparasitado: false,
@@ -75,33 +187,35 @@ const AddAnimalForm = () => {
   const [status, setStatus] = useState(null); // {type: 'success'|'error', message: ''}
   const [openPreviewDialog, setOpenPreviewDialog] = useState(false);
 
-  // Sincronizar raza cuando cambia la especie
+  // Sincronizar raza y caràcter cuando cambia la especie
   useEffect(() => {
     setFormData((prev) => ({
       ...prev,
       raza: "",
+      caracter: [], // Reset caràcter quan canvia l'espècie
     }));
   }, [formData.especie]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
-    // Si cambia la especie, resetear la raza
+    // Si cambia la especie, resetear la raza i caràcter
     if (name === "especie") {
       setFormData((prev) => ({
         ...prev,
         especie: value,
-        raza: "mestizo",
-        raza_perro: value === "perro" ? "mestizo" : prev.raza_perro,
-        raza_gato: value === "gato" ? "mestizo" : prev.raza_gato,
+        raza: "MESTIZO",
+        raza_perro: value === "PERRO" ? "MESTIZO" : prev.raza_perro,
+        raza_gato: value === "GATO" ? "MESTIZO" : prev.raza_gato,
+        caracter: [], // Reset caràcter
       }));
     } else if (name === "raza") {
       // Sincronizar raza con el campo correcto según especie
       setFormData((prev) => ({
         ...prev,
         raza: value,
-        raza_perro: prev.especie === "perro" ? value : prev.raza_perro,
-        raza_gato: prev.especie === "gato" ? value : prev.raza_gato,
+        raza_perro: prev.especie === "PERRO" ? value : prev.raza_perro,
+        raza_gato: prev.especie === "GATO" ? value : prev.raza_gato,
       }));
     } else {
       setFormData((prev) => ({
@@ -111,37 +225,62 @@ const AddAnimalForm = () => {
     }
   };
 
+  // Handler per al multiselect de caràcter (checkboxes)
+  const handleCaracterChange = (caracterValue) => {
+    setFormData((prev) => {
+      const currentCaracter = prev.caracter || [];
+      if (currentCaracter.includes(caracterValue)) {
+        // Treure si ja està seleccionat
+        return {
+          ...prev,
+          caracter: currentCaracter.filter((c) => c !== caracterValue),
+        };
+      } else {
+        // Afegir si no està seleccionat
+        return {
+          ...prev,
+          caracter: [...currentCaracter, caracterValue],
+        };
+      }
+    });
+  };
+
   const handleGenerateDescription = async () => {
     setGeneratingDescription(true);
     setStatus(null);
 
     try {
-      // Preparar los datos para enviar a la IA
+      // Determinar quina raça usar segons l'espècie
+      const razaActual = formData.especie === 'PERRO' 
+        ? (formData.raza_perro || formData.raza || '')
+        : (formData.raza_gato || formData.raza || '');
+
+      // Preparar los datos para enviar a la IA MODULAR
+      // Enviem TOTES les dades reals de l'animal
       const dataForIA = {
         nombre: formData.nombre || "Mascota",
         especie: formData.especie,
-        raza_perro: formData.especie === "perro" ? formData.raza : undefined,
-        raza_gato: formData.especie === "gato" ? formData.raza : undefined,
-        edad: parseInt(formData.edad) || 1,
-        genero: formData.genero,
-        tamaño: formData.tamaño,
-        caracter: formData.caracter || "cariñoso",
-        convivencia_ninos:
-          formData.convivencia_ninos === ""
-            ? undefined
-            : formData.convivencia_ninos,
-        convivencia_animales: formData.convivencia_animales,
-        descripcion_necesidades: formData.descripcion_necesidades,
+        sexo: formData.genero,
+        edad: formData.edad ? parseInt(formData.edad, 10) : null,
+        tamano: formData.tamaño || "",
+        raza: razaActual,
+        // Caràcter - enviem l'array unit per comes
+        caracter_necesidad: Array.isArray(formData.caracter) ? formData.caracter.join(', ') : "",
+        // Convivència
+        convivencia_ninos: formData.convivencia_ninos || "",
+        convivencia_animales: formData.convivencia_animales || "",
+        // Història
+        historia_breve: formData.descripcion_necesidades || "",
       };
 
       console.log("📤 Enviando datos a IA:", dataForIA);
-      const res = await api.post("/generate-description/", dataForIA);
+      const res = await api.post("/ia/generar-bio/", dataForIA);
       console.log("📥 Respuesta de IA:", res.data);
 
-      if (res.data.success && res.data.descripcion) {
+      if (res.data.biografia) {
         setFormData((prev) => ({
           ...prev,
-          descripcion: res.data.descripcion,
+          descripcion: res.data.biografia,
         }));
         setStatus({
           type: "success",
@@ -187,9 +326,9 @@ const AddAnimalForm = () => {
       if (!formData.foto) {
         // Determinar quina imatge per defecte utilitzar
         const defaultImagePath =
-          formData.especie === "perro" ? gosDefecte : gatDefecte;
+          formData.especie === "PERRO" ? gosDefecte : gatDefecte;
         const defaultImageName =
-          formData.especie === "perro" ? "gos_defecte.png" : "gat_defecte.png";
+          formData.especie === "PERRO" ? "gos_defecte.png" : "gat_defecte.png";
 
         try {
           // Carregar la imatge per defecte com a File object
@@ -203,16 +342,61 @@ const AddAnimalForm = () => {
         }
       }
 
+      // Camps que necessiten conversió a majúscules per al backend
+      const upperCaseFields = ['especie', 'genero', 'raza_perro', 'raza_gato', 'tamano', 'caracter_perro', 'caracter_gato'];
+      
+      // Camps que NO s'han d'enviar al backend (no existeixen al model)
+      const excludeFields = ['raza', 'tamaño', 'caracter', 'convivencia_ninos', 'convivencia_animales', 'color', 'foto2', 'foto3', 'desparasitado', 'esterilizado', 'con_microchip', 'vacunado', 'necesidades_especiales', 'descripcion_necesidades'];
+
+      // Construir array estado_legal_salud
+      const estadoLegalSalud = [];
+      if (formData.desparasitado) estadoLegalSalud.push('DESPARASITADO');
+      if (formData.esterilizado) estadoLegalSalud.push('ESTERILIZADO');
+      if (formData.vacunado) estadoLegalSalud.push('VACUNADO');
+      if (formData.con_microchip) estadoLegalSalud.push('MICROCHIP');
+      
+      // Afegir estado_legal_salud al FormData
+      if (estadoLegalSalud.length > 0) {
+        formDataToSend.append('estado_legal_salud', estadoLegalSalud.join(','));
+      }
+
+      // Afegir caràcter com a array (multiselect)
+      if (formData.caracter && formData.caracter.length > 0) {
+        const backendField = formData.especie === 'PERRO' ? 'caracter_perro' : 'caracter_gato';
+        formData.caracter.forEach(c => formDataToSend.append(backendField, c));
+      }
+
       // Afegir tots els camps del formulari
       Object.keys(formData).forEach((key) => {
+        // Saltar camps que no existeixen al backend
+        if (excludeFields.includes(key)) {
+          // Processar camps especials
+          if (key === "tamaño" && formData[key]) {
+            const valueToSend = formData[key].toUpperCase().replace(/\s+/g, '_');
+            formDataToSend.append('tamano', valueToSend);
+          }
+          // El caràcter ja s'ha processat abans
+          return; // Saltar al següent camp
+        }
+        
         if (key === "foto") {
           if (fotoToUpload) {
             formDataToSend.append(key, fotoToUpload);
           }
+        } else if (upperCaseFields.includes(key) && formData[key]) {
+          // Convertir a majúscules i reemplaçar espais per guions baixos
+          const valueToSend = formData[key].toUpperCase().replace(/\s+/g, '_');
+          formDataToSend.append(key, valueToSend);
         } else {
           formDataToSend.append(key, formData[key]);
         }
       });
+
+      // DEBUG: Mostrar què s'envia al backend
+      console.log("📤 Dades enviades al backend:");
+      for (let [key, value] of formDataToSend.entries()) {
+        console.log(`  ${key}: ${value}`);
+      }
 
       // Usar axios amb l'API client (afegeix token automàticament)
       const res = await api.post("/mascota/", formDataToSend, {
@@ -321,10 +505,10 @@ const AddAnimalForm = () => {
                         value={formData.especie}
                         onChange={handleInputChange}
                       >
-                        <MenuItem value="perro">
+                        <MenuItem value="PERRO">
                           {t("addAnimalForm.dog")}
                         </MenuItem>
-                        <MenuItem value="gato">
+                        <MenuItem value="GATO">
                           {t("addAnimalForm.cat")}
                         </MenuItem>
                       </Select>
@@ -338,38 +522,17 @@ const AddAnimalForm = () => {
                         value={formData.raza}
                         onChange={handleInputChange}
                       >
-                        {formData.especie === "perro"
-                          ? [
-                              <MenuItem key="mestizo" value="mestizo">
-                                {t("addAnimalForm.mixed")}
-                              </MenuItem>,
-                              <MenuItem key="labrador" value="labrador">
-                                {t("addAnimalForm.labrador")}
-                              </MenuItem>,
-                              <MenuItem
-                                key="pastor_aleman"
-                                value="pastor_aleman"
-                              >
-                                {t("addAnimalForm.germanShepherd")}
-                              </MenuItem>,
-                              <MenuItem key="bulldog" value="bulldog">
-                                {t("addAnimalForm.bulldog")}
-                              </MenuItem>,
-                              <MenuItem key="beagle" value="beagle">
-                                {t("addAnimalForm.beagle")}
-                              </MenuItem>,
-                            ]
-                          : [
-                              <MenuItem key="mestizo" value="mestizo">
-                                {t("addAnimalForm.mixed")}
-                              </MenuItem>,
-                              <MenuItem key="siames" value="siames">
-                                {t("addAnimalForm.siamese")}
-                              </MenuItem>,
-                              <MenuItem key="persa" value="persa">
-                                {t("addAnimalForm.persian")}
-                              </MenuItem>,
-                            ]}
+                        {formData.especie === "PERRO"
+                          ? RAZAS_PERRO.map((raza) => (
+                              <MenuItem key={raza.value} value={raza.value}>
+                                {raza.label}
+                              </MenuItem>
+                            ))
+                          : RAZAS_GATO.map((raza) => (
+                              <MenuItem key={raza.value} value={raza.value}>
+                                {raza.label}
+                              </MenuItem>
+                            ))}
                       </Select>
                     </FormControl>
                   </Grid>
@@ -381,10 +544,10 @@ const AddAnimalForm = () => {
                         value={formData.genero}
                         onChange={handleInputChange}
                       >
-                        <MenuItem value="macho">
+                        <MenuItem value="MACHO">
                           {t("addAnimalForm.male")}
                         </MenuItem>
-                        <MenuItem value="hembra">
+                        <MenuItem value="HEMBRA">
                           {t("addAnimalForm.female")}
                         </MenuItem>
                       </Select>
@@ -408,18 +571,35 @@ const AddAnimalForm = () => {
                         value={formData.tamaño}
                         onChange={handleInputChange}
                       >
-                        <MenuItem value="pequeño">
-                          {t("addAnimalForm.small")}
-                        </MenuItem>
-                        <MenuItem value="mediano">
-                          {t("addAnimalForm.medium")}
-                        </MenuItem>
-                        <MenuItem value="grande">
-                          {t("addAnimalForm.large")}
-                        </MenuItem>
-                        <MenuItem value="gigante">
-                          {t("addAnimalForm.giant")}
-                        </MenuItem>
+                        {formData.especie === "GATO"
+                          ? [
+                              <MenuItem value="pequeño" key="pequeño">
+                                {t("addAnimalForm.catSmallWeight")}
+                              </MenuItem>,
+                              <MenuItem value="mediano" key="mediano">
+                                {t("addAnimalForm.catMediumWeight")}
+                              </MenuItem>,
+                              <MenuItem value="grande" key="grande">
+                                {t("addAnimalForm.catLargeWeight")}
+                              </MenuItem>,
+                              <MenuItem value="gigante" key="gigante">
+                                {t("addAnimalForm.catGiantWeight")}
+                              </MenuItem>,
+                            ]
+                          : [
+                              <MenuItem value="pequeño" key="pequeño">
+                                {t("addAnimalForm.small")}
+                              </MenuItem>,
+                              <MenuItem value="mediano" key="mediano">
+                                {t("addAnimalForm.medium")}
+                              </MenuItem>,
+                              <MenuItem value="grande" key="grande">
+                                {t("addAnimalForm.large")}
+                              </MenuItem>,
+                              <MenuItem value="gigante" key="gigante">
+                                {t("addAnimalForm.giant")}
+                              </MenuItem>,
+                            ]}
                       </Select>
                     </FormControl>
                   </Grid>
@@ -684,44 +864,31 @@ const AddAnimalForm = () => {
                     </FormControl>
                   </Grid>
                   <Grid size={{ xs: 12 }}>
-                    <FormControl fullWidth>
-                      <InputLabel>
-                        {t("addAnimalForm.mainCharacter")}
-                      </InputLabel>
-                      <Select
-                        name="caracter"
-                        value={formData.caracter}
-                        onChange={handleInputChange}
-                      >
-                        <MenuItem value="cariñoso">
-                          {t("addAnimalForm.affectionate")}
-                        </MenuItem>
-                        <MenuItem value="jugueton">
-                          {t("addAnimalForm.playful")}
-                        </MenuItem>
-                        <MenuItem value="tranquilo">
-                          {t("addAnimalForm.calm")}
-                        </MenuItem>
-                        <MenuItem value="activo">
-                          {t("addAnimalForm.active")}
-                        </MenuItem>
-                        <MenuItem value="sociable">
-                          {t("addAnimalForm.sociable")}
-                        </MenuItem>
-                        <MenuItem value="independiente">
-                          {t("addAnimalForm.independent")}
-                        </MenuItem>
-                        <MenuItem value="protector">
-                          {t("addAnimalForm.protective")}
-                        </MenuItem>
-                        <MenuItem value="timido">
-                          {t("addAnimalForm.shy")}
-                        </MenuItem>
-                        <MenuItem value="obediente">
-                          {t("addAnimalForm.obedient")}
-                        </MenuItem>
-                      </Select>
-                    </FormControl>
+                    <Typography
+                      variant="body2"
+                      sx={{ mb: 1, fontWeight: "bold" }}
+                    >
+                      {t("addAnimalForm.mainCharacter")}
+                    </Typography>
+                    <FormGroup row sx={{ flexWrap: 'wrap', gap: 0.5 }}>
+                      {(formData.especie === "PERRO" ? CARACTER_PERRO : CARACTER_GATO).map((caracter) => (
+                        <FormControlLabel
+                          key={caracter.value}
+                          control={
+                            <Checkbox
+                              checked={formData.caracter?.includes(caracter.value) || false}
+                              onChange={() => handleCaracterChange(caracter.value)}
+                              size="small"
+                            />
+                          }
+                          label={caracter.label}
+                          sx={{ 
+                            minWidth: '180px',
+                            '& .MuiFormControlLabel-label': { fontSize: '0.875rem' }
+                          }}
+                        />
+                      ))}
+                    </FormGroup>
                   </Grid>
                   <Grid size={{ xs: 12 }}>
                     <Typography

@@ -9,6 +9,7 @@ from mascotas.constants import (
     SEXO_CHOICES,
     APTO_CON_CHOICES,
     ESTADO_LEGAL_SALUD_CHOICES,
+    ESPECIE_CHOICES,
 )
 
 
@@ -54,6 +55,13 @@ class PerfilUsuario(models.Model):
     ]
     genero = models.CharField(max_length=1, choices=GENERO_CHOICES, blank=True, null=True)
 
+    # Preferències de mascota
+    preferencias_especie = MultiSelectField(
+        choices=ESPECIE_CHOICES, 
+        blank=True, 
+        verbose_name="Especie(s) Preferida(s)",
+        help_text="Selecciona si prefieres perro, gato o ambos"
+    )
     preferencias_tamano = MultiSelectField(choices=TAMANO_CHOICES, blank=True, verbose_name="Tamaño(s) Preferido(s)")
     preferencias_edad = MultiSelectField(choices=EDAD_CHOICES, blank=True, verbose_name="Edad(es) Preferida(s)")
     preferencias_sexo = MultiSelectField(choices=SEXO_CHOICES, blank=True, verbose_name="Sexo Preferido")

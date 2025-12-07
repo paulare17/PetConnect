@@ -28,18 +28,20 @@ export default function CardPet({ animal, isFavorito, onToggleFavorito, sx }) {
 
   if (!data) return null;
 
-  // Colors i icones segons espècie
-  const cardColor = data.especie === 'perro' ? colors.lightOrange : colors.lightBlue;
-  const iconColor = data.especie === 'perro' ? colors.darkOrange : colors.darkBlue;
+  // Colors i icones segons espècie (el backend retorna en majúscules)
+  const especieLower = (data.especie || '').toLowerCase();
+  const generoLower = (data.genero || '').toLowerCase();
+  const cardColor = especieLower === 'perro' ? colors.lightOrange : colors.lightBlue;
+  const iconColor = especieLower === 'perro' ? colors.darkOrange : colors.darkBlue;
   let imageSrc;
   if (!data.foto) {
-    imageSrc = data.especie === 'gato'
+    imageSrc = especieLower === 'gato'
       ? gatDefecte
       : gosDefecte;
   } else {
     imageSrc = data.foto;
   }
-  const raza = data.especie === 'perro' ? data.raza_perro : data.raza_gato;
+  const raza = especieLower === 'perro' ? (data.raza_perro_display || data.raza_perro) : (data.raza_gato_display || data.raza_gato);
 
   return (
     <Card sx={{
@@ -76,7 +78,7 @@ export default function CardPet({ animal, isFavorito, onToggleFavorito, sx }) {
         {/* Chip d'espècie amb icona poteta */}
         <Chip
           icon={<PetsIcon />}
-          label={data.especie === 'perro' ? t('cardPet.dog') : t('cardPet.cat')}
+          label={especieLower === 'perro' ? t('cardPet.dog') : t('cardPet.cat')}
           sx={{ position: 'absolute', bottom: 8, left: 8, backgroundColor: iconColor, color: 'white', fontWeight: 'bold' }}
         />
       </Box>
@@ -87,7 +89,7 @@ export default function CardPet({ animal, isFavorito, onToggleFavorito, sx }) {
           {data.nombre}
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
-          {data.genero === 'macho' ? (
+          {generoLower === 'macho' ? (
             <MaleIcon sx={{ color: colors.blue, mr: 0.5 }} />
           ) : (
             <FemaleIcon sx={{ color: 'pink', mr: 0.5 }} />
@@ -98,7 +100,7 @@ export default function CardPet({ animal, isFavorito, onToggleFavorito, sx }) {
         </Box>
         <Box sx={{ mt: 2 }}>
           <Typography variant="body2" sx={{ 
-            color: 'text.secondary',
+            color: colors.textDark,
             display: '-webkit-box',
             WebkitLineClamp: 4,
             WebkitBoxOrient: 'vertical',

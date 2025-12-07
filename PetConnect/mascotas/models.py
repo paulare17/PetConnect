@@ -1,4 +1,5 @@
 from django.db import models
+from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from multiselectfield import MultiSelectField 
@@ -392,6 +393,14 @@ class Mascota(models.Model):
     nombre = models.CharField(max_length=100, help_text="Introduzca el nombre del animal", verbose_name="Nombre")
     edad = models.PositiveIntegerField(default=0, help_text="Edad en años", verbose_name="Edad")
     foto = models.ImageField(upload_to='mascotas/', verbose_name="Foto")
+    
+    # Descripción/Biografía del animal (puede ser generada por IA)
+    descripcion = models.TextField(
+        blank=True, 
+        null=True,
+        verbose_name="Descripción/Biografía",
+        help_text="Descripción del animal, puede ser generada automáticamente por IA"
+    )
 
     #estado del perfil
     oculto = models.BooleanField(default=False)
@@ -404,7 +413,6 @@ class Mascota(models.Model):
             verbose_name="Fecha de Adopción"
         )
         
-    # Opcional: Usar el método save para actualizar la fecha automáticamente
     def save(self, *args, **kwargs):
             # Si se marca como adoptado y aún no tiene fecha, establece la fecha actual
             if self.adoptado and not self.fecha_adopcion:
@@ -438,48 +446,37 @@ class Mascota(models.Model):
         verbose_name = "Mascota"
         verbose_name_plural = "Mascotas"
         ordering = ['-fecha_creacion']
-        
-        
 
-# Clase para registrar las interacciones de swipe (like/dislike)
 
 class Interaccion(models.Model):
-    LIKE = 'L'
-    DISLIKE = 'D'
-    
-    CHOICES = [
-        (LIKE, 'Me interesa'),
-        (DISLIKE, 'No me interesa'),
+    """
+    Registra les interaccions (likes/dislikes) dels usuaris amb les mascotes.
+    S'utilitza per al sistema de swipe (PetTinder) i per a les recomanacions de IA.
+    """
+    ACCION_CHOICES = [
+        ('like', 'Like'),
+        ('dislike', 'Dislike'),
     ]
-
+    
     usuario = models.ForeignKey(
         settings.AUTH_USER_MODEL, 
-        on_delete=models.CASCADE, 
-        related_name='interacciones_realizadas',
-        help_text="Usuario adoptante que realiza la acción."
+        on_delete=models.CASCADE,
+        related_name='interacciones'
     )
-    
     mascota = models.ForeignKey(
         Mascota, 
-        on_delete=models.CASCADE, 
-        related_name='interacciones_recibidas'
+        on_delete=models.CASCADE,
+        related_name='interacciones'
     )
+    accion = models.CharField(max_length=10, choices=ACCION_CHOICES)
+    fecha = models.DateTimeField(auto_now_add=True)
     
-    accion = models.CharField(
-        max_length=1, 
-        choices=CHOICES, 
-        verbose_name="Acción (L/D)"
-    )
-    
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-
     class Meta:
-        # Crucial para evitar que un usuario haga swipe dos veces en la misma mascota
-        unique_together = ('usuario', 'mascota') 
-        db_table = 'interacciones_swipe'
-        verbose_name = "Interacción de Swipe"
-        verbose_name_plural = "Interacciones de Swipes"
-
+        db_table = 'interacciones'
+        verbose_name = "Interacción"
+        verbose_name_plural = "Interacciones"
+        unique_together = ('usuario', 'mascota')  # Un usuari només pot tenir una interacció per mascota
+        ordering = ['-fecha']
+    
     def __str__(self):
-        accion_display = dict(self.CHOICES).get(self.accion, self.accion)
-        return f"{self.usuario.username} - {accion_display} -> {self.mascota.nombre}"
+        return f"{self.usuario.username} - {self.accion} - {self.mascota.nombre}"
