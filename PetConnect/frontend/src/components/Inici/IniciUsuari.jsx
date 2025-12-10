@@ -353,6 +353,35 @@ function IniciUsuari() {
                   </Select>
                 </FormControl>
               </Grid>
+              <Grid item xs={12} sm={4}>
+                <FormControl fullWidth>
+                  <InputLabel>{t('iniciUsuari.filterSize')}</InputLabel>
+                  <Select
+                    value={filtros.tamaño}
+                    label={t('iniciUsuari.filterSize')}
+                    onChange={(e) =>
+                      handleFilterChange("tamaño", e.target.value)
+                    }
+                    sx={{
+                      "& .MuiOutlinedInput-notchedOutline": {
+                        borderColor: colors.yellow,
+                      },
+                      "&:hover .MuiOutlinedInput-notchedOutline": {
+                        borderColor: colors.yellow,
+                      },
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: colors.yellow,
+                      },
+                    }}
+                  >
+                    {FILTROS.tamaño.map((opt) => (
+                      <MenuItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
             </Grid>
           </Paper>
         </Box>
