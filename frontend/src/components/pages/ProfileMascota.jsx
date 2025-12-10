@@ -29,6 +29,48 @@ import api from '../../api/client';
 import { useAuthContext } from '../../context/AuthProvider';
 import { ROLES } from '../../constants/roles';
 
+// Mapeig de caràcters backend -> clau traducció
+const CHARACTER_TRANSLATION_MAP = {
+  CARINOSO: 'affectionate',
+  FALDERO: 'lapDog',
+  DEPENDIENTE: 'dependent',
+  DUO_INSEPARABLE: 'inseparableDuo',
+  TIMIDO: 'shy',
+  MIEDOSO: 'fearful',
+  JUGUETON: 'playful',
+  ACTIVO_ENERGICO: 'activeEnergetic',
+  TRANQUILO: 'calm',
+  TRABAJADOR: 'hardWorking',
+  SOCIABLE: 'sociable',
+  PROTECTOR_GUARDIAN: 'protectiveGuardian',
+  DOMINANTE_PERROS: 'dominantWithDogs',
+  REACTIVO: 'reactive',
+  LIDERAZGO: 'leadership',
+  DESCONFIADO_EXTRANOS: 'distrustfulOfStrangers',
+  OBEDIENTE: 'obedient',
+  OLAFATEADOR: 'sniffer',
+  LADRADOR: 'barker',
+  ESCAPISTA: 'escapist',
+  EXCAVADOR: 'digger',
+  GLOTON: 'glutton',
+  CABEZOTA: 'stubborn',
+  INTELIGENTE: 'intelligent',
+  SENSIBLE: 'sensitive',
+  LEAL: 'loyal',
+  INDEPENDIENTE: 'independent',
+  ASUSTADIZO: 'skittish',
+  JUGUETON_INTENSO: 'intenselyPlayful',
+  ACTIVO: 'active',
+  CAZADOR: 'hunter',
+  AFECTIVO_CONOCIDOS: 'affectionateWithFamiliar',
+  TERRITORIAL: 'territorial',
+  SEMIFERAL: 'semiFeral',
+  OBSERVADOR: 'observer',
+  ADAPTABLE: 'adaptable',
+  DIVA: 'diva',
+  LIMPIO: 'clean'
+};
+
 function ProfileAnimal() {
   const { t } = useTranslation();
   const { colors } = useColors();
@@ -38,11 +80,15 @@ function ProfileAnimal() {
   const [animal, setAnimal] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [favorit, setFavorit] = useState(false);
+  const [preferit, setPreferit] = useState(false);
   const [altres, setAltres] = useState([]);
   const [galeriaIndex, setGaleriaIndex] = useState(0);
   const [updatingAdoption, setUpdatingAdoption] = useState(false);
   const [startingChat, setStartingChat] = useState(false);
+  const [alerta, setAlerta] = useState(null);
+  
+  // Verificar si l'usuari és protectora
+  const isProtectora = user?.role === ROLES.PROTECTORA;
 
   useEffect(() => {
     setLoading(true);
@@ -69,7 +115,51 @@ function ProfileAnimal() {
       .catch(err => {
         console.error('Error carregant altres mascotes:', err);
       });
-  }, [id, t]);
+    // Carrega els preferits de l'usuari
+    if (user) {
+      api.get('/preferits/')
+        .then(res => {
+          const preferitsIds = res.data.preferits_ids || [];
+          if (preferitsIds.includes(Number(id))) {
+            setPreferit(true);
+          }
+        })
+        .catch(err => {
+          console.error('Error carregant preferits:', err);
+        });
+    }
+  }, [id, t, user]);
+
+  const togglePreferit = async () => {
+    // No permetre accions de favorits per a protectores
+    if (isProtectora) {
+      console.log('Acció bloquejada: l\'usuari és protectora');
+      return;
+    }
+    
+    try {
+      const action = preferit ? 'dislike' : 'like';
+      const response = await api.post('/swipe/action/', {
+        mascota_id: animal.id,
+        action: action
+      });
+      if (response.data.is_like) {
+        setPreferit(true);
+        if (response.data.chat_id) {
+          setAlerta({
+            type: 'success',
+            message: `S'ha creat un xat amb la protectora!`,
+            chatId: response.data.chat_id
+          });
+        }
+      } else {
+        setPreferit(false);
+      }
+    } catch (error) {
+      setAlerta({ type: 'error', message: 'Error al processar la interacció.' });
+    }
+    setTimeout(() => setAlerta(null), 4000);
+  };
 
   if (loading) {
     return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}><CircularProgress sx={{ color: colors.orange }} size={60} /></Box>;
@@ -109,13 +199,26 @@ function ProfileAnimal() {
     <Box sx={{ background: colors.background, minHeight: '100vh', py: 6 }}>
       <Container maxWidth="md">
         <Paper elevation={4} sx={{ p: 4, borderRadius: 5, background: colors.lightColor, maxWidth: 900, mx: 'auto', position: 'relative' }}>
-          {/* Cor de favorit */}
-          <IconButton
-            onClick={() => setFavorit(f => !f)}
-            sx={{ position: 'absolute', top: 32, right: 32, zIndex: 2, background: 'none' }}
-          >
-            {favorit ? <FavoriteIcon sx={{ color: 'red', fontSize: 36 }} /> : <FavoriteBorderIcon sx={{ color: colors.orange, fontSize: 36 }} />}
-          </IconButton>
+          {/* Notificació visual d'alerta - només per usuaris */}
+          {alerta && !isProtectora && (
+            <Alert severity={alerta.type} sx={{ mb: 3 }}>
+              {alerta.message}
+              {alerta.chatId && (
+                <Button color="success" size="small" sx={{ ml: 2 }} onClick={() => navigate(`/chat/${alerta.chatId}`)}>
+                  Ves al xat
+                </Button>
+              )}
+            </Alert>
+          )}
+          {/* Cor de preferit - només per usuaris */}
+          {!isProtectora && (
+            <IconButton
+              onClick={togglePreferit}
+              sx={{ position: 'absolute', top: 32, right: 32, zIndex: 2, background: 'none' }}
+            >
+              {preferit ? <FavoriteIcon sx={{ color: 'red', fontSize: 36 }} /> : <FavoriteBorderIcon sx={{ color: colors.orange, fontSize: 36 }} />}
+            </IconButton>
+          )}
           {/* Capçalera amb imatge i nom */}
           <Grid container spacing={4} alignItems="center">
             <Grid item xs={12} md={5}>
@@ -173,7 +276,12 @@ function ProfileAnimal() {
             <Divider sx={{ my: 2 }} />
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.character')}</strong> {caracter || '-'}</Typography>
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  <strong>{t('profileMascota.character')}</strong>{' '}
+                  {Array.isArray(caracter)
+                    ? caracter.map((c) => t(`character.${CHARACTER_TRANSLATION_MAP[c] || c.toLowerCase()}`)).join(', ')
+                    : caracter || '-'}
+                </Typography>
                 <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.compatibility')}</strong> {aptoCon.length > 0 ? aptoCon.join(', ') : '-'}</Typography>
                 <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.dewormed')}</strong> {desparasitado ? t('profileMascota.yes') : t('profileMascota.no')}</Typography>
                 <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.sterilized')}</strong> {esterilizado ? t('profileMascota.yes') : t('profileMascota.no')}</Typography>

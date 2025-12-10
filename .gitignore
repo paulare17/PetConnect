@@ -40,3 +40,7 @@ venv/
 
 # Logs
 *.log
+
+# Node modules and build artifacts
+node_modules/
+.vite/

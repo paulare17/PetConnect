@@ -3,18 +3,27 @@ import { Box, Typography, Grid, Card, CardContent, Button, Avatar, CircularProgr
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import PetsIcon from "@mui/icons-material/Pets";
-import { colors } from "../../constants/colors.jsx";
+import { useColors } from "../../hooks/useColors";
 import api from "../../api/client.js";
 import ChatMiniList from "../Chat/ChatMiniList.jsx";
 import Chat from "../Chat/Chat.jsx";
+import gatDefecte from "../../assets/gat_defecte.png";
+import gosDefecte from "../../assets/gos_defecte.png";
 
 export default function IniciProtectora() {
   const { t } = useTranslation();
+  const { colors } = useColors();
   const navigate = useNavigate();
   const [mascotas, setMascotas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedChatId, setSelectedChatId] = useState(null);
+
+  // Funció per obtenir imatge per defecte segons espècie
+  const getDefaultImage = (especie) => {
+    const especieLower = (especie || '').toLowerCase();
+    return especieLower === 'gato' ? gatDefecte : gosDefecte;
+  };
 
   useEffect(() => {
     const fetchMisMascotas = async () => {

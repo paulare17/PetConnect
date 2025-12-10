@@ -49,6 +49,29 @@
     "createAccount": "Crea'l",
     "authError": "Error en l'autenticació. Comprova les teves credencials."
   },
+  "forgotPasswordPage": {
+    "title": "Recuperar Contrasenya",
+    "subtitle": "Introdueix el teu correu electrònic i t'enviarem un enllaç per restablir la contrasenya",
+    "emailLabel": "Correu electrònic",
+    "sendButton": "Enviar enllaç",
+    "sending": "Enviant...",
+    "successMessage": "Si el correu existeix, rebràs un enllaç per restablir la contrasenya",
+    "errorMessage": "Error en enviar el correu. Torna-ho a provar.",
+    "backToLogin": "Tornar a l'inici de sessió"
+  },
+  "resetPasswordPage": {
+    "title": "Restablir Contrasenya",
+    "subtitle": "Introdueix la teva nova contrasenya",
+    "newPasswordLabel": "Nova contrasenya",
+    "confirmPasswordLabel": "Confirma la contrasenya",
+    "resetButton": "Canviar contrasenya",
+    "resetting": "Canviant...",
+    "passwordsMustMatch": "Les contrasenyes han de coincidir",
+    "passwordMinLength": "La contrasenya ha de tenir almenys 8 caràcters",
+    "successMessage": "Contrasenya canviada correctament",
+    "errorMessage": "Error en canviar la contrasenya. L'enllaç pot haver expirat.",
+    "backToLogin": "Tornar a l'inici de sessió"
+  },
   "landpage": {
     "title": "PetConnect",
     "subtitle": "Connecta amb la teva mascota perfecta",
@@ -173,7 +196,7 @@
     "species": "Espècie",
     "dog": "Gos",
     "cat": "Gat",
-    "breed": "Raça",
+    "breed": "Raça (o la que més s'hi assembli)",
     "mixed": "Mestís",
     "labrador": "Labrador Retriever",
     "germanShepherd": "Pastor Alemany",
@@ -194,6 +217,10 @@
     "catMediumWeight": "Mitjà (3-5kg)",
     "catLargeWeight": "Gran (5-7kg)",
     "catGiantWeight": "Gegant (més de 7kg)",
+    "dogSmallWeight": "Petit (1-15kg)",
+    "dogMediumWeight": "Mitjà (15-35kg)",
+    "dogLargeWeight": "Gran (35-60kg)",
+    "dogGiantWeight": "Gegant (més de 60kg)",
     "color": "Color",
     "black": "Negre",
     "white": "Blanc",
@@ -596,5 +623,12 @@
     "adaptable": "Adaptable",
     "diva": "Diva",
     "clean": "Net"
+  },
+  "favs": {
+    "title": "Els meus preferits",
+    "subtitle": "Animals que t'han agradat",
+    "noFavorites": "Encara no tens cap animal preferit.",
+    "loading": "Carregant preferits...",
+    "errorLoading": "No s'han pogut carregar els preferits."
   }
 }

@@ -36,7 +36,7 @@ import CardPetDetail from "../MostraMascotes/CardPetDetail.jsx";
 import ProfileMascotaView from "../MostraMascotes/ProfileMascotaView.jsx";
 import gatDefecte from "../../assets/gat_defecte.png";
 import gosDefecte from "../../assets/gos_defecte.png";
-import PreviewDialog from "./PreviewDialog.jsx";
+import PreviewDialog from "../MostraMascotes/PreviewDialog.jsx";
 
 const AddAnimalForm = () => {
   const { t } = useTranslation();
@@ -346,7 +346,7 @@ const AddAnimalForm = () => {
       const upperCaseFields = ['especie', 'genero', 'raza_perro', 'raza_gato', 'tamano', 'caracter_perro', 'caracter_gato'];
       
       // Camps que NO s'han d'enviar al backend (no existeixen al model)
-      const excludeFields = ['raza', 'tamaño', 'caracter', 'convivencia_ninos', 'convivencia_animales', 'color', 'foto2', 'foto3', 'desparasitado', 'esterilizado', 'con_microchip', 'vacunado', 'necesidades_especiales', 'descripcion_necesidades'];
+      const excludeFields = ['raza', 'tamaño', 'caracter', 'convivencia_ninos', 'convivencia_animales', 'color', 'desparasitado', 'esterilizado', 'con_microchip', 'vacunado', 'necesidades_especiales', 'descripcion_necesidades'];
 
       // Construir array estado_legal_salud
       const estadoLegalSalud = [];
@@ -366,6 +366,14 @@ const AddAnimalForm = () => {
         formData.caracter.forEach(c => formDataToSend.append(backendField, c));
       }
 
+      // Afegir les fotos addicionals (foto2 i foto3)
+      if (formData.foto2) {
+        formDataToSend.append('foto2', formData.foto2);
+      }
+      if (formData.foto3) {
+        formDataToSend.append('foto3', formData.foto3);
+      }
+
       // Afegir tots els camps del formulari
       Object.keys(formData).forEach((key) => {
         // Saltar camps que no existeixen al backend
@@ -383,6 +391,9 @@ const AddAnimalForm = () => {
           if (fotoToUpload) {
             formDataToSend.append(key, fotoToUpload);
           }
+        } else if (key === "foto2" || key === "foto3") {
+          // Les fotos 2 i 3 ja s'han afegit abans
+          return;
         } else if (upperCaseFields.includes(key) && formData[key]) {
           // Convertir a majúscules i reemplaçar espais per guions baixos
           const valueToSend = formData[key].toUpperCase().replace(/\s+/g, '_');
@@ -441,7 +452,7 @@ const AddAnimalForm = () => {
         justifyContent: "center",
         transition: "background-color 0.3s ease",
       }}
-    >
+      >
       <Grid
         container
         spacing={4}
@@ -452,11 +463,12 @@ const AddAnimalForm = () => {
           flexWrap: "nowrap",
           borderRadius: 5,
         }}
-      >
+        >
         {/* esquerra: Formulari */}
         <Grid
-          size={{ xs: 12, md: 6 }}
+          size={{ xs: 12, md: 6.5 }}
           sx={{
+
             borderRadius: 5,
             display: "flex",
             justifyContent: "center",
@@ -491,19 +503,26 @@ const AddAnimalForm = () => {
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       fullWidth
+                      variant="outlined"
                       name="nombre"
                       label={t("addAnimalForm.name")}
                       value={formData.nombre}
                       onChange={handleInputChange}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 1,
+                        },
+                      }}
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <FormControl fullWidth>
-                      <InputLabel>{t("addAnimalForm.species")}</InputLabel>
+                    <FormControl fullWidth variant="filled" sx={{ '& .MuiOutlinedInput-root': { borderRadius: 1 } }}>
+                      <InputLabel >{t("addAnimalForm.species")}</InputLabel>
                       <Select
                         name="especie"
                         value={formData.especie}
                         onChange={handleInputChange}
+                        MenuProps={{ disableScrollLock: true }}
                       >
                         <MenuItem value="PERRO">
                           {t("addAnimalForm.dog")}
@@ -515,12 +534,13 @@ const AddAnimalForm = () => {
                     </FormControl>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <FormControl fullWidth>
-                      <InputLabel>{t("addAnimalForm.breed")}</InputLabel>
+                    <FormControl fullWidth variant="filled">
+                      <InputLabel >{t("addAnimalForm.breed")}</InputLabel>
                       <Select
                         name="raza"
                         value={formData.raza}
                         onChange={handleInputChange}
+                        MenuProps={{ disableScrollLock: true }}
                       >
                         {formData.especie === "PERRO"
                           ? RAZAS_PERRO.map((raza) => (
@@ -537,12 +557,13 @@ const AddAnimalForm = () => {
                     </FormControl>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <FormControl fullWidth>
+                    <FormControl fullWidth variant="filled">
                       <InputLabel>{t("addAnimalForm.gender")}</InputLabel>
                       <Select
                         name="genero"
                         value={formData.genero}
                         onChange={handleInputChange}
+                        MenuProps={{ disableScrollLock: true }}
                       >
                         <MenuItem value="MACHO">
                           {t("addAnimalForm.male")}
@@ -556,20 +577,27 @@ const AddAnimalForm = () => {
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       fullWidth
+                      variant="outlined"
                       name="edad"
                       label={t("addAnimalForm.age")}
                       type="number"
                       value={formData.edad}
                       onChange={handleInputChange}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 1,
+                        },
+                      }}
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <FormControl fullWidth>
+                    <FormControl fullWidth variant="filled">
                       <InputLabel>{t("addAnimalForm.size")}</InputLabel>
                       <Select
                         name="tamaño"
                         value={formData.tamaño}
                         onChange={handleInputChange}
+                        MenuProps={{ disableScrollLock: true }}
                       >
                         {formData.especie === "GATO"
                           ? [
@@ -588,28 +616,29 @@ const AddAnimalForm = () => {
                             ]
                           : [
                               <MenuItem value="pequeño" key="pequeño">
-                                {t("addAnimalForm.small")}
+                                {t("addAnimalForm.dogSmallWeight")}
                               </MenuItem>,
                               <MenuItem value="mediano" key="mediano">
-                                {t("addAnimalForm.medium")}
+                                {t("addAnimalForm.dogMediumWeight")}
                               </MenuItem>,
                               <MenuItem value="grande" key="grande">
-                                {t("addAnimalForm.large")}
+                                {t("addAnimalForm.dogLargeWeight")}
                               </MenuItem>,
                               <MenuItem value="gigante" key="gigante">
-                                {t("addAnimalForm.giant")}
+                                {t("addAnimalForm.dogGiantWeight")}
                               </MenuItem>,
                             ]}
                       </Select>
                     </FormControl>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <FormControl fullWidth>
+                    <FormControl fullWidth variant="filled">
                       <InputLabel>{t("addAnimalForm.color")}</InputLabel>
                       <Select
                         name="color"
                         value={formData.color}
                         onChange={handleInputChange}
+                        MenuProps={{ disableScrollLock: true }}
                       >
                         {formData.especie === "gato"
                           ? [
@@ -814,16 +843,22 @@ const AddAnimalForm = () => {
                   <Grid size={{ xs: 12 }}>
                     <TextField
                       fullWidth
+                      variant="outlined"
                       multiline
                       rows={3}
                       name="descripcion_necesidades"
                       label={t("addAnimalForm.specialNeedsDescription")}
                       value={formData.descripcion_necesidades}
                       onChange={handleInputChange}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 1,
+                        },
+                      }}
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <FormControl fullWidth>
+                    <FormControl fullWidth variant="outlined">
                       <InputLabel>
                         {t("addAnimalForm.coexistenceAnimals")}
                       </InputLabel>
@@ -831,6 +866,7 @@ const AddAnimalForm = () => {
                         name="convivencia_animales"
                         value={formData.convivencia_animales}
                         onChange={handleInputChange}
+                        MenuProps={{ disableScrollLock: true }}
                       >
                         <MenuItem value="no">
                           {t("addAnimalForm.noAnimals")}
@@ -845,7 +881,7 @@ const AddAnimalForm = () => {
                     </FormControl>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <FormControl fullWidth>
+                    <FormControl fullWidth variant="outlined">
                       <InputLabel>
                         {t("addAnimalForm.coexistenceChildren")}
                       </InputLabel>
@@ -853,6 +889,7 @@ const AddAnimalForm = () => {
                         name="convivencia_ninos"
                         value={formData.convivencia_ninos}
                         onChange={handleInputChange}
+                        MenuProps={{ disableScrollLock: true }}
                       >
                         <MenuItem value={true}>
                           {t("addAnimalForm.yes")}
@@ -866,11 +903,11 @@ const AddAnimalForm = () => {
                   <Grid size={{ xs: 12 }}>
                     <Typography
                       variant="body2"
-                      sx={{ mb: 1, fontWeight: "bold" }}
+                      sx={{ mb: 2, fontWeight: "bold" }}
                     >
                       {t("addAnimalForm.mainCharacter")}
                     </Typography>
-                    <FormGroup row sx={{ flexWrap: 'wrap', gap: 0.5 }}>
+                    <FormGroup row sx={{ flexWrap: 'wrap', gap: 1 }}>
                       {(formData.especie === "PERRO" ? CARACTER_PERRO : CARACTER_GATO).map((caracter) => (
                         <FormControlLabel
                           key={caracter.value}
@@ -883,7 +920,7 @@ const AddAnimalForm = () => {
                           }
                           label={caracter.label}
                           sx={{ 
-                            minWidth: '180px',
+                            minWidth: '150px',
                             '& .MuiFormControlLabel-label': { fontSize: '0.875rem' }
                           }}
                         />
@@ -893,11 +930,11 @@ const AddAnimalForm = () => {
                   <Grid size={{ xs: 12 }}>
                     <Typography
                       variant="body2"
-                      sx={{ mb: 1, fontWeight: "bold" }}
+                      sx={{ mb: 2, fontWeight: "bold" }}
                     >
                       {t("addAnimalForm.healthStatus")}
                     </Typography>
-                    <FormGroup>
+                    <FormGroup row sx={{ gap: 2 }}>
                       <FormControlLabel
                         control={
                           <Checkbox
@@ -991,6 +1028,7 @@ const AddAnimalForm = () => {
                     </Box>
                     <TextField
                       fullWidth
+                      variant="outlined"
                       multiline
                       rows={8}
                       name="descripcion"
@@ -999,6 +1037,11 @@ const AddAnimalForm = () => {
                       value={formData.descripcion}
                       onChange={handleInputChange}
                       helperText={t("addAnimalForm.descriptionHelper")}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 1,
+                        },
+                      }}
                     />
                   </Grid>
                 </Grid>
@@ -1093,8 +1136,19 @@ const AddAnimalForm = () => {
                         (typeof formData.foto === "string"
                           ? formData.foto
                           : ""),
+                      foto2:
+                        previewUrls[1] ||
+                        (typeof formData.foto2 === "string"
+                          ? formData.foto2
+                          : ""),
+                      foto3:
+                        previewUrls[2] ||
+                        (typeof formData.foto3 === "string"
+                          ? formData.foto3
+                          : ""),
                     }}
                     isFavorito={false}
+                    showFavoriteButton={false}
                     onToggleFavorito={() => {}}
                   />
                 </Box>
@@ -1109,7 +1163,7 @@ const AddAnimalForm = () => {
         openPreviewDialog={openPreviewDialog}
         setOpenPreviewDialog={setOpenPreviewDialog}
         formData={formData}
-        previewUrl={previewUrls[0]}
+        previewUrls={previewUrls}
       />
     </Box>
   );

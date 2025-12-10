@@ -15,7 +15,11 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import MaleIcon from '@mui/icons-material/Male';
 import FemaleIcon from '@mui/icons-material/Female';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useTranslation } from 'react-i18next';
+import { useAuthContext } from '../../context/AuthProvider';
+import { ROLES } from '../../constants/roles';
 // Mapeig de caràcters backend -> clau traducció
 const CHARACTER_TRANSLATION_MAP = {
   CARINOSO: 'affectionate',
@@ -64,7 +68,47 @@ import gosDefecte from '../../assets/gos_defecte.png';
 function ProfileMascotaView({ animal, showAdoptButton = true }) {
   const { t } = useTranslation();
   const { colors } = useColors();
+  const { user } = useAuthContext();
   const [favorit, setFavorit] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [alerta, setAlerta] = useState(null);
+  
+  // Verificar si l'usuari és protectora
+  const isProtectora = user?.role === ROLES.PROTECTORA;
+  console.log('ProfileMascotaView - isProtectora:', isProtectora, 'user.role:', user?.role);
+  
+  // const isOwnPet = isProtectora && animal?.protectora === user?.id;
+  const handleToggleFavorit = async () => {
+    // No permetre accions de favorits per a protectores
+    if (isProtectora) {
+      console.log('Acció bloquejada: l\'usuari és protectora');
+      return;
+    }
+    
+    try {
+      const action = favorit ? 'dislike' : 'like';
+      const response = await import('../../api/client').then(m => m.default.post('/swipe/action/', {
+        mascota_id: animal.id,
+        action: action
+      }));
+      if (response.data.is_like) {
+        setFavorit(true);
+        if (response.data.chat_id) {
+          setAlerta({
+            type: 'success',
+            message: `S'ha creat un xat amb la protectora!`,
+            chatId: response.data.chat_id
+          });
+        }
+      } else {
+        setFavorit(false);
+      }
+    } catch (error) {
+      console.error('Error al processar la interacció:', error);
+      setAlerta({ type: 'error', message: 'Error al processar la interacció.' });
+    }
+    setTimeout(() => setAlerta(null), 4000);
+  };
 
   if (!animal) return null;
 
@@ -72,10 +116,19 @@ function ProfileMascotaView({ animal, showAdoptButton = true }) {
   const especieLower = (animal.especie || '').toLowerCase();
   const generoLower = (animal.genero || '').toLowerCase();
   
-  // Si no hi ha foto, mostrar la imatge per defecte segons l'espècie
-  let imageSrc = animal.foto;
-  if (!imageSrc) {
-    imageSrc = especieLower === 'perro' ? gosDefecte : gatDefecte;
+  // Determinar imatge per defecte segons espècie
+  const defaultImage = especieLower === 'perro' ? gosDefecte : gatDefecte;
+  
+  // Crear array amb totes les fotos disponibles
+  const images = [
+    animal.foto || defaultImage,
+    animal.foto2,
+    animal.foto3
+  ].filter(Boolean); // Eliminar valors null/undefined
+  
+  // Si no hi ha cap foto, afegir la imatge per defecte
+  if (images.length === 0) {
+    images.push(defaultImage);
   }
   
   // Raça i altres camps segons espècie
@@ -99,27 +152,118 @@ function ProfileMascotaView({ animal, showAdoptButton = true }) {
   // Apto con (convivència)
   const aptoCon = animal.apto_con || [];
 
+  // Funcions per navegar pel carrussel
+  const handlePrevImage = () => {
+    setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+  };
+
+  const handleNextImage = () => {
+    setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+  };
+
   return (
     <Box sx={{ py: 2 , width: '1000px', justifyContent: 'center', display: 'flex' }}>
       <Paper elevation={4} sx={{ p: 4, borderRadius: 5, background: colors.lightColor, position: 'relative' }}>
-        {/* Cor de favorit */}
-        <IconButton
-          onClick={() => setFavorit(f => !f)}
-          sx={{ position: 'absolute', top: 16, right: 16, zIndex: 2, background: 'none' }}
-        >
-          {favorit ? <FavoriteIcon sx={{ color: 'red', fontSize: 36 }} /> : <FavoriteBorderIcon sx={{ color: colors.orange, fontSize: 36 }} />}
-        </IconButton>
+        {/* Notificació visual d'alerta - només per usuaris */}
+        {alerta && !isProtectora && (
+          <Box sx={{ position: 'absolute', top: 70, right: 16, zIndex: 10, minWidth: 300 }}>
+            <Button color={alerta.type === 'success' ? 'success' : 'error'} variant="outlined" fullWidth disabled>
+              {alerta.message}
+              {alerta.chatId && (
+                <Button color="success" size="small" sx={{ ml: 2 }} href={`/chat/${alerta.chatId}`}>Ves al xat</Button>
+              )}
+            </Button>
+          </Box>
+        )}
+        {/* Cor de favorit - només per usuaris */}
+        {!isProtectora && (
+          <IconButton
+            onClick={handleToggleFavorit}
+            sx={{ position: 'absolute', top: 16, right: 16, zIndex: 2, background: 'none' }}
+          >
+            {favorit ? <FavoriteIcon sx={{ color: 'red', fontSize: 36 }} /> : <FavoriteBorderIcon sx={{ color: colors.orange, fontSize: 36 }} />}
+          </IconButton>
+        )}
         
         {/* Capçalera amb imatge i nom */}
         <Grid container spacing={4} alignItems="center">
           <Grid item xs={12} md={5}>
-            <Card sx={{ boxShadow: 3, borderRadius: 3, display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: 300 }}>
+            <Card sx={{ boxShadow: 3, borderRadius: 3, display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: 300, position: 'relative' }}>
               <CardMedia
                 component="img"
-                image={imageSrc}
-                alt={animal.nombre}
+                image={images[currentImageIndex]}
+                alt={`${animal.nombre} - ${currentImageIndex + 1}`}
                 sx={{ objectFit: 'cover', objectPosition: 'center center', width: '100%', height: 300, borderRadius: 3 }}
               />
+              
+              {/* Controls del carrussel - només si hi ha més d'una imatge */}
+              {images.length > 1 && (
+                <>
+                  {/* Fletxa esquerra */}
+                  <IconButton
+                    onClick={handlePrevImage}
+                    sx={{
+                      position: 'absolute',
+                      left: 8,
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                      '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.95)' },
+                      zIndex: 1
+                    }}
+                  >
+                    <ChevronLeftIcon />
+                  </IconButton>
+                  
+                  {/* Fletxa dreta */}
+                  <IconButton
+                    onClick={handleNextImage}
+                    sx={{
+                      position: 'absolute',
+                      right: 8,
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                      '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.95)' },
+                      zIndex: 1
+                    }}
+                  >
+                    <ChevronRightIcon />
+                  </IconButton>
+                  
+                  {/* Indicadors (dots) */}
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      bottom: 8,
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      display: 'flex',
+                      gap: 0.5,
+                      zIndex: 1
+                    }}
+                  >
+                    {images.map((_, index) => (
+                      <Box
+                        key={index}
+                        onClick={() => setCurrentImageIndex(index)}
+                        sx={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: '50%',
+                          backgroundColor: index === currentImageIndex ? 'white' : 'rgba(255, 255, 255, 0.5)',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s',
+                          '&:hover': {
+                            backgroundColor: 'white',
+                            transform: 'scale(1.2)'
+                          }
+                        }}
+                      />
+                    ))}
+                  </Box>
+                </>
+              )}
             </Card>
           </Grid>
           <Grid item xs={12} md={7}>
