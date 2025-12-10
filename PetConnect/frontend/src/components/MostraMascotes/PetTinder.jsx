@@ -10,7 +10,6 @@ import {
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import CloseIcon from "@mui/icons-material/Close";
 import PetsIcon from "@mui/icons-material/Pets";
-import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useColors } from "../../hooks/useColors";
 import api from "../../api/client.js";
@@ -18,32 +17,30 @@ import ChatMiniList from "../Chat/ChatMiniList.jsx";
 import Chat from "../Chat/Chat.jsx";
 import CardPet from "./CardPet.jsx";
 import CardPetDetail from "./CardPetDetail.jsx";
+import PetTinderButton from "../Buttons/PetTinderButton.jsx";
 
 function PetTinder() {
   const { t } = useTranslation();
   const { colors } = useColors();
-  const navigate = useNavigate();
   const [animal, setAnimal] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [message, setMessage] = useState("");
   const [selectedChatId, setSelectedChatId] = useState(null);
+  
+  // Llista de recomanacions IA i índex actual
+  const [recomanacions, setRecomanacions] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Función que se encarga de cargar el siguiente animal
-  const fetchNextAnimal = useCallback(() => {
-    setLoading(true);
-    setAnimal(null); // Limpiamos el animal anterior
-    setMessage(""); // Limpiamos mensajes
-
-    // Llama al endpoint de PetTinder Next
+  // Fallback al sistema antic si la IA falla
+  const fetchNextAnimalFallback = useCallback(() => {
     api
       .get("/pettinder/next/")
       .then((response) => {
-        // Si la respuesta incluye un animal, lo mostramos
         if (response.data.id) {
           setAnimal(response.data);
+          setRecomanacions([response.data]);
         } else {
-          // Si no hay más animales, mostramos el mensaje de "no quedan"
           setAnimal({ message: response.data.message });
         }
         setLoading(false);
@@ -53,12 +50,53 @@ function PetTinder() {
         setError(t('petTinder.errorLoading'));
         setLoading(false);
       });
-  }, []);
+  }, [t]);
+
+  // Funció per carregar recomanacions IA
+  const fetchRecomanacions = useCallback(() => {
+    setLoading(true);
+    setError(null);
+    setMessage("");
+
+    // Crida al sistema de recomanació IA
+    api
+      .get("/ia/recomendacion/?limit=50")
+      .then((response) => {
+        const llista = response.data.recomendaciones || [];
+        setRecomanacions(llista);
+        setCurrentIndex(0);
+        
+        if (llista.length > 0) {
+          setAnimal(llista[0]);
+        } else {
+          setAnimal({ message: response.data.mensaje || "No hi ha més mascotes disponibles!" });
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(t('petTinder.errorFetch'), err);
+        // Fallback al sistema antic si falla la IA
+        fetchNextAnimalFallback();
+      });
+  }, [t, fetchNextAnimalFallback]);
+
+  // Funció per passar al següent animal de la llista
+  const goToNextAnimal = useCallback(() => {
+    const nextIndex = currentIndex + 1;
+    
+    if (nextIndex < recomanacions.length) {
+      setCurrentIndex(nextIndex);
+      setAnimal(recomanacions[nextIndex]);
+    } else {
+      // S'han acabat les recomanacions, recarregar
+      fetchRecomanacions();
+    }
+  }, [currentIndex, recomanacions, fetchRecomanacions]);
 
   // Se ejecuta al montar el componente
   useEffect(() => {
-    fetchNextAnimal();
-  }, [fetchNextAnimal]);
+    fetchRecomanacions();
+  }, [fetchRecomanacions]);
 
   // Función genérica para manejar las acciones (Like/Dislike)
   const handleAction = (actionType) => {
@@ -85,8 +123,8 @@ function PetTinder() {
         ) {
           setSelectedChatId(response.data.chat_id);
         }
-        // La card canvia a següent animal quan fem like/dislike
-        setTimeout(() => fetchNextAnimal(), 500);
+        // Passar al següent animal de la llista de recomanacions
+        setTimeout(() => goToNextAnimal(), 500);
       })
       .catch((err) => {
         console.error(`Error al registrar ${actionType}:`, err);
@@ -284,41 +322,10 @@ function PetTinder() {
       </Box>
 
       {/* Botó sticky cap a Galeria */}
-      <Button
-          variant="contained"
-          onClick={() => navigate("/inici-usuari-galeria")}
-          sx={{
-            position: "fixed",
-            top: { xs: 120, sm: 125 },
-            right: { xs: 16, sm: 60 },
-            backgroundColor: colors.blue,
-            color: "white",
-            px: { xs: 2.5, sm: 4 },
-            py: { xs: 1.2, sm: 3 },
-            fontSize: { xs: "0.95rem", sm: "1.1rem" },
-            fontWeight: "bold",
-            borderRadius: 50,
-            display: "flex",
-            gap: 1.5,
-            alignItems: "center",
-            boxShadow: `0 6px 20px ${colors.blue}60`,
-            zIndex: 1000,
-            animation: { xs: "none", sm: "pulse 2s ease-in-out infinite" },
-            "@keyframes pulse": {
-              "0%, 100%": { transform: "scale(1)" },
-              "50%": { transform: "scale(1.20)" },
-            },
-            "&:hover": {
-              backgroundColor: colors.darkBlue,
-              transform: "translateY(-2px) scale(1.05)",
-              boxShadow: `0 8px 25px ${colors.orange}80`,
-            },
-            transition: "all 0.3s ease",
-          }}
-        >
-          <PetsIcon sx={{ fontSize: 28 }} />
-          {t('petTinder.galleryButton')}
-        </Button>
+      <PetTinderButton 
+        route="/inici-usuari-galeria" 
+        labelKey="petTinder.galleryButton" 
+      />
     </Box>
   );
 }

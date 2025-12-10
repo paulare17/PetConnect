@@ -823,3 +823,228 @@ class DebugKeysIAView(APIView):
             'total_especies_cargadas': len(debug_output),
             'detalles_de_entrenamiento': debug_output
         }, status=status.HTTP_200_OK)
+        
+        
+        
+        # ******************************************************************************
+
+# import random
+# import unicodedata
+# import csv
+# import re 
+
+# from rest_framework.views import APIView
+# from rest_framework.response import Response
+# from rest_framework import status
+# from nltk.tokenize import RegexpTokenizer 
+# from .base_conocimiento import FAQ_BOT 
+
+# # --- Lógica de Ayuda Global y Carga de Dataset (IA 3: El Entrenamiento) ---
+
+# DATASET_BIOGRAFIAS = {}
+
+# def normalize_text(text):
+#     """Convierte tildes y ñ a caracteres ASCII planos, elimina guiones bajos y lo pone en minúsculas."""
+#     if not isinstance(text, str):
+#         text = str(text)
+
+#     text = text.lower().replace('_', ' ')
+#     text = unicodedata.normalize('NFD', text).encode('ascii', 'ignore').decode("utf-8")
+#     return text
+
+# def cargar_dataset_ia3():
+#     """Carga el CSV de datos de entrenamiento y almacena todas las palabras clave."""
+#     global DATASET_BIOGRAFIAS
+#     file_path = 'mascotas/training_data.csv' 
+    
+#     try:
+#         with open(file_path, mode='r', encoding='utf-8') as file:
+#             reader = csv.DictReader(file, delimiter=';')
+            
+#             for row in reader:
+#                 especie = normalize_text(row.get('Especie', ''))
+#                 caracter_raw = normalize_text(row.get('Caracter_Necesidad', ''))
+#                 keywords_set = set([k.strip() for k in caracter_raw.split(',') if k.strip()])
+                
+#                 if especie not in DATASET_BIOGRAFIAS:
+#                     DATASET_BIOGRAFIAS[especie] = []
+                    
+#                 DATASET_BIOGRAFIAS[especie].append({
+#                     'nombre_ejemplo': row.get('Nombre', 'ejemplo'),
+#                     'biografia_final': row.get('Biografia_Final', 'Biografía de ejemplo no disponible.'), 
+#                     'sexo': normalize_text(row.get('Sexo', 'N/A')),
+#                     'keywords': keywords_set
+#                 })
+                        
+#     except FileNotFoundError:
+#         print(f"ADVERTENCIA IA: No se encontró el archivo de entrenamiento: {file_path}")
+            
+# cargar_dataset_ia3()
+
+
+# def simular_generacion_ia(datos):
+#     """
+#     IA 3: Genera la biografía usando un SCORING de múltiples palabras clave y ensambla el resultado final de forma estética (PÁRRAFO ÚNICO, EMOCIONALIDAD PRIMERO).
+#     """
+#     nombre = datos.get('nombre', 'un amigo').strip()
+#     especie = normalize_text(datos.get('especie', 'mascota'))
+#     caracter_necesidad_input = normalize_text(datos.get('caracter_necesidad', '')) 
+#     sexo = normalize_text(datos.get('sexo', 'N/A'))
+    
+#     historia_breve = datos.get('historia_breve', '').strip()
+    
+#     input_keywords = set([k.strip() for k in caracter_necesidad_input.split(',') if k.strip()])
+#     ejemplos_disponibles = DATASET_BIOGRAFIAS.get(especie, [])
+    
+#     mejor_plantilla = None
+#     max_score = -1
+    
+#     if ejemplos_disponibles:
+        
+#         for plantilla_candidata in ejemplos_disponibles:
+#             overlap = len(input_keywords.intersection(plantilla_candidata['keywords']))
+            
+#             if overlap > max_score:
+#                 max_score = overlap
+#                 mejor_plantilla = plantilla_candidata
+                
+#         if mejor_plantilla and max_score > 0:
+#             plantilla = mejor_plantilla 
+#             bio_generada = plantilla['biografia_final']
+#             nombre_ejemplo = plantilla['nombre_ejemplo']
+            
+#             # --- ROBUSTEZ: Reemplazo de Nombres y Ajuste de Género ---
+            
+#             nombre_ejemplo_lower = nombre_ejemplo.lower()
+#             nombre_ejemplo_capitalized = nombre_ejemplo.capitalize()
+#             nombre_capitalized = nombre.capitalize()
+            
+#             bio_generada = re.sub(r'\b' + re.escape(nombre_ejemplo_capitalized) + r'\b', nombre_capitalized, bio_generada)
+#             bio_generada = re.sub(r'\b' + re.escape(nombre_ejemplo_lower) + r'\b', nombre.lower(), bio_generada)
+#             bio_generada = bio_generada.replace(nombre_ejemplo.upper(), nombre.upper())
+            
+#             if plantilla['sexo'] == 'macho' and sexo == 'hembra':
+#                 bio_generada = bio_generada.replace('él', 'ella').replace('su', 'suya')
+#             elif plantilla['sexo'] == 'hembra' and sexo == 'macho':
+#                 bio_generada = bio_generada.replace('ella', 'él').replace('suya', 'su')
+                
+#             # 5. ENSAMBLAJE FINAL ESTÉTICO Y CONCISO (V10: LIMPIEZA TOTAL Y DESDUPLICACIÓN)
+            
+#             # 5.1 Asegura que la biografía comienza con el nombre (Texto Emocional)
+#             if not bio_generada.strip().startswith(nombre_capitalized):
+#                  biografia_final = f"{nombre_capitalized} {bio_generada.strip()}"
+#             else:
+#                  biografia_final = bio_generada.strip()
+
+#             # 5.2. Añadir la historia breve al final como un párrafo secundario, SIN ENCABEZADO
+#             if historia_breve:
+#                 # Se utiliza UNICAMENTE esta línea para añadir la historia, resolviendo la duplicación y el encabezado.
+#                 biografia_final += f"\n\n{historia_breve}" 
+            
+#             # Limpiar dobles espacios y asegurar que la biografía es legible.
+#             biografia_final = re.sub(r'\s{2,}', ' ', biografia_final).strip()
+            
+#             return {'biografia': biografia_final, 'score': max_score}
+            
+#         else:
+#             return {'biografia': (
+#                 f"¡Conoce a {nombre}! Lamentablemente, no se encontró una biografía de entrenamiento "
+#                 f"específica con una alta coincidencia de palabras clave ('{caracter_necesidad_input}'). "
+#                 f"Asegúrate de que los términos de personalidad coincidan con los de tu dataset."
+#             ), 'score': max_score}
+            
+#     else:
+#         return {'biografia': (
+#             f"¡Conoce a {nombre}! Lamentablemente, no se encontraron datos de entrenamiento para la especie '{especie}'. "
+#             f"La biografía no pudo ser generada."
+#         ), 'score': max_score}
+
+
+# def simular_recomendacion_ia(usuario_id, mascotas_vistas):
+#     """
+#     IA 2: Simula un motor de recomendación basado en popularidad y especie.
+#     """
+#     MASCOTAS_POPULARES_SIMULADAS = [
+#         {'nombre': 'Berta', 'especie': 'Perro', 'id': 101, 'bio': 'Perra de pastoreo amorosa...'},
+#         {'nombre': 'Miau', 'especie': 'Gato', 'id': 102, 'bio': 'Gato independiente, ideal para apartamentos.'},
+#         {'nombre': 'Paco', 'especie': 'Perro', 'id': 103, 'bio': 'Cachorro labrador juguetón.'},
+#     ]
+
+#     for mascota in MASCOTAS_POPULARES_SIMULADAS:
+#         if mascota['nombre'] not in mascotas_vistas:
+#             return {
+#                 'id': mascota['id'],
+#                 'nombre': mascota['nombre'],
+#                 'especie': mascota['especie'],
+#                 'descripcion_ia': mascota['bio'],
+#                 'recomendacion_score': 0.85
+#             }
+    
+#     return None 
+
+# # --- VISTAS API ---
+
+# class GenerarBioIAView(APIView):
+#     """
+#     Endpoint IA 3: Genera la biografía de una mascota usando la lógica de Fine-Tuning Simulado.
+#     """
+#     def post(self, request, *args, **kwargs):
+#         resultado = simular_generacion_ia(request.data)
+        
+#         return Response({'biografia': resultado['biografia']}, status=status.HTTP_200_OK)
+
+
+# class ChatbotFAQView(APIView):
+#     """
+#     Endpoint IA 1: Chatbot FAQ básico.
+#     """
+#     def post(self, request, *args, **kwargs):
+#         pregunta_usuario = normalize_text(request.data.get('pregunta', ''))
+        
+#         tokenizer = RegexpTokenizer(r'\w+') 
+#         palabras_pregunta = tokenizer.tokenize(pregunta_usuario)
+#         palabras_set = set(palabras_pregunta)
+
+#         for palabras_clave, respuesta in FAQ_BOT.items():
+#             if palabras_set.intersection(set(palabras_clave)):
+#                 return Response({'respuesta': respuesta}, status=status.HTTP_200_OK)
+
+#         return Response({
+#             "respuesta": "Lo siento, aún no tengo respuesta para eso. Nuestro equipo te contactará pronto si tu duda no se resuelve. Pregúntame sobre \"costo\", \"proceso\" o \"niños\"."
+#         }, status=status.HTTP_200_OK)
+
+
+# class RecomendacionIAView(APIView):
+#     """
+#     Endpoint IA 2: Prototipo de Sistema de Recomendación.
+#     """
+#     def get(self, request, *args, **kwargs):
+#         usuario_id = request.query_params.get('user_id', 'anonimo')
+#         mascotas_vistas = request.query_params.getlist('vistas', []) 
+#         mascota_recomendada = simular_recomendacion_ia(usuario_id, mascotas_vistas)
+
+#         if mascota_recomendada:
+#             return Response(mascota_recomendada, status=status.HTTP_200_OK)
+#         else:
+#             return Response(
+#                 {'mensaje': '¡Has visto todas las recomendaciones de hoy!'}, 
+#                 status=status.HTTP_204_NO_CONTENT
+#             )
+
+
+# class DebugKeysIAView(APIView):
+#     """
+#     Endpoint de Depuración. Muestra todas las palabras clave que la IA 3 ha cargado.
+#     """
+#     def get(self, request, *args, **kwargs):
+#         debug_output = {}
+#         for especie, plantillas in DATASET_BIOGRAFIAS.items():
+#             debug_output[especie] = [
+#                 {'nombre_ejemplo': p['nombre_ejemplo'], 'keywords': list(p['keywords'])} 
+#                 for p in plantillas
+#             ]
+        
+#         return Response({
+#             'total_especies_cargadas': len(debug_output),
+#             'detalles_de_entrenamiento': debug_output
+#         }, status=status.HTTP_200_OK)

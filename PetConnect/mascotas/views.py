@@ -145,7 +145,7 @@ class MascotaViewSet(viewsets.ModelViewSet):
     - POST create: solo autenticados (IsAuthenticated)
     - Paginación: 12 por página
     - Orden por defecto: -fecha_creacion
-    - Filtros básicos por query params: especie, tamano, genero, edad_clasificacion, apto_con
+    - Filtros básicos por query params: especie, tamano, genero, edad_clasificacion, apto_con, estado_salud
     """
     queryset = Mascota.objects.all().order_by('-fecha_creacion')
     serializer_class = MascotaSerializer
@@ -179,7 +179,7 @@ class MascotaViewSet(viewsets.ModelViewSet):
             qs = qs.filter(oculto=False, adoptado=False)
         q = self.request.query_params
 
-        # Filtro por rango de edad
+        # Filtro por rango de edad (edad_min, edad_max)
         edad_min = q.get('edad_min')
         edad_max = q.get('edad_max')
         try:
@@ -193,22 +193,21 @@ class MascotaViewSet(viewsets.ModelViewSet):
         except (ValueError, TypeError):
             pass
 
-        # Filtro por rango de edad
-        q = self.request.query_params
-        edad_min = q.get('edad_min')
-        edad_max = q.get('edad_max')
-        try:
-            if edad_min is not None:
-                qs = qs.filter(edad__gte=int(edad_min))
-        except (ValueError, TypeError):
-            pass
-        try:
-            if edad_max is not None:
-                qs = qs.filter(edad__lte=int(edad_max))
-        except (ValueError, TypeError):
-            pass
+        # Filtro por clasificación de edad (0, 1_2, 3_6, 7_10, 11_14, 15_MAS)
+        edad_clasificacion = q.get('edad')
+        if edad_clasificacion and edad_clasificacion != 'todos':
+            qs = qs.filter(edad_clasificacion=edad_clasificacion)
 
-        # Los demás filtros (django-filter los manejará si están en filterset_fields)
+        # Filtro por apto_con (convivència)
+        apto_con = q.get('apto_con')
+        if apto_con and apto_con != 'todos':
+            qs = qs.filter(apto_con__contains=apto_con)
+
+        # Filtro por estado de salud/legal
+        estado_salud = q.get('estado_salud')
+        if estado_salud and estado_salud != 'todos':
+            qs = qs.filter(estado_legal_salud__contains=estado_salud)
+
         return qs
 
     def perform_create(self, serializer):

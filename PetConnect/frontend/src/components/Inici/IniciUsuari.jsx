@@ -32,6 +32,7 @@ import api from "../../api/client";
 import CardPet from "../MostraMascotes/CardPet";
 import Pagination from "@mui/material/Pagination";
 import { Height } from "@mui/icons-material";
+import PetTinderButton from "../Buttons/PetTinderButton";
 
 function IniciUsuari() {
   const { user } = useAuthContext();
@@ -39,7 +40,7 @@ function IniciUsuari() {
   const { colors } = useColors();
   const navigate = useNavigate();
   
-  // Opcions de filtre segons el model Mascota
+  // Opcions de filtre segons el model Mascota i preferències d'usuari
   const FILTROS = {
     especie: [
       { value: "todos", label: t('iniciUsuari.all') },
@@ -58,6 +59,32 @@ function IniciUsuari() {
       { value: "grande", label: t('iniciUsuari.large') },
       { value: "gigante", label: t('iniciUsuari.giant') },
     ],
+    edad: [
+      { value: "todos", label: t('iniciUsuari.all') },
+      { value: "0", label: t('iniciUsuari.ageLessThan1') },
+      { value: "1_2", label: t('iniciUsuari.age1to2') },
+      { value: "3_6", label: t('iniciUsuari.age3to6') },
+      { value: "7_10", label: t('iniciUsuari.age7to10') },
+      { value: "11_14", label: t('iniciUsuari.age11to14') },
+      { value: "15_MAS", label: t('iniciUsuari.age15plus') },
+    ],
+    convivencia: [
+      { value: "todos", label: t('iniciUsuari.all') },
+      { value: "NINOS", label: t('iniciUsuari.aptChildren') },
+      { value: "SIN_NINOS", label: t('iniciUsuari.adultsOnly') },
+      { value: "PERROS", label: t('iniciUsuari.aptDogs') },
+      { value: "GATOS", label: t('iniciUsuari.aptCats') },
+      { value: "SOLO_EL", label: t('iniciUsuari.onlyPet') },
+      { value: "PRIMERIZOS", label: t('iniciUsuari.beginnerOwners') },
+      { value: "EXPERIENCIA", label: t('iniciUsuari.experiencedOwners') },
+    ],
+    estadoSalud: [
+      { value: "todos", label: t('iniciUsuari.all') },
+      { value: "DESPARASITADO", label: t('iniciUsuari.dewormed') },
+      { value: "ESTERILIZADO", label: t('iniciUsuari.sterilized') },
+      { value: "VACUNADO", label: t('iniciUsuari.vaccinated') },
+      { value: "MICROCHIP", label: t('iniciUsuari.microchipped') },
+    ],
   };
   const [animales, setAnimales] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -67,11 +94,24 @@ function IniciUsuari() {
     especie: "todos",
     genero: "todos",
     tamaño: "todos",
+    edad: "todos",
+    convivencia: "todos",
+    estadoSalud: "todos",
   });
   const [page, setPage] = useState(1);
+  // eslint-disable-next-line no-unused-vars
   const [totalCount, setTotalCount] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+
   const itemsPerPage = 12; // Match backend pagination
+
+  // Detectar si l'usuari ha aplicat filtres manuals
+  const tienesFiltrosManuales = filtros.especie !== "todos" || 
+                                filtros.genero !== "todos" || 
+                                filtros.tamaño !== "todos" ||
+                                filtros.edad !== "todos" ||
+                                filtros.convivencia !== "todos" ||
+                                filtros.estadoSalud !== "todos";
 
   // Funció per canviar els filtres
   const handleFilterChange = (name, value) => {
@@ -82,26 +122,23 @@ function IniciUsuari() {
     setPage(1); // Reset to first page when filters change
   };
 
-  // Carregar animals des de l'API
-  useEffect(() => {
-    setLoading(true);
-    setError(null);
-
-    // Construir la URL amb paràmetres de consulta
+  // Funció per carregar llista normal (sense IA)
+  const carregarLlistaNormal = () => {
     const params = new URLSearchParams();
     if (filtros.especie !== "todos") params.append("especie", filtros.especie.toUpperCase());
     if (filtros.genero !== "todos") params.append("genero", filtros.genero.toUpperCase());
     if (filtros.tamaño !== "todos") params.append("tamano", filtros.tamaño.toUpperCase());
-    // Afegim la paginació (DRF pagination usa 'page')
+    if (filtros.edad !== "todos") params.append("edad", filtros.edad);
+    // Buscar dentro de los arrays JSON usando format: "valor"
+    if (filtros.convivencia !== "todos") params.append("apto_con", `"${filtros.convivencia}"`);
+    if (filtros.estadoSalud !== "todos") params.append("estado_salud", `"${filtros.estadoSalud}"`);
     params.append("page", page);
 
-    // Cridar l'API
     api
       .get(`/mascota/?${params.toString()}`)
       .then((response) => {
         setAnimales(response.data.results || response.data);
         setTotalCount(response.data.count || 0);
-        // Calculate total pages from count and page_size
         setTotalPages(Math.ceil((response.data.count || 0) / itemsPerPage));
         setLoading(false);
       })
@@ -110,7 +147,35 @@ function IniciUsuari() {
         setError(t('iniciUsuari.errorLoading'));
         setLoading(false);
       });
-  }, [filtros, page, t]);
+  };
+
+  // Carregar animals des de l'API
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+
+    // Si NO hi ha filtres manuals i l'usuari està autenticat -> usar IA de recomanació
+    if (!tienesFiltrosManuales && user) {
+      api
+        .get(`/ia/recomendacion/?limit=50`) // Obtenir recomanacions IA
+        .then((response) => {
+          const recomanacions = response.data.recomendaciones || [];
+          setAnimales(recomanacions);
+          setTotalCount(recomanacions.length);
+          setTotalPages(Math.ceil(recomanacions.length / itemsPerPage));
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error('Error carregant recomanacions IA, usant llista normal:', err);
+          // Fallback a la llista normal si falla la IA
+          carregarLlistaNormal();
+        });
+    } else {
+      // Amb filtres manuals o usuari no autenticat -> llista normal
+      carregarLlistaNormal();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filtros, page, user, tienesFiltrosManuales]);
 
   // Carregar preferits de l'usuari
   useEffect(() => {
@@ -148,7 +213,7 @@ function IniciUsuari() {
       } else {
         setPreferits(preferits.filter(fav => fav !== id));
       }
-    } catch (error) {
+    } catch {
       setAlerta({ type: 'error', message: 'Error al processar la interacció.' });
     }
     setTimeout(() => setAlerta(null), 4000);
@@ -187,49 +252,10 @@ function IniciUsuari() {
     >
       <Container maxWidth="xl">
         {/* Capçalera */}
-        <Button
-          variant="contained"
-          onClick={() => navigate("/inici-usuari-pettinder")}
-          sx={{
-            position: "fixed",
-            top: 125,
-            right: 60,
-            backgroundColor: colors.blue,
-            color: "white",
-            px: 4,
-            py: 3,
-            fontSize: "1.1rem",
-            fontWeight: "bold",
-            borderRadius: 50,
-            display: "flex",
-            gap: 1.5,
-            alignItems: "center",
-            boxShadow: `0 6px 20px ${colors.blue}60`,
-            zIndex: 1000,
-            animation: "pulse 2s ease-in-out infinite",
-            "@keyframes pulse": {
-              "0%, 100%": { transform: "scale(1)" },
-              "50%": { transform: "scale(1.20)" },
-            },
-            "&:hover": {
-              backgroundColor: colors.darkBlue,
-              transform: "translateY(-2px) scale(1.05)",
-              boxShadow: `0 8px 25px ${colors.orange}80`,
-            },
-            transition: "all 0.3s ease",
-            // Responsive
-            "@media (max-width: 600px)": {
-              px: 2.5,
-              py: 1.2,
-              fontSize: "0.95rem",
-              top: 16,
-              right: 16,
-            },
-          }}
-        >
-          <PetsIcon sx={{ fontSize: 28 }} />
-          {t('iniciUsuari.petTinderButton')}
-        </Button>
+        <PetTinderButton 
+          route="/inici-usuari-pettinder" 
+          labelKey="iniciUsuari.petTinderButton" 
+        />
         <Box sx={{ textAlign: "center", mb: 4 }}>
           <Typography
             variant="h3"
@@ -244,16 +270,15 @@ function IniciUsuari() {
             }}
           >
             <PetsIcon sx={{ fontSize: 48 }} />
-            Galeria d'Animals Disponibles
+            {t('iniciUsuari.title')}
           </Typography>
           <Typography variant="h6" sx={{ color: colors.darkBlue }}>
-            Troba el teu company perfecte!
+            {t('iniciUsuari.subtitle')}
           </Typography>
         </Box>
 
         {/* Filtres */}
         <Box sx={{ mb: 4 }}>
-          {/* Filtres */}
           <Paper
             elevation={3}
             sx={{
@@ -263,121 +288,128 @@ function IniciUsuari() {
               borderRadius: 2,
             }}
           >
-            <Grid container spacing={3} alignItems="center">
-              <Grid item xs={12} sm={4}>
-                <FormControl fullWidth>
+            <Grid container spacing={2} alignItems="center">
+              {/* Espècie */}
+              <Grid item xs={12} sm={6} lg={4}>
+                <FormControl fullWidth size="small">
                   <InputLabel>{t('iniciUsuari.filterSpecies')}</InputLabel>
                   <Select
                     value={filtros.especie}
                     label={t('iniciUsuari.filterSpecies')}
-                    onChange={(e) =>
-                      handleFilterChange("especie", e.target.value)
-                    }
+                    onChange={(e) => handleFilterChange("especie", e.target.value)}
                     sx={{
-                      "& .MuiOutlinedInput-notchedOutline": {
-                        borderColor: colors.orange,
-                      },
-                      "&:hover .MuiOutlinedInput-notchedOutline": {
-                        borderColor: colors.darkOrange,
-                      },
-                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: colors.orange,
-                      },
+                      "& .MuiOutlinedInput-notchedOutline": { borderColor: colors.orange },
+                      "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: colors.darkOrange },
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: colors.orange },
                     }}
                   >
                     {FILTROS.especie.map((opt) => (
-                      <MenuItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </MenuItem>
+                      <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
                     ))}
                   </Select>
                 </FormControl>
               </Grid>
 
-              <Grid item xs={12} sm={4}>
-                <FormControl fullWidth>
+              {/* Gènere */}
+              <Grid item xs={12} sm={6} lg={4}>
+                <FormControl fullWidth size="small">
                   <InputLabel>{t('iniciUsuari.filterGender')}</InputLabel>
                   <Select
                     value={filtros.genero}
                     label={t('iniciUsuari.filterGender')}
-                    onChange={(e) =>
-                      handleFilterChange("genero", e.target.value)
-                    }
+                    onChange={(e) => handleFilterChange("genero", e.target.value)}
                     sx={{
-                      "& .MuiOutlinedInput-notchedOutline": {
-                        borderColor: colors.blue,
-                      },
-                      "&:hover .MuiOutlinedInput-notchedOutline": {
-                        borderColor: colors.darkBlue,
-                      },
-                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: colors.blue,
-                      },
+                      "& .MuiOutlinedInput-notchedOutline": { borderColor: colors.blue },
+                      "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: colors.darkBlue },
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: colors.blue },
                     }}
                   >
                     {FILTROS.genero.map((opt) => (
-                      <MenuItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </MenuItem>
+                      <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
                     ))}
                   </Select>
                 </FormControl>
               </Grid>
 
-              <Grid item xs={12} sm={4}>
-                <FormControl fullWidth>
+              {/* Tamany */}
+              <Grid item xs={12} sm={6} lg={4}>
+                <FormControl fullWidth size="small">
                   <InputLabel>{t('iniciUsuari.filterSize')}</InputLabel>
                   <Select
                     value={filtros.tamaño}
                     label={t('iniciUsuari.filterSize')}
-                    onChange={(e) =>
-                      handleFilterChange("tamaño", e.target.value)
-                    }
+                    onChange={(e) => handleFilterChange("tamaño", e.target.value)}
                     sx={{
-                      "& .MuiOutlinedInput-notchedOutline": {
-                        borderColor: colors.yellow,
-                      },
-                      "&:hover .MuiOutlinedInput-notchedOutline": {
-                        borderColor: colors.yellow,
-                      },
-                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: colors.yellow,
-                      },
+                      "& .MuiOutlinedInput-notchedOutline": { borderColor: colors.yellow },
+                      "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: colors.yellow },
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: colors.yellow },
                     }}
                   >
                     {FILTROS.tamaño.map((opt) => (
-                      <MenuItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </MenuItem>
+                      <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
                     ))}
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={4}>
-                <FormControl fullWidth>
-                  <InputLabel>{t('iniciUsuari.filterSize')}</InputLabel>
+
+              {/* Edat */}
+              <Grid item xs={12} sm={6} lg={4}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>{t('iniciUsuari.filterAge')}</InputLabel>
                   <Select
-                    value={filtros.tamaño}
-                    label={t('iniciUsuari.filterSize')}
-                    onChange={(e) =>
-                      handleFilterChange("tamaño", e.target.value)
-                    }
+                    value={filtros.edad}
+                    label={t('iniciUsuari.filterAge')}
+                    onChange={(e) => handleFilterChange("edad", e.target.value)}
                     sx={{
-                      "& .MuiOutlinedInput-notchedOutline": {
-                        borderColor: colors.yellow,
-                      },
-                      "&:hover .MuiOutlinedInput-notchedOutline": {
-                        borderColor: colors.yellow,
-                      },
-                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: colors.yellow,
-                      },
+                      "& .MuiOutlinedInput-notchedOutline": { borderColor: colors.purple },
+                      "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: colors.purple },
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: colors.purple },
                     }}
                   >
-                    {FILTROS.tamaño.map((opt) => (
-                      <MenuItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </MenuItem>
+                    {FILTROS.edad.map((opt) => (
+                      <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {/* Convivència */}
+              <Grid item xs={12} sm={6} lg={4}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>{t('iniciUsuari.filterCohabitation')}</InputLabel>
+                  <Select
+                    value={filtros.convivencia}
+                    label={t('iniciUsuari.filterCohabitation')}
+                    onChange={(e) => handleFilterChange("convivencia", e.target.value)}
+                    sx={{
+                      "& .MuiOutlinedInput-notchedOutline": { borderColor: colors.green },
+                      "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: colors.green },
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: colors.green },
+                    }}
+                  >
+                    {FILTROS.convivencia.map((opt) => (
+                      <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {/* Estat de Salut */}
+              <Grid item xs={12} sm={6} lg={4}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>{t('iniciUsuari.filterHealthStatus')}</InputLabel>
+                  <Select
+                    value={filtros.estadoSalud}
+                    label={t('iniciUsuari.filterHealthStatus')}
+                    onChange={(e) => handleFilterChange("estadoSalud", e.target.value)}
+                    sx={{
+                      "& .MuiOutlinedInput-notchedOutline": { borderColor: colors.red },
+                      "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: colors.red },
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: colors.red },
+                    }}
+                  >
+                    {FILTROS.estadoSalud.map((opt) => (
+                      <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
                     ))}
                   </Select>
                 </FormControl>
