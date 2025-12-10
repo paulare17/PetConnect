@@ -38,11 +38,12 @@ function ProfileAnimal() {
   const [animal, setAnimal] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [favorit, setFavorit] = useState(false);
+  const [preferit, setPreferit] = useState(false);
   const [altres, setAltres] = useState([]);
   const [galeriaIndex, setGaleriaIndex] = useState(0);
   const [updatingAdoption, setUpdatingAdoption] = useState(false);
   const [startingChat, setStartingChat] = useState(false);
+  const [alerta, setAlerta] = useState(null);
 
   useEffect(() => {
     setLoading(true);
@@ -69,7 +70,45 @@ function ProfileAnimal() {
       .catch(err => {
         console.error('Error carregant altres mascotes:', err);
       });
-  }, [id, t]);
+    // Carrega els preferits de l'usuari
+    if (user) {
+      api.get('/preferits/')
+        .then(res => {
+          const preferitsIds = res.data.preferits_ids || [];
+          if (preferitsIds.includes(Number(id))) {
+            setPreferit(true);
+          }
+        })
+        .catch(err => {
+          console.error('Error carregant preferits:', err);
+        });
+    }
+  }, [id, t, user]);
+
+  const togglePreferit = async () => {
+    try {
+      const action = preferit ? 'dislike' : 'like';
+      const response = await api.post('/swipe/action/', {
+        mascota_id: animal.id,
+        action: action
+      });
+      if (response.data.is_like) {
+        setPreferit(true);
+        if (response.data.chat_id) {
+          setAlerta({
+            type: 'success',
+            message: `S'ha creat un xat amb la protectora!`,
+            chatId: response.data.chat_id
+          });
+        }
+      } else {
+        setPreferit(false);
+      }
+    } catch (error) {
+      setAlerta({ type: 'error', message: 'Error al processar la interacció.' });
+    }
+    setTimeout(() => setAlerta(null), 4000);
+  };
 
   if (loading) {
     return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}><CircularProgress sx={{ color: colors.orange }} size={60} /></Box>;
@@ -109,12 +148,23 @@ function ProfileAnimal() {
     <Box sx={{ background: colors.background, minHeight: '100vh', py: 6 }}>
       <Container maxWidth="md">
         <Paper elevation={4} sx={{ p: 4, borderRadius: 5, background: colors.lightColor, maxWidth: 900, mx: 'auto', position: 'relative' }}>
-          {/* Cor de favorit */}
+          {/* Notificació visual d'alerta */}
+          {alerta && (
+            <Alert severity={alerta.type} sx={{ mb: 3 }}>
+              {alerta.message}
+              {alerta.chatId && (
+                <Button color="success" size="small" sx={{ ml: 2 }} onClick={() => navigate(`/chat/${alerta.chatId}`)}>
+                  Ves al xat
+                </Button>
+              )}
+            </Alert>
+          )}
+          {/* Cor de preferit */}
           <IconButton
-            onClick={() => setFavorit(f => !f)}
+            onClick={togglePreferit}
             sx={{ position: 'absolute', top: 32, right: 32, zIndex: 2, background: 'none' }}
           >
-            {favorit ? <FavoriteIcon sx={{ color: 'red', fontSize: 36 }} /> : <FavoriteBorderIcon sx={{ color: colors.orange, fontSize: 36 }} />}
+            {preferit ? <FavoriteIcon sx={{ color: 'red', fontSize: 36 }} /> : <FavoriteBorderIcon sx={{ color: colors.orange, fontSize: 36 }} />}
           </IconButton>
           {/* Capçalera amb imatge i nom */}
           <Grid container spacing={4} alignItems="center">

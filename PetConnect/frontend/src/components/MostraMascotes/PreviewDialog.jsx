@@ -10,11 +10,11 @@ import {
   Grid,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import ProfileMascotaView from "../MostraMascotes/ProfileMascotaView.jsx";
-import CardPetDetail from "../MostraMascotes/CardPetDetail.jsx";
-import { useColors } from '../../hooks/useColors';
+import ProfileMascotaView from "./ProfileMascotaView.jsx";
+import CardPetDetail from "./CardPetDetail.jsx";
+import { useColors } from '../../hooks/useColors.jsx';
 
-export default function PreviewDialog({ openPreviewDialog, setOpenPreviewDialog, formData, previewUrl }) {
+export default function PreviewDialog({ openPreviewDialog, setOpenPreviewDialog, formData, previewUrls }) {
   const { t } = useTranslation();
   const { colors } = useColors();
 
@@ -85,7 +85,9 @@ export default function PreviewDialog({ openPreviewDialog, setOpenPreviewDialog,
                 <ProfileMascotaView 
                   animal={{
                     ...formData,
-                    foto: previewUrl || (typeof formData.foto === "string" ? formData.foto : "")
+                    foto: previewUrls[0] || (typeof formData.foto === "string" ? formData.foto : ""),
+                    foto2: previewUrls[1] || (typeof formData.foto2 === "string" ? formData.foto2 : ""),
+                    foto3: previewUrls[2] || (typeof formData.foto3 === "string" ? formData.foto3 : "")
                   }}
                   showAdoptButton={false}
                 />
@@ -109,7 +111,9 @@ export default function PreviewDialog({ openPreviewDialog, setOpenPreviewDialog,
                   <CardPetDetail 
                     animal={{
                       ...formData,
-                      foto: previewUrl || (typeof formData.foto === "string" ? formData.foto : "")
+                      foto: previewUrls[0] || (typeof formData.foto === "string" ? formData.foto : ""),
+                      foto2: previewUrls[1] || (typeof formData.foto2 === "string" ? formData.foto2 : ""),
+                      foto3: previewUrls[2] || (typeof formData.foto3 === "string" ? formData.foto3 : "")
                     }} 
                     isFavorito={false} 
                     onToggleFavorito={() => {}} 

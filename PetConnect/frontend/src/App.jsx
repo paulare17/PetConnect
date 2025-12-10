@@ -10,6 +10,8 @@ import FormDialogProtectora from "./components/Forms/FormDialogProtectora";
 import { Routes, Route } from "react-router-dom";
 import { AuthProvider, useAuthContext } from "./context/AuthProvider";
 import ViewLogin from "./components/Login/ViewLogin";
+import ForgotPassword from "./components/Login/ForgotPassword";
+import ResetPassword from "./components/Login/ResetPassword";
 import FormProtectora from "./components/Forms/FormProtectora";
 import FormUsuari from "./components/Forms/FormUsuari";
 import AddAnimalForm from "./components/Forms/AddAnimalForm";
@@ -24,6 +26,7 @@ import ProfileMascota from "./components/pages/ProfileMascota.jsx";
 import ChatRoom from "./components/Chat/Chat.jsx";
 import ChatList from "./components/Chat/ChatList.jsx";
 import ChatbotWidget from "./components/ChatBot/ChatBot.jsx";
+import Favs from "./components/Favs/Favs.jsx";
 
 // Component que conté l'aplicació i pot accedir al context d'autenticació
 function AppContent() {
@@ -51,6 +54,8 @@ function AppContent() {
         } />
         <Route path="/rol" element={<FormRol />} />
         <Route path="/formulari-acces" element={<ViewLogin />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/login-protectora" element={
           <>
             <ViewLogin />
@@ -93,6 +98,11 @@ function AppContent() {
         <Route path="/inici-usuari-pettinder" element={
           <UsuarioRoute>
             <PetTinder />
+          </UsuarioRoute>
+        } />
+        <Route path="/favoritos" element={
+          <UsuarioRoute>
+            <Favs />
           </UsuarioRoute>
         } />
 

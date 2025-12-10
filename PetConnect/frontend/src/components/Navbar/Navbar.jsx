@@ -245,11 +245,11 @@ function ResponsiveAppBar() {
                       bgcolor: colors.lightBlue,
                     },
                   }}
-                >
+                  >
                   <Typography
                     sx={{
+                      color: isDarkMode ? colors.textLight : colors.textDark,
                       fontSize: "1rem",
-                      color: colors.textDark,
                     }}
                   >
                     {page.label}
@@ -281,11 +281,11 @@ function ResponsiveAppBar() {
                   <DarkModeIcon
                     sx={{
                       fontSize: "1.2rem",
-                      color: colors.textDark,
+                      color: isDarkMode ? colors.textLight : colors.textDark,
                     }}
                   />
                   <Typography
-                    sx={{ fontSize: "1rem", color: colors.textDark }}
+                    sx={{ fontSize: "1rem", color: isDarkMode ? colors.textLight : colors.textDark }}
                   >
                     {isDarkMode ? t('navbar.lightMode') : t('navbar.darkMode')}
                   </Typography>
@@ -307,11 +307,11 @@ function ResponsiveAppBar() {
                   <TranslateIcon
                     sx={{
                       fontSize: "1.2rem",
-                      color: colors.textDark,
+                        color: isDarkMode ? colors.textLight : colors.textDark,
                         }}
                       />
                       <Typography
-                        sx={{ fontSize: "1rem", color: colors.textDark }}
+                        sx={{ fontSize: "1rem", color: isDarkMode ? colors.textLight : colors.textDark }}
                       >
                         {i18n.language === 'ca' ? 'Idioma: Català' : i18n.language === 'es' ? 'Idioma: Español' : 'Language: English'}
                       </Typography>
@@ -411,7 +411,6 @@ function ResponsiveAppBar() {
               </Button>
             ))}
           </Box>
-          {/* Secció dreta: Avatar */}
          {/* Secció dreta: DarkMode + Traducció + Avatar */}
 <Box
   sx={{
@@ -632,6 +631,7 @@ function ResponsiveAppBar() {
         <Divider />
 
         {/* Opcions de menú */}
+
         <MenuItem
           onClick={() => handleUserMenuAction("Perfil")}
           sx={{
@@ -655,6 +655,24 @@ function ResponsiveAppBar() {
         >
           <Typography sx={{ fontSize: "0.95rem" }}>{t('menu.home')}</Typography>
         </MenuItem>
+
+        {/* Preferits: només per rol usuari */}
+        {user?.role === ROLES.USUARIO && (
+          <MenuItem
+            onClick={() => {
+              handleCloseUserMenu();
+              navigate("/favoritos");
+            }}
+            sx={{
+              py: 1.5,
+              "&:hover": {
+                bgcolor: colors.lightBlue,
+              },
+            }}
+          >
+            <Typography sx={{ fontSize: "0.95rem" }}>Preferits</Typography>
+          </MenuItem>
+        )}
 
         <Divider sx={{ my: 0.5 }} />
 

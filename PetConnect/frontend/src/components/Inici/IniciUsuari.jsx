@@ -27,12 +27,14 @@ import MaleIcon from "@mui/icons-material/Male";
 import FemaleIcon from "@mui/icons-material/Female";
 import { useTranslation } from "react-i18next";
 import { useColors } from "../../hooks/useColors";
+import { useAuthContext } from "../../context/AuthProvider";
 import api from "../../api/client";
 import CardPet from "../MostraMascotes/CardPet";
 import Pagination from "@mui/material/Pagination";
 import { Height } from "@mui/icons-material";
 
 function IniciUsuari() {
+  const { user } = useAuthContext();
   const { t } = useTranslation();
   const { colors } = useColors();
   const navigate = useNavigate();
@@ -60,7 +62,7 @@ function IniciUsuari() {
   const [animales, setAnimales] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [favoritos, setFavoritos] = useState([]);
+  const [preferits, setPreferits] = useState([]);
   const [filtros, setFiltros] = useState({
     especie: "todos",
     genero: "todos",
@@ -68,7 +70,8 @@ function IniciUsuari() {
   });
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const itemsPerPage = 20;
+  const [totalPages, setTotalPages] = useState(0);
+  const itemsPerPage = 12; // Match backend pagination
 
   // Funció per canviar els filtres
   const handleFilterChange = (name, value) => {
@@ -76,6 +79,7 @@ function IniciUsuari() {
       ...filtros,
       [name]: value,
     });
+    setPage(1); // Reset to first page when filters change
   };
 
   // Carregar animals des de l'API
@@ -88,21 +92,17 @@ function IniciUsuari() {
     if (filtros.especie !== "todos") params.append("especie", filtros.especie.toUpperCase());
     if (filtros.genero !== "todos") params.append("genero", filtros.genero.toUpperCase());
     if (filtros.tamaño !== "todos") params.append("tamano", filtros.tamaño.toUpperCase());
-    // Afegim la paginació
-    params.append("limit", itemsPerPage);
-    params.append("offset", (page - 1) * itemsPerPage);
+    // Afegim la paginació (DRF pagination usa 'page')
+    params.append("page", page);
 
     // Cridar l'API
     api
       .get(`/mascota/?${params.toString()}`)
       .then((response) => {
         setAnimales(response.data.results || response.data);
-        setTotalCount(
-          response.data.count ||
-            (response.data.results
-              ? response.data.results.length
-              : response.data.length)
-        );
+        setTotalCount(response.data.count || 0);
+        // Calculate total pages from count and page_size
+        setTotalPages(Math.ceil((response.data.count || 0) / itemsPerPage));
         setLoading(false);
       })
       .catch((err) => {
@@ -112,14 +112,47 @@ function IniciUsuari() {
       });
   }, [filtros, page, t]);
 
-  // Gestió de favorits
-  const toggleFavorito = (id) => {
-    if (favoritos.includes(id)) {
-      setFavoritos(favoritos.filter((fav) => fav !== id));
-    } else {
-      setFavoritos([...favoritos, id]);
+  // Carregar preferits de l'usuari
+  useEffect(() => {
+    if (!user) return;
+    api.get('/preferits/')
+      .then(res => {
+        const preferitsIds = res.data.preferits_ids || [];
+        setPreferits(preferitsIds);
+      })
+      .catch(err => {
+        console.error('Error carregant preferits:', err);
+      });
+  }, [user]);
+
+
+  // Gestió de preferits amb API i notificació
+  const [alerta, setAlerta] = useState(null);
+  const togglePreferit = async (id) => {
+    const isPreferit = preferits.includes(id);
+    try {
+      const action = isPreferit ? 'dislike' : 'like';
+      const response = await api.post('/swipe/action/', {
+        mascota_id: id,
+        action: action
+      });
+      if (response.data.is_like) {
+        setPreferits([...preferits, id]);
+        if (response.data.chat_id) {
+          setAlerta({
+            type: 'success',
+            message: `S'ha creat un xat amb la protectora!`,
+            chatId: response.data.chat_id
+          });
+        }
+      } else {
+        setPreferits(preferits.filter(fav => fav !== id));
+      }
+    } catch (error) {
+      setAlerta({ type: 'error', message: 'Error al processar la interacció.' });
     }
-  };
+    setTimeout(() => setAlerta(null), 4000);
+  } 
 
   if (loading) {
     return (
@@ -339,6 +372,18 @@ function IniciUsuari() {
           />
         </Box>
 
+        {/* Notificació visual d'alerta */}
+        {alerta && (
+          <Alert severity={alerta.type} sx={{ mb: 3 }}>
+            {alerta.message}
+            {alerta.chatId && (
+              <Button color="success" size="small" sx={{ ml: 2 }} onClick={() => navigate(`/chat/${alerta.chatId}`)}>
+                Ves al xat
+              </Button>
+            )}
+          </Alert>
+        )}
+
         {/* Galeria d'animals */}
         {animales.length > 0 ? (
           <>
@@ -369,8 +414,8 @@ function IniciUsuari() {
                   >
                     <CardPet
                       animal={animal}
-                      isFavorito={favoritos.includes(animal.id)}
-                      onToggleFavorito={() => toggleFavorito(animal.id)}
+                      isFavorito={preferits.includes(animal.id)}
+                      onToggleFavorito={() => togglePreferit(animal.id)}
                       sx={{
                         width: { xs: "100%", sm: 300, md: 300 },
                         maxWidth: 300,
@@ -381,13 +426,15 @@ function IniciUsuari() {
                 ))}
               </Box>
             </Container>
-            <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 4, mb: 4 }}>
               <Pagination
-                count={Math.ceil(totalCount / itemsPerPage)}
+                count={totalPages}
                 page={page}
                 onChange={(e, value) => setPage(value)}
                 color="primary"
                 size="large"
+                showFirstButton
+                showLastButton
               />
             </Box>
           </>

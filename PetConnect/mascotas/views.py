@@ -1,3 +1,23 @@
+# Vista per obtenir mascotes preferides
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Mascota, Interaccion
+from .serializers import MascotaSerializer
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def favoritos(request):
+    """
+    Retorna les mascotes marcades com a preferides (like) per l'usuari autenticat.
+    """
+    user = request.user
+    interaccions = Interaccion.objects.filter(usuario=user, accion='like')
+    mascota_ids = interaccions.values_list('mascota_id', flat=True)
+    mascotes = Mascota.objects.filter(id__in=mascota_ids)
+    serializer = MascotaSerializer(mascotes, many=True, context={'request': request})
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 import json
 from django.shortcuts import get_object_or_404
@@ -81,6 +101,7 @@ def swipe_action(request):
         )
         
         is_like = (action_str == 'like')
+        chat_id = None
         if is_like:
             # Comprova si ja existeix el xat, si no el crea
             chat, chat_created = Chat.objects.get_or_create(
@@ -88,8 +109,9 @@ def swipe_action(request):
                 adoptante=user,
                 defaults={'protectora': mascota.protectora, 'activo': True}
             )
+            chat_id = chat.id
         return Response(
-            {'status': 'ok', 'is_like': is_like, 'message': 'Interacció registrada amb èxit.'}, 
+            {'status': 'ok', 'is_like': is_like, 'chat_id': chat_id, 'message': 'Interacció registrada amb èxit.'}, 
             status=status.HTTP_201_CREATED if created else status.HTTP_200_OK
         )
 
@@ -97,6 +119,24 @@ def swipe_action(request):
         return Response({'detail': 'Mascota no trobada.'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({'detail': f'Error intern: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def get_user_preferits(request):
+    """
+    [GET] /api/preferits/
+    Retorna la llista de mascotes que l'usuari ha marcat com a preferits (likes).
+    """
+    user = request.user
+    preferits_ids = Interaccion.objects.filter(
+        usuario=user,
+        accion='like'
+    ).values_list('mascota_id', flat=True)
+    
+    return Response(
+        {'preferits_ids': list(preferits_ids)},
+        status=status.HTTP_200_OK
+    )
 
 class MascotaViewSet(viewsets.ModelViewSet):
     """ViewSet para Mascota con solo `list` y `create`.

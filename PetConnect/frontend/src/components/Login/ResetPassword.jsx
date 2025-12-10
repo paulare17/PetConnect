@@ -10,22 +10,24 @@ import {
   InputAdornment,
   IconButton
 } from '@mui/material';
-import { Visibility, VisibilityOff, Email, Lock } from '@mui/icons-material';
+import { Visibility, VisibilityOff, Lock } from '@mui/icons-material';
 import { useColors } from '../../hooks/useColors';
-import { useNavigate } from "react-router-dom";
-import { useAuthContext } from '../../context/AuthProvider';
+import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
+import api from '../../api/client';
 
-export default function ViewLogin() {
+
+export default function ResetPassword() {
   const navigate = useNavigate();
-  const { login } = useAuthContext();
+  const { token } = useParams();
   const { colors, isDarkMode } = useColors();
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
-    username: '',
-    password: ''
+    password: '',
+    confirmPassword: ''
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -40,28 +42,35 @@ export default function ViewLogin() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    
+    // Validar que les contrasenyes coincideixin
+    if (formData.password !== formData.confirmPassword) {
+      setError(t('resetPasswordPage.passwordsMustMatch'));
+      return;
+    }
+
+    // Validar longitud mínima
+    if (formData.password.length < 8) {
+      setError(t('resetPasswordPage.passwordMinLength'));
+      return;
+    }
+
     setLoading(true);
     
     try {
-      console.log('Dades d\'accés:', { username: formData.username, password: formData.password });
-      const loginResult = await login({ 
-        username: formData.username, 
+      // Enviar petició al backend per canviar contrasenya
+      await api.post('/usuarios/reset-password/', { 
+        token,
         password: formData.password 
       });
       
-      // Redirigir segons el rol
-      if (loginResult?.user?.role === 'usuario') {
-        navigate('/inici-usuari-pettinder');
-      } else if (loginResult?.user?.role === 'protectora') {
-        navigate('/inici-protectora');
-      } else {
-        navigate('/');
-      }
+      // Redirigir al login amb missatge d'èxit
+      navigate('/formulari-acces', { state: { resetSuccess: true } });
     } catch (err) {
-      console.log('Error backend detall:', err.response?.data);
+      console.log('Error reset contrasenya:', err.response?.data);
       const errorMsg = err.response?.data?.detail || 
                        err.response?.data?.error || 
-                       t('loginPage.authError');
+                       t('resetPasswordPage.errorMessage');
       setError(errorMsg);
     } finally {
       setLoading(false);
@@ -70,6 +79,10 @@ export default function ViewLogin() {
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
   };
 
   return (
@@ -92,7 +105,7 @@ export default function ViewLogin() {
             align="center"
             sx={{ mb: 3, color: colors.darkBlue, fontWeight: 'bold' }}
           >
-            {t('loginPage.title')}
+            {t('resetPasswordPage.title')}
           </Typography>
 
           <Typography 
@@ -100,7 +113,7 @@ export default function ViewLogin() {
             align="center" 
             sx={{ mb: 3, color: 'text.secondary' }}
           >
-            {t('loginPage.subtitle')}
+            {t('resetPasswordPage.subtitle')}
           </Typography>
 
           {error && (
@@ -114,38 +127,18 @@ export default function ViewLogin() {
               margin="normal"
               required
               fullWidth
-              id="username"
-              label={t('loginPage.username')}
-              name="username"
-              autoComplete="username"
-              autoFocus
-              value={formData.username}
-              onChange={handleInputChange}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Email sx ={{color: isDarkMode ? colors.blue : colors.darkBlue}} />
-                  </InputAdornment>
-                ),
-              }}
-              sx={{ mb: 2, }}
-            />
-
-            <TextField
-              margin="normal"
-              required
-              fullWidth
               name="password"
-              label={t('loginPage.password')}
+              label={t('resetPasswordPage.newPasswordLabel')}
               type={showPassword ? 'text' : 'password'}
               id="password"
-              autoComplete="current-password"
+              autoComplete="new-password"
+              autoFocus
               value={formData.password}
               onChange={handleInputChange}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Lock sx ={{color:colors.blue}} />
+                    <Lock sx ={{color: isDarkMode ? colors.blue : colors.darkBlue}} />
                   </InputAdornment>
                 ),
                 endAdornment: (
@@ -156,6 +149,38 @@ export default function ViewLogin() {
                       edge="end"
                     >
                       {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+              sx={{ mb: 2 }}
+            />
+
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="confirmPassword"
+              label={t('resetPasswordPage.confirmPasswordLabel')}
+              type={showConfirmPassword ? 'text' : 'password'}
+              id="confirmPassword"
+              autoComplete="new-password"
+              value={formData.confirmPassword}
+              onChange={handleInputChange}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Lock sx ={{color: isDarkMode ? colors.blue : colors.darkBlue}} />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle confirm password visibility"
+                      onClick={toggleConfirmPasswordVisibility}
+                      edge="end"
+                    >
+                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -178,60 +203,24 @@ export default function ViewLogin() {
                 textTransform: 'none',
                 bgcolor: colors.blue,
                 "&:hover": {
-                              bgcolor: colors.darkBlue,
-                              transform: "translateY(-2px)",
-                              boxShadow: "0 4px 12px rgba(102, 197, 189, 0.3)",
-                            },
-              }}
-            >
-              {loading ? t('loginPage.loggingIn') : t('loginPage.loginButton')}
-            </Button>
-
-            <Button
-              fullWidth
-              variant="outlined"
-              disabled={loading}
-              onClick={() => navigate('/login-protectora')}
-              sx={{ 
-                mb: 2, 
-                py: 1,
-                px: 4,
-                borderRadius: 5,
-                fontSize: '0.95rem',
-                textTransform: 'none',
-                color: colors.yellow,
-                borderColor: colors.yellow,
-                "&:hover": {
-                  borderColor: colors.purple,
-                  bgcolor: 'rgba(246, 206, 91, 0.1)',
+                  bgcolor: colors.darkBlue,
                   transform: "translateY(-2px)",
+                  boxShadow: "0 4px 12px rgba(102, 197, 189, 0.3)",
                 },
               }}
             >
-              {t('loginPage.shelterButton')}
+              {loading ? t('resetPasswordPage.resetting') : t('resetPasswordPage.resetButton')}
             </Button>
 
             <Box sx={{ textAlign: 'center', mt: 2 }}>
               <Typography variant="body2" color="text.secondary">
-                {t('loginPage.forgotPassword')}{' '}
                 <Button 
-                  onClick={() => navigate('/forgot-password')}
+                  onClick={() => navigate('/formulari-acces')}
                   variant="text" 
                   size="small"
                   sx={{ textTransform: 'none', p: 0, minWidth: 'auto' }}
                 >
-                  {t('loginPage.recoverPassword')}
-                </Button>
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {t('loginPage.noAccount')}{' '}
-                <Button 
-                  onClick={()=> navigate('/formulari-dialog')}
-                  variant="text" 
-                  size="small"
-                  sx={{ textTransform: 'none', p: 0, minWidth: 'auto' }}
-                >
-                  {t('loginPage.createAccount')}
+                  {t('resetPasswordPage.backToLogin')}
                 </Button>
               </Typography>
             </Box>

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Card from '@mui/material/Card';
 import CardMedia from '@mui/material/CardMedia';
@@ -11,6 +12,8 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import PetsIcon from '@mui/icons-material/Pets';
 import MaleIcon from '@mui/icons-material/Male';
 import FemaleIcon from '@mui/icons-material/Female';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useColors } from '../../hooks/useColors';
 import Box from '@mui/material/Box';
 import gatDefecte from "../../assets/gat_defecte.png";
@@ -22,7 +25,7 @@ import gosDefecte from "../../assets/gos_defecte.png";
 export default function CardPet({ animal, isFavorito, onToggleFavorito, sx }) {
   const { t } = useTranslation();
   const { colors } = useColors();
-  // Exemple per defecte si no hi ha animal
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
   const data = animal || null;
 
@@ -33,20 +36,41 @@ export default function CardPet({ animal, isFavorito, onToggleFavorito, sx }) {
   const generoLower = (data.genero || '').toLowerCase();
   const cardColor = especieLower === 'perro' ? colors.lightOrange : colors.lightBlue;
   const iconColor = especieLower === 'perro' ? colors.darkOrange : colors.darkBlue;
-  let imageSrc;
-  if (!data.foto) {
-    imageSrc = especieLower === 'gato'
-      ? gatDefecte
-      : gosDefecte;
-  } else {
-    imageSrc = data.foto;
+  
+  // Determinar imatge per defecte segons espècie
+  const defaultImage = especieLower === 'gato' ? gatDefecte : gosDefecte;
+  
+  // Crear array amb totes les fotos disponibles
+  const images = [
+    data.foto || defaultImage,
+    data.foto2,
+    data.foto3
+  ].filter(Boolean); // Eliminar valors null/undefined
+  
+  // Si no hi ha cap foto, afegir la imatge per defecte
+  if (images.length === 0) {
+    images.push(defaultImage);
   }
+  
   const raza = especieLower === 'perro' ? (data.raza_perro_display || data.raza_perro) : (data.raza_gato_display || data.raza_gato);
+
+  // Funcions per navegar pel carrussel
+  const handlePrevImage = (e) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+  };
+
+  const handleNextImage = (e) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+  };
 
   return (
     <Card sx={{
       ...sx,
       maxHeight: '100%',
+      width: '100%',
+      maxWidth: 400,
       display: 'flex',
       flexDirection: 'column',
       transition: 'transform 0.3s, box-shadow 0.3s',
@@ -55,18 +79,19 @@ export default function CardPet({ animal, isFavorito, onToggleFavorito, sx }) {
       overflow: 'hidden',
       backgroundColor: cardColor
     }}>
-      {/* Imatge */}
+      {/* Carrussel d'Imatges */}
       <Box sx={{ position: 'relative' }}>
         <CardMedia
           component="img"
           height="270px"
-          image={imageSrc}
-          alt={data.nombre}
+          image={images[currentImageIndex]}
+          alt={`${data.nombre} - ${currentImageIndex + 1}`}
           sx={{ objectFit: 'cover', objectPosition: 'center center' }}
         />
+        
         {/* Botó favorit */}
         <IconButton
-          onClick={onToggleFavorito}
+          onClick={e => { e.stopPropagation(); onToggleFavorito(); }}
           sx={{ position: 'absolute', top: 8, right: 8, backgroundColor: 'white', '&:hover': { backgroundColor: 'white' } }}
         >
           {isFavorito ? (
@@ -75,12 +100,85 @@ export default function CardPet({ animal, isFavorito, onToggleFavorito, sx }) {
             <FavoriteBorderIcon sx={{ color: colors.orange }} />
           )}
         </IconButton>
+        
         {/* Chip d'espècie amb icona poteta */}
         <Chip
           icon={<PetsIcon />}
           label={especieLower === 'perro' ? t('cardPet.dog') : t('cardPet.cat')}
           sx={{ position: 'absolute', bottom: 8, left: 8, backgroundColor: iconColor, color: 'white', fontWeight: 'bold' }}
         />
+        
+        {/* Controls del carrussel - només si hi ha més d'una imatge */}
+        {images.length > 1 && (
+          <>
+            {/* Fletxa esquerra */}
+            <IconButton
+              onClick={handlePrevImage}
+              sx={{
+                position: 'absolute',
+                left: 8,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.95)' },
+                zIndex: 1
+              }}
+            >
+              <ChevronLeftIcon />
+            </IconButton>
+            
+            {/* Fletxa dreta */}
+            <IconButton
+              onClick={handleNextImage}
+              sx={{
+                position: 'absolute',
+                right: 8,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.95)' },
+                zIndex: 1
+              }}
+            >
+              <ChevronRightIcon />
+            </IconButton>
+            
+            {/* Indicadors (dots) */}
+            <Box
+              sx={{
+                position: 'absolute',
+                bottom: 42,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                display: 'flex',
+                gap: 0.5,
+                zIndex: 1
+              }}
+            >
+              {images.map((_, index) => (
+                <Box
+                  key={index}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentImageIndex(index);
+                  }}
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    backgroundColor: index === currentImageIndex ? 'white' : 'rgba(255, 255, 255, 0.5)',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s',
+                    '&:hover': {
+                      backgroundColor: 'white',
+                      transform: 'scale(1.2)'
+                    }
+                  }}
+                />
+              ))}
+            </Box>
+          </>
+        )}
       </Box>
 
       {/* Contingut */}
@@ -107,7 +205,7 @@ export default function CardPet({ animal, isFavorito, onToggleFavorito, sx }) {
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             lineHeight: 1.5,
-            width: '1'
+            width: '100%'
           }}>
             {data.descripcion || t('cardPet.noDescription')}
           </Typography>

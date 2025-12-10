@@ -156,6 +156,8 @@ export default function FormProtectora() {
     else if (!/\S+@\S+\.\S+/.test(formData.email))
       newErrors.email = t('formProtectora.emailInvalid');
 
+    if (!formData.city.trim()) newErrors.city = t('formProtectora.cityRequired');
+
     // Validacions camps de protectora
     if (!formData.nombre_protectora.trim())
       newErrors.nombre_protectora = t('formProtectora.shelterNameRequired');
@@ -368,11 +370,14 @@ export default function FormProtectora() {
 
               <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
+                  required
                   fullWidth
                   name="city"
                   label={t('formProtectora.city')}
                   value={formData.city}
                   onChange={handleInputChange}
+                  error={!!errors.city}
+                  helperText={errors.city}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">

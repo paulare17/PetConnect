@@ -264,20 +264,29 @@ def generar_biografia_modular(datos):
     NUEVA IA: Genera biografías únicas combinando fragmentos modulares
     según las características reales del animal.
     """
-    # Extraer datos
-    nombre = datos.get('nombre', 'Amigo').strip().capitalize()
-    especie = normalize_text(datos.get('especie', 'perro'))
-    sexo = normalize_text(datos.get('sexo', 'macho'))
-    
-    edad = datos.get('edad')
-    if edad is not None:
-        try:
-            edad = int(edad)
-        except (ValueError, TypeError):
-            edad = None
-    
-    tamano = datos.get('tamano') or datos.get('tamaño') or ''
-    tamano = tamano.lower() if tamano else ''
+    try:
+        # Extraer datos
+        nombre = datos.get('nombre', 'Amigo')
+        if nombre:
+            nombre = str(nombre).strip().capitalize()
+        else:
+            nombre = 'Amigo'
+            
+        especie = normalize_text(datos.get('especie', 'perro'))
+        sexo = normalize_text(datos.get('sexo', 'macho'))
+        
+        edad = datos.get('edad')
+        if edad is not None:
+            try:
+                edad = int(edad)
+            except (ValueError, TypeError):
+                edad = None
+        
+        tamano = datos.get('tamano') or datos.get('tamaño') or ''
+        tamano = tamano.lower() if tamano else ''
+    except Exception as e:
+        print(f"❌ Error extrayendo datos básicos: {e}")
+        raise
     
     raza = datos.get('raza') or datos.get('raza_perro') or datos.get('raza_gato') or ''
     
@@ -709,9 +718,21 @@ class GenerarBioIAView(APIView):
     permission_classes = []  # Públic
     
     def post(self, request, *args, **kwargs):
-        resultado = simular_generacion_ia(request.data)
-        
-        return Response({'biografia': resultado['biografia']}, status=status.HTTP_200_OK)
+        try:
+            print("📥 Datos recibidos en GenerarBioIAView:", request.data)
+            resultado = simular_generacion_ia(request.data)
+            print("✅ Biografía generada exitosamente")
+            
+            return Response({'biografia': resultado['biografia']}, status=status.HTTP_200_OK)
+        except Exception as e:
+            print("❌ Error en GenerarBioIAView:", str(e))
+            import traceback
+            traceback.print_exc()
+            
+            return Response({
+                'error': str(e),
+                'biografia': 'Error al generar la biografía. Por favor, inténtalo de nuevo o escribe una manualmente.'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class ChatbotFAQView(APIView):

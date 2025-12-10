@@ -393,6 +393,8 @@ class Mascota(models.Model):
     nombre = models.CharField(max_length=100, help_text="Introduzca el nombre del animal", verbose_name="Nombre")
     edad = models.PositiveIntegerField(default=0, help_text="Edad en años", verbose_name="Edad")
     foto = models.ImageField(upload_to='mascotas/', verbose_name="Foto")
+    foto2 = models.ImageField(upload_to='mascotas/', verbose_name="Foto 2", blank=True, null=True)
+    foto3 = models.ImageField(upload_to='mascotas/', verbose_name="Foto 3", blank=True, null=True)
     
     # Descripción/Biografía del animal (puede ser generada por IA)
     descripcion = models.TextField(

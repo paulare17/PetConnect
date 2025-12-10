@@ -285,13 +285,13 @@ function PetTinder() {
           onClick={() => navigate("/inici-usuari-galeria")}
           sx={{
             position: "fixed",
-            top: 125,
-            right: 60,
+            top: { xs: 120, sm: 125 },
+            right: { xs: 16, sm: 60 },
             backgroundColor: colors.blue,
             color: "white",
-            px: 4,
-            py: 3,
-            fontSize: "1.1rem",
+            px: { xs: 2.5, sm: 4 },
+            py: { xs: 1.2, sm: 3 },
+            fontSize: { xs: "0.95rem", sm: "1.1rem" },
             fontWeight: "bold",
             borderRadius: 50,
             display: "flex",
@@ -299,7 +299,7 @@ function PetTinder() {
             alignItems: "center",
             boxShadow: `0 6px 20px ${colors.blue}60`,
             zIndex: 1000,
-            animation: "pulse 2s ease-in-out infinite",
+            animation: { xs: "none", sm: "pulse 2s ease-in-out infinite" },
             "@keyframes pulse": {
               "0%, 100%": { transform: "scale(1)" },
               "50%": { transform: "scale(1.20)" },
@@ -310,14 +310,6 @@ function PetTinder() {
               boxShadow: `0 8px 25px ${colors.orange}80`,
             },
             transition: "all 0.3s ease",
-            // Responsive
-            "@media (max-width: 600px)": {
-              px: 2.5,
-              py: 1.2,
-              fontSize: "0.95rem",
-              top: 16,
-              right: 16,
-            },
           }}
         >
           <PetsIcon sx={{ fontSize: 28 }} />
