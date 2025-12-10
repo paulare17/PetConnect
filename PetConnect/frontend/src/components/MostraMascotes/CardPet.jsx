@@ -22,7 +22,7 @@ import gosDefecte from "../../assets/gos_defecte.png";
 // El component ara rep també la info de la protectora via props (simulant la futura connexió amb Django REST Framework)
 // protectora = { nombre: string, foto: string }
 
-export default function CardPet({ animal, isFavorito, onToggleFavorito, sx }) {
+export default function CardPet({ animal, isFavorito, onToggleFavorito, sx, showFavoriteButton = true }) {
   const { t } = useTranslation();
   const { colors } = useColors();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -89,17 +89,32 @@ export default function CardPet({ animal, isFavorito, onToggleFavorito, sx }) {
           sx={{ objectFit: 'cover', objectPosition: 'center center' }}
         />
         
-        {/* Botó favorit */}
-        <IconButton
-          onClick={e => { e.stopPropagation(); onToggleFavorito(); }}
-          sx={{ position: 'absolute', top: 8, right: 8, backgroundColor: 'white', '&:hover': { backgroundColor: 'white' } }}
-        >
-          {isFavorito ? (
-            <FavoriteIcon sx={{ color: 'red' }} />
-          ) : (
-            <FavoriteBorderIcon sx={{ color: colors.orange }} />
-          )}
-        </IconButton>
+        {/* Degradat de transició foto → contingut */}
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: '60px',
+            background: `linear-gradient(to bottom, transparent, ${cardColor})`,
+            pointerEvents: 'none'
+          }}
+        />
+        
+        {/* Botó favorit - només si showFavoriteButton és true */}
+        {showFavoriteButton && (
+          <IconButton
+            onClick={e => { e.stopPropagation(); onToggleFavorito(); }}
+            sx={{ position: 'absolute', top: 8, right: 8, backgroundColor: 'white', '&:hover': { backgroundColor: 'white' } }}
+          >
+            {isFavorito ? (
+              <FavoriteIcon sx={{ color: 'red' }} />
+            ) : (
+              <FavoriteBorderIcon sx={{ color: colors.orange }} />
+            )}
+          </IconButton>
+        )}
         
         {/* Chip d'espècie amb icona poteta */}
         <Chip
@@ -183,7 +198,7 @@ export default function CardPet({ animal, isFavorito, onToggleFavorito, sx }) {
 
       {/* Contingut */}
       <CardContent sx={{ flexGrow: 1 }}>
-        <Typography variant="h6" component="h2" sx={{ color: colors.black, mb: 1, textAlign: 'center' }}>
+        <Typography variant="h6" component="h2" sx={{ color: colors.textDark, mb: 1, textAlign: 'center' }}>
           {data.nombre}
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>

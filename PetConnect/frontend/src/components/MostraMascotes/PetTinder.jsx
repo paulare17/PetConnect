@@ -221,7 +221,11 @@ function PetTinder() {
               justifyContent: "center",
             }}
           >
-            <CardPet animal={animal} sx={{ width: "100%", height: "100%" }} />
+            <CardPet 
+              animal={animal} 
+              sx={{ width: "100%", height: "100%" }} 
+              showFavoriteButton={false} 
+            />
           </Box>
 
           {/* botons */}

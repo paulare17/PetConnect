@@ -18,6 +18,8 @@ import FemaleIcon from '@mui/icons-material/Female';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useTranslation } from 'react-i18next';
+import { useAuthContext } from '../../context/AuthProvider';
+import { ROLES } from '../../constants/roles';
 // Mapeig de caràcters backend -> clau traducció
 const CHARACTER_TRANSLATION_MAP = {
   CARINOSO: 'affectionate',
@@ -66,10 +68,23 @@ import gosDefecte from '../../assets/gos_defecte.png';
 function ProfileMascotaView({ animal, showAdoptButton = true }) {
   const { t } = useTranslation();
   const { colors } = useColors();
+  const { user } = useAuthContext();
   const [favorit, setFavorit] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [alerta, setAlerta] = useState(null);
+  
+  // Verificar si l'usuari és protectora
+  const isProtectora = user?.role === ROLES.PROTECTORA;
+  console.log('ProfileMascotaView - isProtectora:', isProtectora, 'user.role:', user?.role);
+  
+  // const isOwnPet = isProtectora && animal?.protectora === user?.id;
   const handleToggleFavorit = async () => {
+    // No permetre accions de favorits per a protectores
+    if (isProtectora) {
+      console.log('Acció bloquejada: l\'usuari és protectora');
+      return;
+    }
+    
     try {
       const action = favorit ? 'dislike' : 'like';
       const response = await import('../../api/client').then(m => m.default.post('/swipe/action/', {
@@ -149,8 +164,8 @@ function ProfileMascotaView({ animal, showAdoptButton = true }) {
   return (
     <Box sx={{ py: 2 , width: '1000px', justifyContent: 'center', display: 'flex' }}>
       <Paper elevation={4} sx={{ p: 4, borderRadius: 5, background: colors.lightColor, position: 'relative' }}>
-        {/* Notificació visual d'alerta */}
-        {alerta && (
+        {/* Notificació visual d'alerta - només per usuaris */}
+        {alerta && !isProtectora && (
           <Box sx={{ position: 'absolute', top: 70, right: 16, zIndex: 10, minWidth: 300 }}>
             <Button color={alerta.type === 'success' ? 'success' : 'error'} variant="outlined" fullWidth disabled>
               {alerta.message}
@@ -160,13 +175,15 @@ function ProfileMascotaView({ animal, showAdoptButton = true }) {
             </Button>
           </Box>
         )}
-        {/* Cor de favorit */}
-        <IconButton
-          onClick={handleToggleFavorit}
-          sx={{ position: 'absolute', top: 16, right: 16, zIndex: 2, background: 'none' }}
-        >
-          {favorit ? <FavoriteIcon sx={{ color: 'red', fontSize: 36 }} /> : <FavoriteBorderIcon sx={{ color: colors.orange, fontSize: 36 }} />}
-        </IconButton>
+        {/* Cor de favorit - només per usuaris */}
+        {!isProtectora && (
+          <IconButton
+            onClick={handleToggleFavorit}
+            sx={{ position: 'absolute', top: 16, right: 16, zIndex: 2, background: 'none' }}
+          >
+            {favorit ? <FavoriteIcon sx={{ color: 'red', fontSize: 36 }} /> : <FavoriteBorderIcon sx={{ color: colors.orange, fontSize: 36 }} />}
+          </IconButton>
+        )}
         
         {/* Capçalera amb imatge i nom */}
         <Grid container spacing={4} alignItems="center">

@@ -623,5 +623,12 @@
     "adaptable": "Adaptable",
     "diva": "Diva",
     "clean": "Clean"
+  },
+  "favs": {
+    "title": "My favorites",
+    "subtitle": "Animals you liked",
+    "noFavorites": "You don't have any favorite animals yet.",
+    "loading": "Loading favorites...",
+    "errorLoading": "Could not load favorites."
   }
 }

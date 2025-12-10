@@ -1148,6 +1148,7 @@ const AddAnimalForm = () => {
                           : ""),
                     }}
                     isFavorito={false}
+                    showFavoriteButton={false}
                     onToggleFavorito={() => {}}
                   />
                 </Box>

@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Container, Typography, CircularProgress, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import CardPet from '../MostraMascotes/CardPet';
 import { useColors } from '../../hooks/useColors';
 import api from '../../api/client';
 import { useAuthContext } from '../../context/AuthProvider';
+import { ROLES } from '../../constants/roles';
 
 export default function Favs() {
+  const { t } = useTranslation();
   const { colors } = useColors();
   const { user } = useAuthContext();
   const navigate = useNavigate();
@@ -16,6 +19,12 @@ export default function Favs() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    // Redirigir protectores a la seva pàgina d'inici
+    if (user?.role === ROLES.PROTECTORA) {
+      navigate('/inici');
+      return;
+    }
+    
     if (!user) {
       setLoading(false);
       return;
@@ -55,13 +64,13 @@ export default function Favs() {
       } catch (err) {
         console.error('Error carregant preferits:', err);
         console.error('Detalls error:', err.response?.data);
-        setError(err.response?.data?.detail || 'No s\'han pogut carregar els preferits.');
+        setError(err.response?.data?.detail || t('favs.errorLoading'));
         setLoading(false);
       }
     };
     
     fetchFavorits();
-  }, [user]);
+  }, [user, t, navigate]);
 
   if (loading) {
     return (
@@ -95,10 +104,10 @@ export default function Favs() {
           }}
         >
           <FavoriteIcon sx={{ fontSize: 48 }} />
-          Els meus preferits
+          {t('favs.title')}
         </Typography>
         <Typography variant="h6" sx={{ color: colors.textDark }}>
-          Animals que t'han agradat
+          {t('favs.subtitle')}
         </Typography>
       </Box>
       
@@ -106,7 +115,7 @@ export default function Favs() {
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' }, gap: 4 }}>
           {favorits.length === 0 ? (
             <Typography variant="body1" sx={{ color: colors.textDark, textAlign: 'center', gridColumn: '1/-1' }}>
-              Encara no tens cap animal preferit.
+              {t('favs.noFavorites')}
             </Typography>
           ) : (
             favorits.map(animal => (

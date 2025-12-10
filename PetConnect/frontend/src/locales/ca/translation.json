@@ -623,5 +623,12 @@
     "adaptable": "Adaptable",
     "diva": "Diva",
     "clean": "Net"
+  },
+  "favs": {
+    "title": "Els meus preferits",
+    "subtitle": "Animals que t'han agradat",
+    "noFavorites": "Encara no tens cap animal preferit.",
+    "loading": "Carregant preferits...",
+    "errorLoading": "No s'han pogut carregar els preferits."
   }
 }
