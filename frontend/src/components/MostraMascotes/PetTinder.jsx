@@ -18,12 +18,12 @@ import ChatIcon from "@mui/icons-material/Chat";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useColors } from "../../hooks/useColors";
-import api from "../../../../../frontend/src/api/client.js";
+import api from "../../api/client.js";
 import ChatMiniList from "../Chat/ChatMiniList.jsx";
 import Chat from "../Chat/Chat.jsx";
 import CardPet from "./CardPet.jsx";
 import CardPetDetail from "./CardPetDetail.jsx";
-import PetTinderButton from "../../../../../frontend/src/components/Buttons/PetTinderButton.jsx";
+import PetTinderButton from "../Buttons/PetTinderButton.jsx";
 
 function PetTinder() {
   const { t } = useTranslation();

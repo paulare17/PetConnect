@@ -5,7 +5,7 @@ import gatImatgeInfEsq from "../../assets/gat-cantonada.png";
 import gatImatgeSupDreta from "../../assets/gat-superior.png";
 import gosImatgeCentre from "../../assets/gos-baix.png";
 import "./petjades.css";
-import { useColors } from "../../../../PetConnect/frontend/src/hooks/useColors";
+import { useColors } from "../../hooks/useColors";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 

@@ -10,7 +10,7 @@ import {
   InputAdornment,
 } from '@mui/material';
 import { Email } from '@mui/icons-material';
-import { useColors } from '../../../../PetConnect/frontend/src/hooks/useColors';
+import { useColors } from '../../hooks/useColors';
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import api from '../../api/client';

@@ -32,7 +32,7 @@ import {
   Group,
   VolunteerActivism,
 } from "@mui/icons-material";
-import { useColors } from "../../../../PetConnect/frontend/src/hooks/useColors";
+import { useColors } from "../../hooks/useColors";
 import { useNavigate } from "react-router-dom";
 import { createUserProfile } from "../../api/client";
 import {
@@ -43,7 +43,7 @@ import {
   edadOptions,
   sexoOptions,
   tipoViviendaOptions,
-} from "../../../../PetConnect/frontend/src/constants/options";
+} from "../../constants/options";
 import { useTranslation } from "react-i18next";
 
 export default function FormUsuari({ onProfileCreated, existingProfile }) {

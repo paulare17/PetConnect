@@ -1,5 +1,5 @@
 import PetsIcon from "@mui/icons-material/Pets";
-import { useColors } from "../../../../PetConnect/frontend/src/hooks/useColors";
+import { useColors } from "../../hooks/useColors";
 import { useTranslation } from "react-i18next";
 
 export default function Footer() {

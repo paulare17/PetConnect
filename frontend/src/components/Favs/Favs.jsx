@@ -3,10 +3,10 @@ import { Box, Container, Typography, CircularProgress, Alert } from '@mui/materi
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import FavoriteIcon from '@mui/icons-material/Favorite';
-import CardPet from '../../../../PetConnect/frontend/src/components/MostraMascotes/CardPet';
+import CardPet from '../MostraMascotes/CardPet';
 import { useColors } from '../../hooks/useColors';
 import api from '../../api/client';
-import { useAuthContext } from '../../../../PetConnect/frontend/src/context/AuthProvider';
+import { useAuthContext } from '../../context/AuthProvider';
 import { ROLES } from '../../constants/roles';
 
 export default function Favs() {

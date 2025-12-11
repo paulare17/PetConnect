@@ -26,10 +26,10 @@ import FemaleIcon from '@mui/icons-material/Female';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { useTranslation } from 'react-i18next';
-import { useColors } from '../../../../PetConnect/frontend/src/hooks/useColors';
+import { useColors } from '../../hooks/useColors';
 import api from '../../api/client';
-import { useAuthContext } from '../../../../PetConnect/frontend/src/context/AuthProvider';
-import { ROLES } from '../../../../PetConnect/frontend/src/constants/roles';
+import { useAuthContext } from '../../context/AuthProvider';
+import { ROLES } from '../../constants/roles';
 
 // Mapeig de caràcters backend -> clau traducció
 const CHARACTER_TRANSLATION_MAP = {

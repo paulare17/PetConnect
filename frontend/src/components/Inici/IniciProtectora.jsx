@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import PetsIcon from "@mui/icons-material/Pets";
 import ChatIcon from "@mui/icons-material/Chat";
-import { useColors } from "../../../../PetConnect/frontend/src/hooks/useColors.jsx";
+import { useColors } from "../../hooks/useColors.jsx";
 import api from "../../api/client.js";
 import ChatMiniList from "../Chat/ChatMiniList.jsx";
 import Chat from "../Chat/Chat.jsx";

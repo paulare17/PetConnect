@@ -16,7 +16,7 @@ import {
 import SendIcon from '@mui/icons-material/Send';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PetsIcon from '@mui/icons-material/Pets';
-import api from '../../../../../frontend/src/api/client';
+import api from '../../api/client';
 import { colors } from '../../constants/colors';
 import { useAuthContext } from '../../context/AuthProvider';
 

@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom';
-import { useAuthContext } from '../../../PetConnect/frontend/src/context/AuthProvider';
+import { useAuthContext } from '../context/AuthProvider';
 import { ROLES } from '../constants/roles';
 
 /**

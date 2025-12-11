@@ -91,7 +91,7 @@ function ProfileMascotaView({ animal, showAdoptButton = true }) {
     
     try {
       const action = favorit ? 'dislike' : 'like';
-      const response = await import('../../../../../frontend/src/api/client').then(m => m.default.post('/swipe/action/', {
+      const response = await import('../../api/client').then(m => m.default.post('/swipe/action/', {
         mascota_id: animal.id,
         action: action
       }));

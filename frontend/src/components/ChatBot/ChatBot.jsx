@@ -19,7 +19,7 @@ import {
   SmartToy as BotIcon,
   Person as PersonIcon
 } from '@mui/icons-material';
-import { useColors } from '../../../../PetConnect/frontend/src/hooks/useColors';
+import { useColors } from '../../hooks/useColors';
 
 const STORAGE_KEY = 'petconnect_chatbot_messages';
 

@@ -13,7 +13,7 @@ import {
   Chip
 } from '@mui/material';
 import PetsIcon from '@mui/icons-material/Pets';
-import api from '../../../../../frontend/src/api/client';
+import api from '../../api/client';
 import { useColors } from '../../hooks/useColors';
 import { useAuthContext } from '../../context/AuthProvider';
 
