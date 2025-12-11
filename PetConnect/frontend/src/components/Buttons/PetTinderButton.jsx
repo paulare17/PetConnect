@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "@mui/material";
 import PetsIcon from "@mui/icons-material/Pets";
 import { useNavigate } from "react-router-dom";
-import { useColors } from "../../hooks/useColors";
+import { useColors } from "../../../../PetConnect/frontend/src/hooks/useColors";
 import { useTranslation } from "react-i18next";
 
 /**

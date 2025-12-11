@@ -31,14 +31,14 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import MaleIcon from "@mui/icons-material/Male";
 import FemaleIcon from "@mui/icons-material/Female";
-import CardPet from "../MostraMascotes/CardPet.jsx";
-import { useColors } from "../../hooks/useColors";
-import api from "../../api/client";
-import CardPetDetail from "../MostraMascotes/CardPetDetail.jsx";
-import ProfileMascotaView from "../MostraMascotes/ProfileMascotaView.jsx";
+import CardPet from "../../../../PetConnect/frontend/src/components/MostraMascotes/CardPet.jsx";
+import { useColors } from "../../../../PetConnect/frontend/src/hooks/useColors.jsx";
+import api from "../../api/client.js";
+import CardPetDetail from "../../../../PetConnect/frontend/src/components/MostraMascotes/CardPetDetail.jsx";
+import ProfileMascotaView from "../../../../PetConnect/frontend/src/components/MostraMascotes/ProfileMascotaView.jsx";
 import gatDefecte from "../../assets/gat_defecte.png";
 import gosDefecte from "../../assets/gos_defecte.png";
-import PreviewDialog from "../MostraMascotes/PreviewDialog.jsx";
+import PreviewDialog from "../../../../PetConnect/frontend/src/components/MostraMascotes/PreviewDialog.jsx";
 
 const AddAnimalForm = () => {
   const { t } = useTranslation();

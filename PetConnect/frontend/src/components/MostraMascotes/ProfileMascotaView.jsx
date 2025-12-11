@@ -21,7 +21,7 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useTranslation } from 'react-i18next';
 import { useAuthContext } from '../../context/AuthProvider';
-import { ROLES } from '../../constants/roles';
+import { ROLES } from '../../../../../frontend/src/constants/roles';
 // Mapeig de caràcters backend -> clau traducció
 const CHARACTER_TRANSLATION_MAP = {
   CARINOSO: 'affectionate',
@@ -63,7 +63,7 @@ const CHARACTER_TRANSLATION_MAP = {
   DIVA: 'diva',
   LIMPIO: 'clean'
 };
-import { useColors } from '../../hooks/useColors';
+import { useColors } from '../../../../../frontend/src/hooks/useColors';
 import gatDefecte from '../../assets/gat_defecte.png';
 import gosDefecte from '../../assets/gos_defecte.png';
 
@@ -91,7 +91,7 @@ function ProfileMascotaView({ animal, showAdoptButton = true }) {
     
     try {
       const action = favorit ? 'dislike' : 'like';
-      const response = await import('../../api/client').then(m => m.default.post('/swipe/action/', {
+      const response = await import('../../../../../frontend/src/api/client').then(m => m.default.post('/swipe/action/', {
         mascota_id: animal.id,
         action: action
       }));
