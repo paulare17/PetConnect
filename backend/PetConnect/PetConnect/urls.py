@@ -18,13 +18,17 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     
     # Rutas API: Router (CRUD básico y /mascota/mis_mascotas/)
+    path('', include(router.urls)),
     path('api/', include(router.urls)),
     
+    path('ia/', include('ai_service.urls')),
     path('api/ia/', include('ai_service.urls')),
     # Rutas API: Manuales de la aplicación 'mascotas' (Swipe/Feed/Upload)
+    path('', include('mascotas.urls')), 
     path('api/', include('mascotas.urls')), 
     
     # Rutas API: Chat
+    path('chat/', include('chat.urls')),
     path('api/chat/', include('chat.urls')), 
        
     # Rutas de Autenticación JWT
