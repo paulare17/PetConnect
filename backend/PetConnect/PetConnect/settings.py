@@ -21,7 +21,12 @@ load_dotenv(BASE_DIR / 'PetConnect.env')
 
 SECRET_KEY =  os.environ.get('DJANGO_SECRET_KEY', 'dev-secret')
 DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost').split(',')
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+
+# Afegir hosts addicionals per desenvolupament
+ALLOWED_HOSTS += ['localhost', '127.0.0.1', '0.0.0.0']
+# Eliminar duplicats
+ALLOWED_HOSTS = list(set(ALLOWED_HOSTS))
 
 # Application definition
 
@@ -59,7 +64,7 @@ SIMPLE_JWT = {
 AUTH_USER_MODEL = 'usuarios.Usuario'
 
 LOGIN_URL = '/usuarios/login'
-LOGIN_REDIRECT_URL = '/usuarios/home'
+LOGIN_REDIRECT_URL = '/usuarios/MostraMascotes'
 LOGOUT_REDIRECT_URL = '/usuarios/login'
 
 MIDDLEWARE = [

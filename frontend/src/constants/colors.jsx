@@ -4,6 +4,7 @@ export const colors = {
   // Taronges
   orange: "#f5842b",
   darkOrange: "#fc6d00ff",
+  lightOrange: "#fbe5cfff",
   backgroundOrange: "#f1d5b6",
   
   // Blaus/Turqueses

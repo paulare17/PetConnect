@@ -19,9 +19,10 @@ export default function useMascotas(filters = {}) {
       
       // Construir query params
       const params = new URLSearchParams();
-      if (filters.especie) params.append('especie', filters.especie);
-      if (filters.genero) params.append('genero', filters.genero);
-      if (filters.tamaño) params.append('tamaño', filters.tamaño);
+      if (filters.especie) params.append('especie', filters.especie.toUpperCase());
+      if (filters.genero) params.append('genero', filters.genero.toUpperCase());
+      if (filters.tamano) params.append('tamano', filters.tamano.toUpperCase());
+      if (filters.tamaño) params.append('tamano', filters.tamaño.toUpperCase()); // Compatibilitat amb accent
       if (filters.busqueda) params.append('busqueda', filters.busqueda);
       
       const queryString = params.toString();

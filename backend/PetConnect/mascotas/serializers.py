@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Mascota
-from ai_service.description_generator import DescriptionGenerator
+from ai_service.views import simular_generacion_ia
 
 
 
@@ -15,8 +15,8 @@ class MascotaSerializer(serializers.ModelSerializer):
     genero_display = serializers.CharField(source='get_genero_display', read_only=True)
     raza_perro_display = serializers.CharField(source='get_raza_perro_display', read_only=True)
     raza_gato_display = serializers.CharField(source='get_raza_gato_display', read_only=True)
-    caracter_display = serializers.CharField(source='get_caracter_display', read_only=True)
-    convivencia_animales_display = serializers.CharField(source='get_convivencia_animales_display', read_only=True)
+    tamano_display = serializers.CharField(source='get_tamano_display', read_only=True)
+    edad_clasificacion_display = serializers.CharField(source='get_edad_clasificacion_display', read_only=True)
     
     class Meta:
         model = Mascota
@@ -28,41 +28,47 @@ class MascotaSerializer(serializers.ModelSerializer):
             'protectora',
             'protectora_nombre',
             'protectora_ciudad',
-            'ubicacion',  # Se asigna automáticamente desde la protectora
             'especie_display',
             'genero_display',
             'raza_perro_display',
             'raza_gato_display',
-            'caracter_display',
-            'convivencia_animales_display'
+            'tamano_display',
+            'edad_clasificacion_display'
         )
         extra_kwargs = {
             'foto': {'required': True},
             'nombre': {'required': True, 'min_length': 2, 'max_length': 100},
             'especie': {'required': True},
             'genero': {'required': True},
-            'edad': {'required': True, 'min_value': 0, 'max_value': 30}
+            'edad': {'required': False, 'min_value': 0, 'max_value': 30}
         }
     
     def validate(self, data):
-        """Validación condicional de razas según la especie y otras validaciones puntuales."""
+        """Validación condicional de razas según la especie."""
         especie = data.get('especie')
 
         # Si la especie no viene en los datos, tomarla de la instancia (en updates)
         if especie is None and getattr(self, 'instance', None):
             especie = getattr(self.instance, 'especie', None)
 
-        if especie == 'perro':
+        if especie == 'PERRO':
             # raza_perro es obligatoria para perros
             if not data.get('raza_perro') and not (self.instance and getattr(self.instance, 'raza_perro', None)):
-                raise serializers.ValidationError({'raza_perro': 'Se requiere `raza_perro` cuando `especie` es "perro".'})
-            # Ignorar/ocultar raza_gato si se envía
+                raise serializers.ValidationError({'raza_perro': 'Se requiere `raza_perro` cuando `especie` es "PERRO".'})
+            # Ignorar campos de gato
             data.pop('raza_gato', None)
+            data.pop('color_pelaje_gato', None)
+            data.pop('caracter_gato', None)
+            data.pop('condicion_especial_gato', None)
 
-        elif especie == 'gato':
+        elif especie == 'GATO':
             if not data.get('raza_gato') and not (self.instance and getattr(self.instance, 'raza_gato', None)):
-                raise serializers.ValidationError({'raza_gato': 'Se requiere `raza_gato` cuando `especie` es "gato".'})
+                raise serializers.ValidationError({'raza_gato': 'Se requiere `raza_gato` cuando `especie` es "GATO".'})
+            # Ignorar campos de perro
             data.pop('raza_perro', None)
+            data.pop('color_pelaje_perro', None)
+            data.pop('caracter_perro', None)
+            data.pop('condicion_especial_perro', None)
 
         return data
 
@@ -71,18 +77,6 @@ class MascotaSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if request and hasattr(request, 'user'):
             validated_data['protectora'] = request.user
-            # Heredar la ubicación de la protectora
-            if hasattr(request.user, 'city') and request.user.city:
-                validated_data['ubicacion'] = request.user.city
-        
-        # Generar descripción con IA si no se proporciona
-        if not validated_data.get('descripcion'):
-            try:
-                generator = DescriptionGenerator()
-                validated_data['descripcion'] = generator.generate_description(validated_data)
-            except Exception as e:
-                print(f"⚠️ Error generando descripción con IA: {e}")
-                # Continuar sin descripción, no bloquear la creación
         
         return super().create(validated_data)
 
@@ -92,13 +86,21 @@ class MascotaSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
     def to_representation(self, instance):
-        """Oculta la raza irrelevante según la especie en la representación de salida."""
+        """Oculta los campos irrelevantes según la especie en la representación de salida."""
         rep = super().to_representation(instance)
         especie = rep.get('especie')
-        if especie == 'perro':
+        if especie == 'PERRO':
+            # Ocultar campos de gato
             rep.pop('raza_gato', None)
             rep.pop('raza_gato_display', None)
-        elif especie == 'gato':
+            rep.pop('color_pelaje_gato', None)
+            rep.pop('caracter_gato', None)
+            rep.pop('condicion_especial_gato', None)
+        elif especie == 'GATO':
+            # Ocultar campos de perro
             rep.pop('raza_perro', None)
             rep.pop('raza_perro_display', None)
+            rep.pop('color_pelaje_perro', None)
+            rep.pop('caracter_perro', None)
+            rep.pop('condicion_especial_perro', None)
         return rep

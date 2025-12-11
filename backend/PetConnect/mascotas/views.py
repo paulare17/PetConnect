@@ -1,3 +1,23 @@
+# Vista per obtenir mascotes preferides
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Mascota, Interaccion
+from .serializers import MascotaSerializer
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def favoritos(request):
+    """
+    Retorna les mascotes marcades com a preferides (like) per l'usuari autenticat.
+    """
+    user = request.user
+    interaccions = Interaccion.objects.filter(usuario=user, accion='like')
+    mascota_ids = interaccions.values_list('mascota_id', flat=True)
+    mascotes = Mascota.objects.filter(id__in=mascota_ids)
+    serializer = MascotaSerializer(mascotes, many=True, context={'request': request})
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 import json
 from django.shortcuts import get_object_or_404
@@ -81,6 +101,7 @@ def swipe_action(request):
         )
         
         is_like = (action_str == 'like')
+        chat_id = None
         if is_like:
             # Comprova si ja existeix el xat, si no el crea
             chat, chat_created = Chat.objects.get_or_create(
@@ -88,8 +109,9 @@ def swipe_action(request):
                 adoptante=user,
                 defaults={'protectora': mascota.protectora, 'activo': True}
             )
+            chat_id = chat.id
         return Response(
-            {'status': 'ok', 'is_like': is_like, 'message': 'Interacció registrada amb èxit.'}, 
+            {'status': 'ok', 'is_like': is_like, 'chat_id': chat_id, 'message': 'Interacció registrada amb èxit.'}, 
             status=status.HTTP_201_CREATED if created else status.HTTP_200_OK
         )
 
@@ -98,6 +120,24 @@ def swipe_action(request):
     except Exception as e:
         return Response({'detail': f'Error intern: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def get_user_preferits(request):
+    """
+    [GET] /api/preferits/
+    Retorna la llista de mascotes que l'usuari ha marcat com a preferits (likes).
+    """
+    user = request.user
+    preferits_ids = Interaccion.objects.filter(
+        usuario=user,
+        accion='like'
+    ).values_list('mascota_id', flat=True)
+    
+    return Response(
+        {'preferits_ids': list(preferits_ids)},
+        status=status.HTTP_200_OK
+    )
+
 class MascotaViewSet(viewsets.ModelViewSet):
     """ViewSet para Mascota con solo `list` y `create`.
 
@@ -105,14 +145,14 @@ class MascotaViewSet(viewsets.ModelViewSet):
     - POST create: solo autenticados (IsAuthenticated)
     - Paginación: 12 por página
     - Orden por defecto: -fecha_creacion
-    - Filtros básicos por query params: edad rango (edad_min, edad_max), especie, tamaño, convivencia_animales, convivencia_ninos, caracter
+    - Filtros básicos por query params: especie, tamano, genero, edad_clasificacion, apto_con, estado_salud
     """
     queryset = Mascota.objects.all().order_by('-fecha_creacion')
     serializer_class = MascotaSerializer
     pagination_class = MascotaPagination
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_fields = ['especie', 'tamaño', 'convivencia_animales', 'convivencia_ninos', 'caracter']
-    search_fields = ['nombre', 'descripcion', 'color']
+    filterset_fields = ['especie', 'tamano', 'genero', 'edad_clasificacion', 'raza_perro', 'raza_gato']
+    search_fields = ['nombre']
     permission_classes = [MascotaPermissions]
 
     def get_permissions(self):
@@ -139,7 +179,7 @@ class MascotaViewSet(viewsets.ModelViewSet):
             qs = qs.filter(oculto=False, adoptado=False)
         q = self.request.query_params
 
-        # Filtro por rango de edad
+        # Filtro por rango de edad (edad_min, edad_max)
         edad_min = q.get('edad_min')
         edad_max = q.get('edad_max')
         try:
@@ -153,22 +193,21 @@ class MascotaViewSet(viewsets.ModelViewSet):
         except (ValueError, TypeError):
             pass
 
-        # Filtro por rango de edad
-        q = self.request.query_params
-        edad_min = q.get('edad_min')
-        edad_max = q.get('edad_max')
-        try:
-            if edad_min is not None:
-                qs = qs.filter(edad__gte=int(edad_min))
-        except (ValueError, TypeError):
-            pass
-        try:
-            if edad_max is not None:
-                qs = qs.filter(edad__lte=int(edad_max))
-        except (ValueError, TypeError):
-            pass
+        # Filtro por clasificación de edad (0, 1_2, 3_6, 7_10, 11_14, 15_MAS)
+        edad_clasificacion = q.get('edad')
+        if edad_clasificacion and edad_clasificacion != 'todos':
+            qs = qs.filter(edad_clasificacion=edad_clasificacion)
 
-        # Los demás filtros (django-filter los manejará si están en filterset_fields)
+        # Filtro por apto_con (convivència)
+        apto_con = q.get('apto_con')
+        if apto_con and apto_con != 'todos':
+            qs = qs.filter(apto_con__contains=apto_con)
+
+        # Filtro por estado de salud/legal
+        estado_salud = q.get('estado_salud')
+        if estado_salud and estado_salud != 'todos':
+            qs = qs.filter(estado_legal_salud__contains=estado_salud)
+
         return qs
 
     def perform_create(self, serializer):
@@ -204,50 +243,52 @@ class MascotaViewSet(viewsets.ModelViewSet):
 # ======================================================================
 # Vista para generar/regenerar descripción con IA
 # ======================================================================
-from ai_service.description_generator import DescriptionGenerator
-from rest_framework.decorators import permission_classes
-from rest_framework.permissions import AllowAny
+# from ai_service.description_generator import DescriptionGenerator
+# from rest_framework.decorators import permission_classes
+# from rest_framework.permissions import AllowAny
 
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def generate_description(request):
-    """
-    Endpoint para generar una descripción de mascota usando IA.
-    POST /api/mascotas/generate-description/
+# @api_view(['POST'])
+# @permission_classes([AllowAny])
+# def generate_description(request):
+#     """
+#     Endpoint para generar una descripción de mascota usando IA.
+#     POST /api/mascotas/generate-description/
     
-    Body (JSON):
-    {
-        "nombre": "Luna",
-        "especie": "gato",
-        "raza_gato": "Siamés",
-        "edad": 2,
-        "genero": "hembra",
-        "tamaño": "mediano",
-        "caracter": "jugueton",
-        "convivencia_ninos": true,
-        "convivencia_animales": "cualquier_especie",
-        "descripcion_necesidades": ""
-    }
+#     Body (JSON):
+#     {
+#         "nombre": "Luna",
+#         "especie": "gato",
+#         "raza_gato": "Siamés",
+#         "edad": 2,
+#         "genero": "hembra",
+#         "tamaño": "mediano",
+#         "caracter": "jugueton",
+#         "convivencia_ninos": true,
+#         "convivencia_animales": "cualquier_especie",
+#         "descripcion_necesidades": ""
+#     }
     
-    Response:
-    {
-        "descripcion": "¡Conoce a Luna, una preciosa gato Siamés!..."
-    }
-    """
-    try:
-        print("📥 Datos recibidos en generate_description:", request.data)
-        generator = DescriptionGenerator()
-        descripcion = generator.generate_description(request.data)
-        print("✅ Descripción generada:", descripcion[:100] + "...")
-        return Response({
-            "descripcion": descripcion,
-            "success": True
-        }, status=status.HTTP_200_OK)
-    except Exception as e:
-        print("❌ Error en generate_description:", str(e))
-        import traceback
-        traceback.print_exc()
-        return Response({
-            "error": str(e),
-            "success": False
-        }, status=status.HTTP_400_BAD_REQUEST)
+#     Response:
+#     {
+#         "descripcion": "¡Conoce a Luna, una preciosa gato Siamés!..."
+#     }
+#     """
+#     try:
+#         print("📥 Datos recibidos en generate_description:", request.data)
+#         generator = DescriptionGenerator()
+#         descripcion = generator.generate_description(request.data)
+#         print("✅ Descripción generada:", descripcion[:100] + "...")
+#         return Response({
+#             "descripcion": descripcion,
+#             "success": True
+#         }, status=status.HTTP_200_OK)
+#     except Exception as e:
+#         print("❌ Error en generate_description:", str(e))
+#         import traceback
+#         traceback.print_exc()
+#         return Response({
+#             "error": str(e),
+#             "success": False
+#         }, status=status.HTTP_400_BAD_REQUEST)
+
+

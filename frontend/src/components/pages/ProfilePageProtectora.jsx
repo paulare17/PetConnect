@@ -10,6 +10,7 @@ import {
   Link,
   CircularProgress,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import { useColors } from "../../hooks/useColors";
 import { getCurrentUser, getProtectoraProfile } from "../../api/client";
 import GroupIcon from "@mui/icons-material/Group";
@@ -27,6 +28,7 @@ import {
 } from "../../constants/options.jsx";
 
 const ProfilePageProtectora = () => {
+  const { t } = useTranslation();
   const { colors } = useColors();
   const [userData, setUserData] = useState(null);
   const [profileData, setProfileData] = useState(null);
@@ -80,7 +82,7 @@ const ProfilePageProtectora = () => {
         <Card sx={{ maxWidth: 900, mx: "auto", borderRadius: 5, boxShadow: 3 }}>
           <CardContent sx={{ p: 4 }}>
             <Typography variant="h5" sx={{ color: colors.blue, textAlign: "center" }}>
-              No s'han trobat dades del perfil de la protectora
+              {t('profilePageProtectora.noData')}
             </Typography>
           </CardContent>
         </Card>
@@ -118,7 +120,7 @@ const ProfilePageProtectora = () => {
             variant="h6"
             sx={{ color: colors.blue, mb: 2 }}
           >
-            Informació Bàsica
+            {t('profilePageProtectora.basicInfo')}
           </Typography>
           <Grid container spacing={2} sx={{ mb: 2 }}>
             <Grid item xs={12} sm={6}>
@@ -126,7 +128,7 @@ const ProfilePageProtectora = () => {
                 variant="subtitle2"
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
-                <EmailIcon sx={{ mr: 1, verticalAlign: "middle" }} /> Email
+                <EmailIcon sx={{ mr: 1, verticalAlign: "middle" }} /> {t('profilePageProtectora.email')}
               </Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
                 {userData.email || "-"}
@@ -137,8 +139,7 @@ const ProfilePageProtectora = () => {
                 variant="subtitle2"
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
-                <PhoneIcon sx={{ mr: 1, verticalAlign: "middle" }} /> Telèfon
-                principal
+                <PhoneIcon sx={{ mr: 1, verticalAlign: "middle" }} /> {t('profilePageProtectora.mainPhone')}
               </Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
                 {profileData.telefon || "-"}
@@ -150,7 +151,7 @@ const ProfilePageProtectora = () => {
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
                 <ContactPhoneIcon sx={{ mr: 1, verticalAlign: "middle" }} />{" "}
-                Telèfon d'emergència
+                {t('profilePageProtectora.emergencyPhone')}
               </Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
                 {profileData.telefonEmergencia || "-"}
@@ -161,7 +162,7 @@ const ProfilePageProtectora = () => {
                 variant="subtitle2"
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
-                <LanguageIcon sx={{ mr: 1, verticalAlign: "middle" }} /> Web
+                <LanguageIcon sx={{ mr: 1, verticalAlign: "middle" }} /> {t('profilePageProtectora.website')}
               </Typography>
               {profileData.webSite ? (
                 <Link
@@ -183,7 +184,7 @@ const ProfilePageProtectora = () => {
                 variant="subtitle2"
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
-                CIF
+                {t('profilePageProtectora.cif')}
               </Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
                 {profileData.cif || "-"}
@@ -194,7 +195,7 @@ const ProfilePageProtectora = () => {
                 variant="subtitle2"
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
-                Núm. registre associació
+                {t('profilePageProtectora.registrationNumber')}
               </Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
                 {profileData.numRegistroAsociacion || "-"}
@@ -205,7 +206,7 @@ const ProfilePageProtectora = () => {
                 variant="subtitle2"
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
-                Tipus entitat
+                {t('profilePageProtectora.entityType')}
               </Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
                 {profileData.tipoEntidadJuridica || "-"}
@@ -220,7 +221,7 @@ const ProfilePageProtectora = () => {
             variant="h6"
             sx={{ color: colors.blue,  mb: 2 }}
           >
-            Ubicació
+            {t('profilePageProtectora.location')}
           </Typography>
           <Grid container spacing={2} sx={{ mb: 2 }}>
             <Grid item xs={12} sm={4}>
@@ -228,7 +229,7 @@ const ProfilePageProtectora = () => {
                 variant="subtitle2"
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
-                Carrer i número
+                {t('profilePageProtectora.streetNumber')}
               </Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
                 {profileData.carrer || "-"}
@@ -239,7 +240,7 @@ const ProfilePageProtectora = () => {
                 variant="subtitle2"
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
-                Ciutat
+                {t('profilePageProtectora.city')}
               </Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
                 {profileData.ciutat || "-"}
@@ -250,7 +251,7 @@ const ProfilePageProtectora = () => {
                 variant="subtitle2"
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
-                Codi Postal
+                {t('profilePageProtectora.postalCode')}
               </Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
                 {profileData.codiPostal || "-"}
@@ -261,7 +262,7 @@ const ProfilePageProtectora = () => {
                 variant="subtitle2"
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
-                Província
+                {t('profilePageProtectora.province')}
               </Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
                 {profileData.provincia || "-"}
@@ -275,7 +276,7 @@ const ProfilePageProtectora = () => {
             variant="h6"
             sx={{ color: colors.blue, mb: 2 }}
           >
-            Direcció jurídica i refugi
+            {t('profilePageProtectora.legalAndShelter')}
           </Typography>
           <Grid container spacing={2} sx={{ mb: 2 }}>
             <Grid item xs={12} sm={6}>
@@ -283,22 +284,22 @@ const ProfilePageProtectora = () => {
                 variant="subtitle2"
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
-                Direcció jurídica (adreça completa)
+                {t('profilePageProtectora.legalAddress')}
               </Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
                 {profileData.direccionJuridica || "-"}
               </Typography>
               <Typography variant="body2">
-                Carrer: {profileData.calleJuridica || "-"}
+                {t('profilePageProtectora.street')} {profileData.calleJuridica || "-"}
               </Typography>
               <Typography variant="body2">
-                Número: {profileData.numeroJuridica || "-"}
+                {t('profilePageProtectora.number')} {profileData.numeroJuridica || "-"}
               </Typography>
               <Typography variant="body2">
-                Població: {profileData.poblacionJuridica || "-"}
+                {t('profilePageProtectora.town')} {profileData.poblacionJuridica || "-"}
               </Typography>
               <Typography variant="body2">
-                Codi postal: {profileData.codigoPostalJuridica || "-"}
+                {t('profilePageProtectora.postalCodeShort')} {profileData.codigoPostalJuridica || "-"}
               </Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -306,22 +307,22 @@ const ProfilePageProtectora = () => {
                 variant="subtitle2"
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
-                Direcció refugi (adreça completa)
+                {t('profilePageProtectora.shelterAddress')}
               </Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
                 {profileData.direccionRefugio || "-"}
               </Typography>
               <Typography variant="body2">
-                Carrer: {profileData.calleRefugio || "-"}
+                {t('profilePageProtectora.street')} {profileData.calleRefugio || "-"}
               </Typography>
               <Typography variant="body2">
-                Número: {profileData.numeroRefugio || "-"}
+                {t('profilePageProtectora.number')} {profileData.numeroRefugio || "-"}
               </Typography>
               <Typography variant="body2">
-                Població: {profileData.poblacionRefugio || "-"}
+                {t('profilePageProtectora.town')} {profileData.poblacionRefugio || "-"}
               </Typography>
               <Typography variant="body2">
-                Codi postal: {profileData.codigoPostalRefugio || "-"}
+                {t('profilePageProtectora.postalCodeShort')} {profileData.codigoPostalRefugio || "-"}
               </Typography>
             </Grid>
           </Grid>
@@ -332,26 +333,26 @@ const ProfilePageProtectora = () => {
             variant="h6"
             sx={{ color: colors.blue, mb: 2 }}
           >
-            Horaris per dia
+            {t('profilePageProtectora.schedulePerDay')}
           </Typography>
           <Box sx={{ mb: 2 }}>
             {[
-              ["Dilluns", "horario_lunes_apertura", "horario_lunes_cierre"],
-              ["Dimarts", "horario_martes_apertura", "horario_martes_cierre"],
+              [t('profilePageProtectora.monday'), "horario_lunes_apertura", "horario_lunes_cierre"],
+              [t('profilePageProtectora.tuesday'), "horario_martes_apertura", "horario_martes_cierre"],
               [
-                "Dimecres",
+                t('profilePageProtectora.wednesday'),
                 "horario_miercoles_apertura",
                 "horario_miercoles_cierre",
               ],
-              ["Dijous", "horario_jueves_apertura", "horario_jueves_cierre"],
+              [t('profilePageProtectora.thursday'), "horario_jueves_apertura", "horario_jueves_cierre"],
               [
-                "Divendres",
+                t('profilePageProtectora.friday'),
                 "horario_viernes_apertura",
                 "horario_viernes_cierre",
               ],
-              ["Dissabte", "horario_sabado_apertura", "horario_sabado_cierre"],
+              [t('profilePageProtectora.saturday'), "horario_sabado_apertura", "horario_sabado_cierre"],
               [
-                "Diumenge",
+                t('profilePageProtectora.sunday'),
                 "horario_domingo_apertura",
                 "horario_domingo_cierre",
               ],
@@ -363,7 +364,7 @@ const ProfilePageProtectora = () => {
                   ? `${open} - ${close}`
                   : open || close
                   ? open || close
-                  : "Tancat";
+                  : t('profilePageProtectora.closed');
               return (
                 <Typography key={openKey} variant="body2">
                   {label}: {text}
@@ -378,7 +379,7 @@ const ProfilePageProtectora = () => {
             variant="h6"
             sx={{ color: colors.blue,  mb: 2 }}
           >
-            Informació dels Animals
+            {t('profilePageProtectora.animalsInfo')}
           </Typography>
           <Grid container spacing={2} sx={{ mb: 2 }}>
             <Grid item xs={12} sm={6}>
@@ -386,7 +387,7 @@ const ProfilePageProtectora = () => {
                 variant="subtitle2"
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
-                Tipus d'animals
+                {t('profilePageProtectora.animalTypes')}
               </Typography>
               <Box sx={{ mb: 1 }}>
                 {Array.isArray(profileData.tipusAnimals) &&
@@ -414,7 +415,7 @@ const ProfilePageProtectora = () => {
                 variant="subtitle2"
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
-                Capacitat màxima d'animals
+                {t('profilePageProtectora.maxCapacity')}
               </Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
                 {profileData.capacitatMaxima || "-"}
@@ -426,7 +427,7 @@ const ProfilePageProtectora = () => {
                 variant="subtitle2"
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
-                Àmbit geogràfic
+                {t('profilePageProtectora.geographicScope')}
               </Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
                 {profileData.ambitoGeografico || "-"}
@@ -437,7 +438,7 @@ const ProfilePageProtectora = () => {
                 variant="subtitle2"
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
-                Any de fundació
+                {t('profilePageProtectora.foundingYear')}
               </Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
                 {profileData.anyFundacio || "-"}
@@ -448,7 +449,7 @@ const ProfilePageProtectora = () => {
                 variant="subtitle2"
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
-                Núcleo zoológico
+                {t('profilePageProtectora.zoologicalNucleus')}
               </Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
                 {profileData.nucleoZoologico || "-"}
@@ -462,7 +463,7 @@ const ProfilePageProtectora = () => {
             variant="h6"
             sx={{ color: colors.blue, mb: 2 }}
           >
-            Descripció i Serveis
+            {t('profilePageProtectora.descriptionServices')}
           </Typography>
           <Typography variant="body1" sx={{ mb: 2 }}>
             {profileData.descripcio || "-"}
@@ -471,7 +472,7 @@ const ProfilePageProtectora = () => {
             variant="subtitle2"
             sx={{ color: colors.orange, fontWeight: "bold" }}
           >
-            Serveis
+            {t('profilePageProtectora.services')}
           </Typography>
           <Box sx={{ mb: 2 }}>
             {Array.isArray(profileData.serveisOferts) &&
@@ -496,7 +497,7 @@ const ProfilePageProtectora = () => {
             variant="subtitle2"
             sx={{ color: colors.orange, fontWeight: "bold" }}
           >
-            Requisits per l'adopció
+            {t('profilePageProtectora.adoptionRequirements')}
           </Typography>
           <Typography variant="body2">
             {profileData.requisitoAdopcio || "-"}
@@ -505,7 +506,7 @@ const ProfilePageProtectora = () => {
             variant="subtitle2"
             sx={{ color: colors.orange,  mt: 2 }}
           >
-            Procés d'adopció
+            {t('profilePageProtectora.adoptionProcess')}
           </Typography>
           <Typography variant="body2" sx={{ mb: 2 }}>
             {profileData.procesAdopcio || "-"}
@@ -517,7 +518,7 @@ const ProfilePageProtectora = () => {
             variant="h6"
             sx={{ color: colors.blue, mb: 2 }}
           >
-            Xarxes Socials
+            {t('profilePageProtectora.socialNetworks')}
           </Typography>
           <Grid container spacing={2} sx={{ mb: 2 }}>
             <Grid item xs={12} sm={4}>
@@ -525,7 +526,7 @@ const ProfilePageProtectora = () => {
                 variant="subtitle2"
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
-                Facebook
+                {t('profilePageProtectora.facebook')}
               </Typography>
               {profileData.facebook ? (
                 <Link href={profileData.facebook} target="_blank" rel="noopener">
@@ -540,7 +541,7 @@ const ProfilePageProtectora = () => {
                 variant="subtitle2"
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
-                Instagram
+                {t('profilePageProtectora.instagram')}
               </Typography>
               {profileData.instagram ? (
                 <Link href={profileData.instagram} target="_blank" rel="noopener">
@@ -555,7 +556,7 @@ const ProfilePageProtectora = () => {
                 variant="subtitle2"
                 sx={{ color: colors.orange, fontWeight: "bold" }}
               >
-                Twitter
+                {t('profilePageProtectora.twitter')}
               </Typography>
               {profileData.twitter ? (
                 <Link href={profileData.twitter} target="_blank" rel="noopener">

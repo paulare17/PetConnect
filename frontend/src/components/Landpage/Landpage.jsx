@@ -5,12 +5,14 @@ import gatImatgeInfEsq from "../../assets/gat-cantonada.png";
 import gatImatgeSupDreta from "../../assets/gat-superior.png";
 import gosImatgeCentre from "../../assets/gos-baix.png";
 import "./petjades.css";
-import { useColors } from "../../hooks/useColors";
+import { useColors } from "../../../../PetConnect/frontend/src/hooks/useColors";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export default function Landpage() {
   const navigate = useNavigate();
   const { colors } = useColors();
+  const { t } = useTranslation();
   const [isHovering, setIsHovering] = useState(false);
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
   const [isOverInteractive, setIsOverInteractive] = useState(false);
@@ -140,7 +142,7 @@ export default function Landpage() {
             WebkitTextFillColor: "transparent",
           }}
         >
-          Connecta amb la teva mascota perfecta
+          {t('landpage.subtitle')}
         </Typography>
 
         {/* Botons */}
@@ -173,7 +175,7 @@ export default function Landpage() {
               transition: "all 0.3s ease-in-out",
             }}
           >
-            Registra't ara
+            {t('landpage.registerButton')}
           </Button>
 
           <Button
@@ -199,7 +201,7 @@ export default function Landpage() {
               transition: "all 0.3s ease-in-out",
             }}
           >
-            Ja tens compte? Inicia sessió
+            {t('landpage.loginButton')}
           </Button>
         </Box>
 <Box
@@ -221,7 +223,7 @@ export default function Landpage() {
         fontSize: { xs: '0.85rem', sm: '0.95rem' },
       }}
     >
-      Segur i fiable
+      {t('landpage.feature1')}
     </Typography>
   </Box>
 
@@ -237,7 +239,7 @@ export default function Landpage() {
         fontSize: { xs: '0.85rem', sm: '0.95rem' },
       }}
     >
-      Garantia d'adopció responsable
+      {t('landpage.feature2')}
     </Typography>
   </Box>
 
@@ -253,7 +255,7 @@ export default function Landpage() {
         fontSize: { xs: '0.85rem', sm: '0.95rem' },
       }}
     >
-      Recomanat
+      {t('landpage.feature3')}
     </Typography>
   </Box>
 </Box>

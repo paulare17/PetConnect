@@ -34,6 +34,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../../api/client";
 import { ROLES } from "../../constants/roles.jsx";
 import { useAuthContext } from "../../context/AuthProvider.jsx";
+import { useTranslation } from "react-i18next";
 
 // Opcions segons el model PerfilProtectora
 const ENTIDAD_CHOICES = [
@@ -58,6 +59,7 @@ export default function FormProtectora() {
   const navigate = useNavigate();
   const { getMe } = useAuthContext();
   const { colors } = useColors();
+  const { t } = useTranslation();
 
   // Camps segons el model PerfilProtectora + camps d'usuari
   const [formData, setFormData] = useState({
@@ -141,27 +143,29 @@ export default function FormProtectora() {
 
     // Validacions camps d'usuari
     if (!formData.username.trim())
-      newErrors.username = "Nom d'usuari obligatori";
+      newErrors.username = t('formProtectora.usernameRequired');
     else if (formData.username.length < 3)
-      newErrors.username = "Mínim 3 caràcters";
+      newErrors.username = t('formProtectora.usernameMinLength');
 
     if (!formData.password.trim())
-      newErrors.password = "Contrasenya obligatòria";
+      newErrors.password = t('formProtectora.passwordRequired');
     else if (formData.password.length < 8)
-      newErrors.password = "Mínim 8 caràcters";
+      newErrors.password = t('formProtectora.passwordMinLength');
 
-    if (!formData.email.trim()) newErrors.email = "Email obligatori";
+    if (!formData.email.trim()) newErrors.email = t('formProtectora.emailRequired');
     else if (!/\S+@\S+\.\S+/.test(formData.email))
-      newErrors.email = "Format d'email invàlid";
+      newErrors.email = t('formProtectora.emailInvalid');
+
+    if (!formData.city.trim()) newErrors.city = t('formProtectora.cityRequired');
 
     // Validacions camps de protectora
     if (!formData.nombre_protectora.trim())
-      newErrors.nombre_protectora = "Nom de la protectora obligatori";
+      newErrors.nombre_protectora = t('formProtectora.shelterNameRequired');
 
-    if (!formData.telefono.trim()) newErrors.telefono = "Telèfon obligatori";
+    if (!formData.telefono.trim()) newErrors.telefono = t('formProtectora.phoneRequired');
 
     if (!formData.descripcion.trim())
-      newErrors.descripcion = "Descripció obligatòria";
+      newErrors.descripcion = t('formProtectora.descriptionRequired');
 
     // Validació URL web (opcional però si s'omple ha de ser vàlida)
     if (formData.web && !/^https?:\/\/.+/.test(formData.web))
@@ -248,7 +252,7 @@ export default function FormProtectora() {
       const msg =
         error?.response?.data?.detail ||
         JSON.stringify(error?.response?.data) ||
-        "Error en crear el perfil. Intenta-ho de nou.";
+        t('formProtectora.createError');
       alert(msg);
     } finally {
       setLoading(false);
@@ -287,7 +291,7 @@ export default function FormProtectora() {
             }}
           >
             <Pets />
-            Perfil de Protectora
+            {t('formProtectora.title')}
           </Typography>
 
           <Typography
@@ -295,8 +299,7 @@ export default function FormProtectora() {
             align="center"
             sx={{ mb: 4, color: "text.secondary", lineHeight: 1.6 }}
           >
-            Completa la informació de la teva protectora per poder oferir els
-            teus serveis d'adopció
+            {t('formProtectora.subtitle')}
           </Typography>
 
           <Box component="form" onSubmit={handleSubmit}>
@@ -306,7 +309,7 @@ export default function FormProtectora() {
               sx={{ mb: 2, color: colors.blue, fontWeight: "bold" }}
             >
               <Group sx={{ mr: 1, verticalAlign: "middle" }} />
-              Dades d'Accés
+              {t('formProtectora.accessData')}
             </Typography>
 
             <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -315,14 +318,11 @@ export default function FormProtectora() {
                   required
                   fullWidth
                   name="username"
-                  label="Nom d'usuari"
+                  label={t('formProtectora.username')}
                   value={formData.username}
                   onChange={handleInputChange}
                   error={!!errors.username}
-                  helperText={
-                    errors.username ||
-                    "Aquest serà el teu nom d'usuari per accedir"
-                  }
+                  helperText={errors.username}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -338,12 +338,12 @@ export default function FormProtectora() {
                   required
                   fullWidth
                   name="password"
-                  label="Contrasenya"
+                  label={t('formProtectora.password')}
                   type="password"
                   value={formData.password}
                   onChange={handleInputChange}
                   error={!!errors.password}
-                  helperText={errors.password || "Mínim 8 caràcters"}
+                  helperText={errors.password}
                 />
               </Grid>
 
@@ -352,7 +352,7 @@ export default function FormProtectora() {
                   required
                   fullWidth
                   name="email"
-                  label="Email de contacte"
+                  label={t('formProtectora.email')}
                   type="email"
                   value={formData.email}
                   onChange={handleInputChange}
@@ -370,11 +370,14 @@ export default function FormProtectora() {
 
               <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
+                  required
                   fullWidth
                   name="city"
-                  label="Ciutat"
+                  label={t('formProtectora.city')}
                   value={formData.city}
                   onChange={handleInputChange}
+                  error={!!errors.city}
+                  helperText={errors.city}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -394,7 +397,7 @@ export default function FormProtectora() {
               sx={{ mb: 2, color: colors.blue, fontWeight: "bold" }}
             >
               <Business sx={{ mr: 1, verticalAlign: "middle" }} />
-              Informació Bàsica
+              {t('formProtectora.basicInfo')}
             </Typography>
 
             <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -403,7 +406,7 @@ export default function FormProtectora() {
                   required
                   fullWidth
                   name="nombre_protectora"
-                  label="Nom de la Protectora"
+                  label={t('formProtectora.shelterName')}
                   value={formData.nombre_protectora}
                   onChange={handleInputChange}
                   error={!!errors.nombre_protectora}
@@ -423,7 +426,7 @@ export default function FormProtectora() {
                 <TextField
                   fullWidth
                   name="cif"
-                  label="CIF"
+                  label={t('formProtectora.cif')}
                   value={formData.cif}
                   onChange={handleInputChange}
                   inputProps={{ maxLength: 20 }}
@@ -434,7 +437,7 @@ export default function FormProtectora() {
                 <TextField
                   fullWidth
                   name="num_registro_asociacion"
-                  label="Núm. registre associació"
+                  label={t('formProtectora.registrationNumber')}
                   value={formData.num_registro_asociacion}
                   onChange={handleInputChange}
                   inputProps={{ maxLength: 100 }}
@@ -443,12 +446,12 @@ export default function FormProtectora() {
 
               <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth>
-                  <InputLabel>Tipus entitat jurídica</InputLabel>
+                  <InputLabel>{t('formProtectora.entityType')}</InputLabel>
                   <Select
                     name="tipo_entidad_juridica"
                     value={formData.tipo_entidad_juridica}
                     onChange={handleInputChange}
-                    label="Tipus entitat jurídica"
+                    label={t('formProtectora.entityType')}
                   >
                     <MenuItem value="">
                       <em>Selecciona...</em>
@@ -471,7 +474,7 @@ export default function FormProtectora() {
               sx={{ mb: 2, color: colors.blue, fontWeight: "bold" }}
             >
               <Phone sx={{ mr: 1, verticalAlign: "middle" }} />
-              Contacte
+              {t('formProtectora.contactInfo')}
             </Typography>
 
             <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -480,7 +483,7 @@ export default function FormProtectora() {
                   required
                   fullWidth
                   name="telefono"
-                  label="Telèfon principal"
+                  label={t('formProtectora.mainPhone')}
                   value={formData.telefono}
                   onChange={handleInputChange}
                   error={!!errors.telefono}
@@ -500,7 +503,7 @@ export default function FormProtectora() {
                 <TextField
                   fullWidth
                   name="telefono_emergencia"
-                  label="Telèfon d'emergència"
+                  label={t('formProtectora.emergencyPhone')}
                   value={formData.telefono_emergencia}
                   onChange={handleInputChange}
                   inputProps={{ maxLength: 15 }}
@@ -518,11 +521,11 @@ export default function FormProtectora() {
                 <TextField
                   fullWidth
                   name="web"
-                  label="Pàgina web"
+                  label={t('formProtectora.website')}
                   value={formData.web}
                   onChange={handleInputChange}
                   error={!!errors.web}
-                  helperText={errors.web || "Ex: https://www.exemple.com"}
+                  helperText={errors.web}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -542,7 +545,7 @@ export default function FormProtectora() {
               sx={{ mb: 2, color: colors.blue, fontWeight: "bold" }}
             >
               <LocationOn sx={{ mr: 1, verticalAlign: "middle" }} />
-              Direcció Jurídica
+              {t('formProtectora.legalAddress')}
             </Typography>
 
             <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -552,10 +555,9 @@ export default function FormProtectora() {
                   multiline
                   rows={2}
                   name="direccion_juridica"
-                  label="Direcció jurídica completa"
+                  label={t('formProtectora.fullLegalAddress')}
                   value={formData.direccion_juridica}
                   onChange={handleInputChange}
-                  helperText="Adreça completa per a documents legals"
                 />
               </Grid>
 
@@ -563,7 +565,7 @@ export default function FormProtectora() {
                 <TextField
                   fullWidth
                   name="calle_juridica"
-                  label="Carrer"
+                  label={t('formProtectora.street')}
                   value={formData.calle_juridica}
                   onChange={handleInputChange}
                   inputProps={{ maxLength: 200 }}
@@ -574,7 +576,7 @@ export default function FormProtectora() {
                 <TextField
                   fullWidth
                   name="numero_juridica"
-                  label="Número"
+                  label={t('formProtectora.number')}
                   value={formData.numero_juridica}
                   onChange={handleInputChange}
                   inputProps={{ maxLength: 10 }}
@@ -585,7 +587,7 @@ export default function FormProtectora() {
                 <TextField
                   fullWidth
                   name="poblacion_juridica"
-                  label="Població"
+                  label={t('formProtectora.town')}
                   value={formData.poblacion_juridica}
                   onChange={handleInputChange}
                   inputProps={{ maxLength: 100 }}
@@ -596,7 +598,7 @@ export default function FormProtectora() {
                 <TextField
                   fullWidth
                   name="codigo_postal_juridica"
-                  label="Codi Postal"
+                  label={t('formProtectora.postalCode')}
                   value={formData.codigo_postal_juridica}
                   onChange={handleInputChange}
                   inputProps={{ maxLength: 10 }}
@@ -612,7 +614,7 @@ export default function FormProtectora() {
               sx={{ mb: 2, color: colors.blue, fontWeight: "bold" }}
             >
               <LocationOn sx={{ mr: 1, verticalAlign: "middle" }} />
-              Direcció Refugi
+              {t('formProtectora.shelterAddress')}
             </Typography>
 
             <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -622,10 +624,9 @@ export default function FormProtectora() {
                   multiline
                   rows={2}
                   name="direccion_refugio"
-                  label="Direcció del refugi completa"
+                  label={t('formProtectora.fullShelterAddress')}
                   value={formData.direccion_refugio}
                   onChange={handleInputChange}
-                  helperText="Adreça física on es troben els animals"
                 />
               </Grid>
 
@@ -633,7 +634,7 @@ export default function FormProtectora() {
                 <TextField
                   fullWidth
                   name="calle_refugio"
-                  label="Carrer"
+                  label={t('formProtectora.street')}
                   value={formData.calle_refugio}
                   onChange={handleInputChange}
                   inputProps={{ maxLength: 200 }}
@@ -644,7 +645,7 @@ export default function FormProtectora() {
                 <TextField
                   fullWidth
                   name="numero_refugio"
-                  label="Número"
+                  label={t('formProtectora.number')}
                   value={formData.numero_refugio}
                   onChange={handleInputChange}
                   inputProps={{ maxLength: 10 }}
@@ -655,7 +656,7 @@ export default function FormProtectora() {
                 <TextField
                   fullWidth
                   name="poblacion_refugio"
-                  label="Població"
+                  label={t('formProtectora.town')}
                   value={formData.poblacion_refugio}
                   onChange={handleInputChange}
                   inputProps={{ maxLength: 100 }}
@@ -666,7 +667,7 @@ export default function FormProtectora() {
                 <TextField
                   fullWidth
                   name="codigo_postal_refugio"
-                  label="Codi Postal"
+                  label={t('formProtectora.postalCode')}
                   value={formData.codigo_postal_refugio}
                   onChange={handleInputChange}
                   inputProps={{ maxLength: 10 }}
@@ -682,7 +683,7 @@ export default function FormProtectora() {
               sx={{ mb: 2, color: colors.blue, fontWeight: "bold" }}
             >
               <Schedule sx={{ mr: 1, verticalAlign: "middle" }} />
-              Horari d'atenció
+              {t('formProtectora.schedule')}
             </Typography>
 
             <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -692,11 +693,9 @@ export default function FormProtectora() {
                   multiline
                   rows={3}
                   name="horario"
-                  label="Horari d'atenció"
+                  label={t('formProtectora.schedule')}
                   value={formData.horario}
                   onChange={handleInputChange}
-                  placeholder="Ex: Dilluns a Divendres: 9:00-14:00 i 16:00-19:00. Dissabtes: 10:00-14:00. Diumenges: Tancat."
-                  helperText="Indica els dies i horaris en què ateneu visites"
                 />
               </Grid>
             </Grid>
@@ -709,18 +708,18 @@ export default function FormProtectora() {
               sx={{ mb: 2, color: colors.blue, fontWeight: "bold" }}
             >
               <Pets sx={{ mr: 1, verticalAlign: "middle" }} />
-              Informació dels Animals
+              {t('formProtectora.animalInfo')}
             </Typography>
 
             <Grid container spacing={3} sx={{ mb: 4 }}>
               <Grid size={{ xs: 12, sm: 4 }}>
                 <FormControl fullWidth>
-                  <InputLabel>Tipus d'animal</InputLabel>
+                  <InputLabel>{t('formProtectora.animalType')}</InputLabel>
                   <Select
                     name="tipo_animal"
                     value={formData.tipo_animal}
                     onChange={handleInputChange}
-                    label="Tipus d'animal"
+                    label={t('formProtectora.animalType')}
                   >
                     <MenuItem value="">
                       <em>Selecciona...</em>
@@ -738,7 +737,7 @@ export default function FormProtectora() {
                 <TextField
                   fullWidth
                   name="capacidad_maxima_animales"
-                  label="Capacitat màxima d'animals"
+                  label={t('formProtectora.maxCapacity')}
                   type="number"
                   value={formData.capacidad_maxima_animales}
                   onChange={handleInputChange}
@@ -750,7 +749,7 @@ export default function FormProtectora() {
                 <TextField
                   fullWidth
                   name="nucleo_zoologico"
-                  label="Nucli zoològic"
+                  label={t('formProtectora.zoologicalCore')}
                   value={formData.nucleo_zoologico}
                   onChange={handleInputChange}
                   inputProps={{ maxLength: 50 }}
@@ -767,7 +766,7 @@ export default function FormProtectora() {
               sx={{ mb: 2, color: colors.blue, fontWeight: "bold" }}
             >
               <Business sx={{ mr: 1, verticalAlign: "middle" }} />
-              Informació Organitzativa
+              {t('formProtectora.organizationInfo')}
             </Typography>
 
             <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -775,7 +774,7 @@ export default function FormProtectora() {
                 <TextField
                   fullWidth
                   name="ano_fundacion"
-                  label="Any de fundació"
+                  label={t('formProtectora.foundationYear')}
                   type="number"
                   value={formData.ano_fundacion}
                   onChange={handleInputChange}
@@ -787,11 +786,10 @@ export default function FormProtectora() {
                 <TextField
                   fullWidth
                   name="ambito_geografico"
-                  label="Àmbit geogràfic"
+                  label={t('formProtectora.geographicScope')}
                   value={formData.ambito_geografico}
                   onChange={handleInputChange}
                   inputProps={{ maxLength: 200 }}
-                  helperText="Zona on opereu (ex: Catalunya, Barcelona i rodalies...)"
                 />
               </Grid>
             </Grid>
@@ -804,7 +802,7 @@ export default function FormProtectora() {
               sx={{ mb: 2, color: colors.blue, fontWeight: "bold" }}
             >
               <Description sx={{ mr: 1, verticalAlign: "middle" }} />
-              Descripció i Serveis
+              {t('formProtectora.servicesProcess')}
             </Typography>
 
             <TextField
@@ -813,19 +811,16 @@ export default function FormProtectora() {
               multiline
               rows={4}
               name="descripcion"
-              label="Descripció de la protectora"
+              label={t('formProtectora.description')}
               value={formData.descripcion}
               onChange={handleInputChange}
               error={!!errors.descripcion}
-              helperText={
-                errors.descripcion ||
-                "Explica la història, missió i valors de la protectora"
-              }
+              helperText={errors.descripcion}
               sx={{ mb: 3 }}
             />
 
             <Typography variant="body2" sx={{ mb: 2, color: colors.blue }}>
-              Serveis que oferiu:
+              {t('formProtectora.services')}
             </Typography>
             <FormGroup row sx={{ mb: 4 }}>
               {SERVICIOS_CHOICES.map((opt) => (
@@ -850,10 +845,9 @@ export default function FormProtectora() {
                   multiline
                   rows={3}
                   name="requisitos_adopcion"
-                  label="Requisits per l'adopció"
+                  label={t('formProtectora.adoptionRequirements')}
                   value={formData.requisitos_adopcion}
                   onChange={handleInputChange}
-                  helperText="Explica els requisits que han de complir els adoptants"
                 />
               </Grid>
 
@@ -863,10 +857,9 @@ export default function FormProtectora() {
                   multiline
                   rows={3}
                   name="proceso_adopcion"
-                  label="Procés d'adopció"
+                  label={t('formProtectora.adoptionProcess')}
                   value={formData.proceso_adopcion}
                   onChange={handleInputChange}
-                  helperText="Descriu el procés que seguiu per les adopcions"
                 />
               </Grid>
             </Grid>
@@ -879,7 +872,7 @@ export default function FormProtectora() {
               sx={{ mb: 2, color: colors.blue, fontWeight: "bold" }}
             >
               <Group sx={{ mr: 1, verticalAlign: "middle" }} />
-              Xarxes Socials
+              {t('formProtectora.socialNetworks')}
             </Typography>
 
             <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -887,10 +880,9 @@ export default function FormProtectora() {
                 <TextField
                   fullWidth
                   name="facebook"
-                  label="Facebook"
+                  label={t('formProtectora.facebook')}
                   value={formData.facebook}
                   onChange={handleInputChange}
-                  placeholder="https://facebook.com/..."
                 />
               </Grid>
 
@@ -898,10 +890,9 @@ export default function FormProtectora() {
                 <TextField
                   fullWidth
                   name="instagram"
-                  label="Instagram"
+                  label={t('formProtectora.instagram')}
                   value={formData.instagram}
                   onChange={handleInputChange}
-                  placeholder="https://instagram.com/..."
                 />
               </Grid>
 
@@ -909,10 +900,9 @@ export default function FormProtectora() {
                 <TextField
                   fullWidth
                   name="twitter"
-                  label="Twitter"
+                  label={t('formProtectora.twitter')}
                   value={formData.twitter}
                   onChange={handleInputChange}
-                  placeholder="https://twitter.com/..."
                 />
               </Grid>
             </Grid>
@@ -939,7 +929,7 @@ export default function FormProtectora() {
                   transition: "all 0.3s ease-in-out",
                 }}
               >
-                Cancel·lar
+                {t('formProtectora.cancelButton')}
               </Button>
 
               <Button
@@ -960,7 +950,7 @@ export default function FormProtectora() {
                   transition: "all 0.3s ease-in-out",
                 }}
               >
-                {loading ? "Creant perfil..." : "Crear Perfil de Protectora"}
+                {loading ? t('formProtectora.registeringButton') : t('formProtectora.registerButton')}
               </Button>
             </Box>
           </Box>

@@ -54,3 +54,7 @@ htmlcov/
 *.env
 !.env.example
 node_modules
+
+# Node modules and build artifacts
+node_modules/
+.vite/

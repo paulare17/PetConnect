@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import api from '../api/client';
+import api from '../../../../frontend/src/api/client';
 
 export default function useAuth() {
     const [user, setUser] = useState(() => {

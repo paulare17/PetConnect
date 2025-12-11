@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useTranslation } from "react-i18next";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
@@ -15,6 +16,7 @@ import { ROLES } from "../../constants/roles.jsx";
 import { useAuthContext } from "../../context/AuthProvider.jsx";
 
 export default function FormDialog() {
+  const { t } = useTranslation();
   const [open, setOpen] = React.useState(true); // Sempre obert quan es carrega el component
   const [ubicacion, setUbicacion] = React.useState("");
   const navigate = useNavigate();
@@ -54,39 +56,68 @@ export default function FormDialog() {
       const msg =
         err?.response?.data?.detail ||
         JSON.stringify(err?.response?.data) ||
-        "Error creant usuari";
+        t('formDialog.errorCreating');
       alert(msg);
     }
   };
   const handleGetLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
           const { latitude, longitude } = position.coords;
-          // Aquí pots usar una API de geocoding per convertir coordenades a adreça
-          // Per simplicitat, mostrem les coordenades
-          setUbicacion(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+          
+          try {
+            // Utilitzem l'API de Nominatim (OpenStreetMap) per geocoding invers
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`,
+              {
+                headers: {
+                  'Accept-Language': 'ca,es,en'
+                }
+              }
+            );
+            
+            if (response.ok) {
+              const data = await response.json();
+              const address = data.address;
+              
+              // Prioritzem ciutat, poble o barri
+              const location = address.city || 
+                             address.town || 
+                             address.village || 
+                             address.suburb || 
+                             address.municipality ||
+                             address.county ||
+                             `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+              
+              setUbicacion(location);
+            } else {
+              // Si falla l'API, mostrem coordenades
+              setUbicacion(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+            }
+          } catch (error) {
+            console.error("Error obtenint adreça:", error);
+            // Si falla, mostrem coordenades
+            setUbicacion(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+          }
         },
         (error) => {
           console.error("Error obtenint ubicació:", error);
-          alert(
-            "No s'ha pogut obtenir la ubicació. Comprova els permisos del navegador."
-          );
+          alert(t('formDialog.locationError'));
         }
       );
     } else {
-      alert("La geolocalització no està suportada en aquest navegador.");
+      alert(t('formDialog.locationNotSupported'));
     }
   };
 
   return (
     <>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Subscribe</DialogTitle>
+        <DialogTitle>{t('formDialog.title')}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            To subscribe to this website, please enter your email address here.
-            We will send updates occasionally.
+            {t('formDialog.subtitle')}
           </DialogContentText>
           <form onSubmit={handleSubmit} id="subscription-form">
             <TextField
@@ -94,7 +125,7 @@ export default function FormDialog() {
               margin="dense"
               id="user"
               name="user"
-              label="User"
+              label={t('formDialog.username')}
               type="text"
               fullWidth
               variant="standard"
@@ -105,7 +136,7 @@ export default function FormDialog() {
               margin="dense"
               id="email"
               name="email"
-              label="Email Address"
+              label={t('formDialog.email')}
               type="email"
               fullWidth
               variant="standard"
@@ -115,42 +146,41 @@ export default function FormDialog() {
               margin="dense"
               id="password"
               name="password"
-              label="Contraseña"
+              label={t('formDialog.password')}
               type="password"
               fullWidth
               variant="standard"
             />
 
-            {/* la de la ubi s'ha de comentar com ho fem */}
             <TextField
               required
               margin="dense"
               id="ciutat"
               name="ciutat"
-              label="Ciutat/Barri"
+              label={t('formDialog.city')}
               type="text"
               fullWidth
               variant="standard"
               value={ubicacion}
               onChange={(e) => setUbicacion(e.target.value)}
-            />
-            <Button
-              startIcon={<LocationOnIcon />}
-              onClick={handleGetLocation}
-              sx={{
-                color: colors.blue,
-                textTransform: "none",
-                fontSize: "0.875rem",
-                lineHeight: 1.2,
-                mt: 1,
-                "&:hover": {
-                  color: colors.darkBlue,
-                  backgroundColor: "transparent",
-                },
+              InputProps={{
+                endAdornment: (
+                  <IconButton
+                    onClick={handleGetLocation}
+                    size="small"
+                    sx={{
+                      color: colors.blue,
+                      "&:hover": {
+                        color: colors.darkBlue,
+                        backgroundColor: "rgba(102, 197, 189, 0.1)",
+                      },
+                    }}
+                  >
+                    <LocationOnIcon />
+                  </IconButton>
+                ),
               }}
-            >
-              Demanem la teva ubicació per poder trobar la teva mascota ideal.
-            </Button>
+            />
           </form>
         </DialogContent>
         <DialogActions>
@@ -168,12 +198,12 @@ export default function FormDialog() {
               borderRadius: 5,
               // px: 4,
               mb: 2,
-              mr: 5.5,
+              mr: 2,
               fontSize: "0.7rem",
               transition: "all 0.3s ease-in-out",
             }}
           >
-            Sóc una protectora
+            {t('formDialog.shelterButton')}
           </Button>
           <Button
             variant="contained"
@@ -193,7 +223,7 @@ export default function FormDialog() {
             }}
             onClick={handleClose}
           >
-            Cancel
+            {t('formDialog.cancelButton')}
           </Button>
           <Button
             variant="contained"
@@ -204,17 +234,18 @@ export default function FormDialog() {
                 transform: "translateY(-2px)",
                 boxShadow: "0 4px 12px rgba(102, 197, 189, 0.3)",
               },
+              width: "40%",
               borderRadius: 5,
-              px: 4,
+              px: 1,
               mb: 2,
-              mr: 4,
+              mr: 1,
               fontSize: "1.1rem",
               transition: "all 0.3s ease-in-out",
             }}
             type="submit"
             form="subscription-form"
           >
-            Subscribe
+            {t('formDialog.subscribeButton')}
           </Button>
         </DialogActions>
       </Dialog>

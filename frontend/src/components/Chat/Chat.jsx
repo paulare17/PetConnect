@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Paper,
@@ -15,13 +16,14 @@ import {
 import SendIcon from '@mui/icons-material/Send';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PetsIcon from '@mui/icons-material/Pets';
-import api from '../../api/client';
+import api from '../../../../../frontend/src/api/client';
 import { colors } from '../../constants/colors';
 import { useAuthContext } from '../../context/AuthProvider';
 
 const WEBSOCKET_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8080';
 
 export default function ChatRoom({ chatId: chatIdProp, onClose, embedded = false }) {
+  const { t } = useTranslation();
   const { chatId: chatIdParam } = useParams();
   const navigate = useNavigate();
   const { user } = useAuthContext();
@@ -33,6 +35,7 @@ export default function ChatRoom({ chatId: chatIdProp, onClose, embedded = false
   const [error, setError] = useState(null);
   const [chatInfo, setChatInfo] = useState(null);
   const [wsConnected, setWsConnected] = useState(false);
+  const [showAvailabilityNotice, setShowAvailabilityNotice] = useState(true);
   
   const wsRef = useRef(null);
   const messagesEndRef = useRef(null);
@@ -68,7 +71,7 @@ export default function ChatRoom({ chatId: chatIdProp, onClose, embedded = false
         const currentChat = chatListResponse.data.find(c => c.id === parseInt(effectiveChatId));
         
         if (!currentChat) {
-          throw new Error('Chat no trobat');
+          throw new Error(t('chatComponent.chatNotFound'));
         }
         setChatInfo(currentChat);
 
@@ -77,7 +80,7 @@ export default function ChatRoom({ chatId: chatIdProp, onClose, embedded = false
         setMessages(messagesResponse.data);
       } catch (err) {
         console.error('Error carregant xat:', err);
-        setError(err.response?.data?.detail || 'Error carregant el xat');
+        setError(err.response?.data?.detail || t('chatComponent.errorLoading'));
       } finally {
         setLoading(false);
       }
@@ -186,7 +189,7 @@ export default function ChatRoom({ chatId: chatIdProp, onClose, embedded = false
       });
     } catch (err) {
       console.error('Error enviant missatge:', err);
-      setError('Error enviant el missatge. Torna-ho a provar.');
+      setError(t('chatComponent.errorSending'));
       setNewMessage(messageContent); // Restaurar el missatge
     }
   };
@@ -279,12 +282,53 @@ export default function ChatRoom({ chatId: chatIdProp, onClose, embedded = false
             </Typography>
           </Box>
           {wsConnected ? (
-            <Chip label="Connectat" color="success" size="small" />
+            <Chip label={t('chatComponent.connected')} color="success" size="small" />
           ) : (
-            <Chip label="Desconnectat" color="default" size="small" />
+            <Chip label={t('chatComponent.disconnected')} color="default" size="small" />
           )}
         </Box>
       </Paper>
+
+      {/* Avís de disponibilitat de protectores al començar la conversa */}
+      {showAvailabilityNotice && (
+        <Alert 
+          severity="info" 
+          sx={{ mb: 2 }}
+        >
+          {t('chatComponent.disclaimer')}
+          <Box sx={{ mt: 1 }}>
+            {chatInfo?.protectora_username && (
+              <Typography variant="body2"><strong>{chatInfo.protectora_username}</strong></Typography>
+            )}
+            {chatInfo?.protectora_info?.horaris && (
+              <Typography variant="body2">{t('chatComponent.schedule')}: {chatInfo.protectora_info.horaris}</Typography>
+            )}
+            {chatInfo?.protectora_info?.telefono && (
+              <Typography variant="body2">{t('chatComponent.phone')}: {chatInfo.protectora_info.telefono}</Typography>
+            )}
+            {chatInfo?.protectora_info?.telefono_emergencia && (
+              <Typography variant="body2">{t('chatComponent.emergencyPhone')}: {chatInfo.protectora_info.telefono_emergencia}</Typography>
+            )}
+            {chatInfo?.protectora_info?.email && (
+              <Typography variant="body2">Email: {chatInfo.protectora_info.email}</Typography>
+            )}
+            {chatInfo?.protectora_info?.web && (
+              <Typography variant="body2">Web: {chatInfo.protectora_info.web}</Typography>
+            )}
+            {chatInfo?.protectora_info?.instagram && (() => {
+              const ig = chatInfo.protectora_info.instagram;
+              const isUrl = typeof ig === 'string' && /^https?:\/\//i.test(ig);
+              const handle = typeof ig === 'string' ? ig.replace(/^@/, '') : ig;
+              const href = isUrl ? ig : `https://instagram.com/${handle}`;
+              return (
+                <Typography variant="body2">
+                  {t('chatComponent.instagram')}: <a href={href} target="_blank" rel="noopener noreferrer">{isUrl ? ig : `@${handle}`}</a>
+                </Typography>
+              );
+            })()}
+          </Box>
+        </Alert>
+      )}
 
       {error && (
         <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 2 }}>
@@ -309,7 +353,7 @@ export default function ChatRoom({ chatId: chatIdProp, onClose, embedded = false
         {messages.length === 0 ? (
           <Box display="flex" justifyContent="center" alignItems="center" height="100%">
             <Typography variant="body1" color="text.secondary">
-              No hi ha missatges. Envia el primer! 🐾
+              {t('chatComponent.noMessages')}
             </Typography>
           </Box>
         ) : (
@@ -363,7 +407,7 @@ export default function ChatRoom({ chatId: chatIdProp, onClose, embedded = false
             {isTyping && (
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 2 }}>
                 <Typography variant="caption" color="text.secondary" fontStyle="italic">
-                  {otherUser} està escrivint...
+                  {otherUser} {t('chatComponent.typing')}
                 </Typography>
               </Box>
             )}
@@ -382,7 +426,7 @@ export default function ChatRoom({ chatId: chatIdProp, onClose, embedded = false
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Escriu un missatge..."
+            placeholder={t('chatComponent.messagePlaceholder')}
             variant="outlined"
             size="small"
             sx={{

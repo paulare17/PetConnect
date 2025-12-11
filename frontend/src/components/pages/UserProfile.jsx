@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { Box, CircularProgress, Typography } from "@mui/material";
 import { getUserProfile } from "../../api/client";
 import FormUsuari from "../Forms/FormUsuari";
@@ -11,6 +12,7 @@ import { useColors } from "../../hooks/useColors";
  */
 export default function UserProfile() {
   const { colors } = useColors();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [hasProfile, setHasProfile] = useState(false);
   const [profileData, setProfileData] = useState(null);
@@ -19,7 +21,7 @@ export default function UserProfile() {
   const checkUserProfile = useCallback(async () => {
     try {
       setLoading(true);
-      console.log("Carregant perfil d'usuari...");
+      console.log(t('userProfile.checking'));
       const response = await getUserProfile();
       console.log("Resposta del perfil:", response.data);
       
@@ -35,14 +37,14 @@ export default function UserProfile() {
         const isProfileFilled = profile.telefono || profile.descripcion || profile.fecha_nacimiento;
         
         if (isProfileFilled) {
-          console.log("Perfil omplert, mostrant pàgina de perfil");
+          console.log(t('userProfile.showProfile'));
           setHasProfile(true);
         } else {
-          console.log("Perfil buit (només creat per defecte), mostrant formulari");
+          console.log(t('userProfile.showForm'));
           setHasProfile(false);
         }
       } else {
-        console.log("No s'ha trobat perfil, mostrant formulari");
+        console.log(t('userProfile.showForm'));
         setHasProfile(false);
         setProfileData(null);
       }
@@ -51,19 +53,19 @@ export default function UserProfile() {
       console.error("Response error:", err.response);
       // Si retorna 404, 403 o array buit, no té perfil - mostrem el formulari
       if (err.response?.status === 404 || err.response?.status === 403 || err.response?.data?.length === 0) {
-        console.log("Error 404/403 o sense dades, mostrant formulari");
+        console.log(t('userProfile.showForm'));
         setHasProfile(false);
         setProfileData(null);
         setError(null); // No és un error real, només no té perfil
       } else {
         console.error("Error real de l'API");
-        setError("Error al carregar el perfil: " + (err.message || "Unknown error"));
+        setError(`${t('userProfile.errorPrefix')} ${err.message || 'Unknown error'}`);
       }
     } finally {
       console.log("Càrrega finalitzada");
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     checkUserProfile();

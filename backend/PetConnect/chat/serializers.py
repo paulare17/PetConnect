@@ -37,6 +37,7 @@ class ChatSerializer(serializers.ModelSerializer):
     ultimo_mensaje = serializers.SerializerMethodField()
     num_mensajes = serializers.SerializerMethodField()
     tiene_mensajes = serializers.SerializerMethodField()
+    protectora_info = serializers.SerializerMethodField()
 
     class Meta:
         model = Chat
@@ -46,7 +47,7 @@ class ChatSerializer(serializers.ModelSerializer):
             'adoptante', 'adoptante_username', 
             'protectora', 'protectora_username', 
             'num_mensajes', 'tiene_mensajes',
-            'activo', 'ultimo_mensaje', 'fecha_creacion'
+            'activo', 'ultimo_mensaje', 'fecha_creacion', 'protectora_info'
         ]
         read_only_fields = fields # Todo en el listado de chats es de solo lectura
         
@@ -70,3 +71,22 @@ class ChatSerializer(serializers.ModelSerializer):
                 'remitente': last_message.remitente.username
             }
         return None
+
+    def get_protectora_info(self, obj):
+        """Inclou dades bàsiques de contacte i, si existeix, el camp d'horaris de la protectora."""
+        user = obj.protectora
+        info = {
+            'username': getattr(user, 'username', None),
+            'email': getattr(user, 'email', None),
+        }
+        perfil = getattr(user, 'perfil_protectora', None)
+        if perfil:
+            info.update({
+                'telefono': getattr(perfil, 'telefono', None),
+                'telefono_emergencia': getattr(perfil, 'telefono_emergencia', None),
+                'web': getattr(perfil, 'web', None),
+                'instagram': getattr(perfil, 'instagram', None),
+                # Intenta diversos noms comuns per als horaris
+                'horaris': getattr(perfil, 'horaris', None) or getattr(perfil, 'horarios', None) or getattr(perfil, 'horari', None),
+            })
+        return info

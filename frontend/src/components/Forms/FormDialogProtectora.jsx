@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useTranslation } from "react-i18next";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
@@ -13,6 +14,7 @@ import { Box, Alert } from "@mui/material";
 import BusinessIcon from "@mui/icons-material/Business";
 
 export default function FormDialogProtectora() {
+  const { t } = useTranslation();
   const [open, setOpen] = React.useState(true);
   const [error, setError] = React.useState("");
   const [loading, setLoading] = React.useState(false);
@@ -37,7 +39,7 @@ export default function FormDialogProtectora() {
 
     // Validació bàsica
     if (!payload.username || !payload.password) {
-      setError("Tots els camps són obligatoris");
+      setError(t('formDialogProtectora.allFieldsRequired'));
       setLoading(false);
       return;
     }
@@ -47,9 +49,7 @@ export default function FormDialogProtectora() {
       handleClose();
     } catch (err) {
       console.error("Error en el login:", err);
-      setError(
-        "Error en l'autenticació. Comprova les teves credencials o registra't si encara no tens compte."
-      );
+      setError(t('formDialogProtectora.authError'));
     } finally {
       setLoading(false);
     }
@@ -76,11 +76,11 @@ export default function FormDialogProtectora() {
    
           }}
         >
-          <BusinessIcon /> Accés Protectores
+          <BusinessIcon /> {t('formDialogProtectora.title')}
         </DialogTitle>
         <DialogContent>
           <DialogContentText sx={{ mb: 2 }}>
-            Inicia sessió amb el teu compte de protectora.
+            {t('formDialogProtectora.subtitle')}
           </DialogContentText>
 
           {error && (
@@ -95,7 +95,7 @@ export default function FormDialogProtectora() {
               margin="dense"
               id="username"
               name="username"
-              label="Nom d'usuari"
+              label={t('formDialogProtectora.username')}
               type="text"
               fullWidth
               variant="standard"
@@ -107,7 +107,7 @@ export default function FormDialogProtectora() {
               margin="dense"
               id="password"
               name="password"
-              label="Contrasenya"
+              label={t('formDialogProtectora.password')}
               type="password"
               fullWidth
               variant="standard"
@@ -131,7 +131,7 @@ export default function FormDialogProtectora() {
               px: 3,
             }}
           >
-            Cancel·lar
+            {t('formDialogProtectora.cancelButton')}
           </Button>
           <Button
             type="submit"
@@ -150,7 +150,7 @@ export default function FormDialogProtectora() {
               transition: "all 0.3s ease-in-out",
             }}
           >
-            {loading ? "Entrant..." : "Entrar"}
+            {loading ? t('formDialogProtectora.loggingIn') : t('formDialogProtectora.loginButton')}
           </Button>
         </DialogActions>
       </Dialog>

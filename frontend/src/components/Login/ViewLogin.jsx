@@ -14,12 +14,13 @@ import { Visibility, VisibilityOff, Email, Lock } from '@mui/icons-material';
 import { useColors } from '../../hooks/useColors';
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from '../../context/AuthProvider';
-
+import { useTranslation } from 'react-i18next';
 
 export default function ViewLogin() {
   const navigate = useNavigate();
   const { login } = useAuthContext();
-  const { colors } = useColors();
+  const { colors, isDarkMode } = useColors();
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     username: '',
     password: ''
@@ -50,7 +51,7 @@ export default function ViewLogin() {
       
       // Redirigir segons el rol
       if (loginResult?.user?.role === 'usuario') {
-        navigate('/inici-usuari');
+        navigate('/inici-usuari-pettinder');
       } else if (loginResult?.user?.role === 'protectora') {
         navigate('/inici-protectora');
       } else {
@@ -60,7 +61,7 @@ export default function ViewLogin() {
       console.log('Error backend detall:', err.response?.data);
       const errorMsg = err.response?.data?.detail || 
                        err.response?.data?.error || 
-                       'Error en l\'autenticació. Comprova les teves credencials.';
+                       t('loginPage.authError');
       setError(errorMsg);
     } finally {
       setLoading(false);
@@ -91,7 +92,7 @@ export default function ViewLogin() {
             align="center"
             sx={{ mb: 3, color: colors.darkBlue, fontWeight: 'bold' }}
           >
-            Iniciar Sessió
+            {t('loginPage.title')}
           </Typography>
 
           <Typography 
@@ -99,7 +100,7 @@ export default function ViewLogin() {
             align="center" 
             sx={{ mb: 3, color: 'text.secondary' }}
           >
-            Accedeix al teu compte de PetMatch
+            {t('loginPage.subtitle')}
           </Typography>
 
           {error && (
@@ -114,7 +115,7 @@ export default function ViewLogin() {
               required
               fullWidth
               id="username"
-              label="Nom d'usuari"
+              label={t('loginPage.username')}
               name="username"
               autoComplete="username"
               autoFocus
@@ -123,11 +124,11 @@ export default function ViewLogin() {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Email sx ={{color:colors.blue}} />
+                    <Email sx ={{color: isDarkMode ? colors.blue : colors.darkBlue}} />
                   </InputAdornment>
                 ),
               }}
-              sx={{ mb: 2}}
+              sx={{ mb: 2, }}
             />
 
             <TextField
@@ -135,7 +136,7 @@ export default function ViewLogin() {
               required
               fullWidth
               name="password"
-              label="Contrasenya"
+              label={t('loginPage.password')}
               type={showPassword ? 'text' : 'password'}
               id="password"
               autoComplete="current-password"
@@ -183,7 +184,7 @@ export default function ViewLogin() {
                             },
               }}
             >
-              {loading ? 'Accedint...' : 'Iniciar Sessió'}
+              {loading ? t('loginPage.loggingIn') : t('loginPage.loginButton')}
             </Button>
 
             <Button
@@ -207,29 +208,30 @@ export default function ViewLogin() {
                 },
               }}
             >
-              Sóc una protectora
+              {t('loginPage.shelterButton')}
             </Button>
 
             <Box sx={{ textAlign: 'center', mt: 2 }}>
               <Typography variant="body2" color="text.secondary">
-                Has oblidat la contrasenya?{' '}
+                {t('loginPage.forgotPassword')}{' '}
                 <Button 
+                  onClick={() => navigate('/forgot-password')}
                   variant="text" 
                   size="small"
                   sx={{ textTransform: 'none', p: 0, minWidth: 'auto' }}
                 >
-                  Recupera-la
+                  {t('loginPage.recoverPassword')}
                 </Button>
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                No tens compte?{' '}
+                {t('loginPage.noAccount')}{' '}
                 <Button 
                   onClick={()=> navigate('/formulari-dialog')}
                   variant="text" 
                   size="small"
                   sx={{ textTransform: 'none', p: 0, minWidth: 'auto' }}
                 >
-                  Crea'l
+                  {t('loginPage.createAccount')}
                 </Button>
               </Typography>
             </Box>

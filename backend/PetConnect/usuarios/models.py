@@ -1,11 +1,16 @@
 from django.db import models
-# Create your models here.
-from django.db import models
 from django.contrib.auth.models import AbstractUser
 from multiselectfield import MultiSelectField
-# Hace falta instalar django-multiselectfield para poder seleccionar múltiples opciones en un campo a
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from mascotas.constants import (
+    TAMANO_CHOICES,
+    EDAD_CHOICES,
+    SEXO_CHOICES,
+    APTO_CON_CHOICES,
+    ESTADO_LEGAL_SALUD_CHOICES,
+    ESPECIE_CHOICES,
+)
 
 
 ROLE_CHOICES = [
@@ -50,69 +55,32 @@ class PerfilUsuario(models.Model):
     ]
     genero = models.CharField(max_length=1, choices=GENERO_CHOICES, blank=True, null=True)
 
-    # Especie de interés (gato / perro)
-    ESPECIE_CHOICES = [
-        ('perro', 'Perro'),
-        ('gato', 'Gato'),
-    ]
-    especie = models.CharField(max_length=10, choices=ESPECIE_CHOICES, blank=True, null=True)
-
-    # Necesidades y experiencia
-    necesidades_especiales = models.BooleanField(default=False)
-    mascota_previa = models.BooleanField(default=False)
-
-    # Vivienda y niños
-    CASA_CHOICES = [
-        ('apartamento', 'Apartamento'),
-        ('casa_pequeña', 'Casa pequeña'),
-        ('casa_grande', 'Casa grande'),
-        ('casa_con_jardin', 'Casa con jardín'),
-        ('finca', 'Finca/Casa rural')
-    ]
-    tipo_vivienda = models.CharField(max_length=20, choices=CASA_CHOICES, blank=True, null=True)
-    tiene_ninos = models.BooleanField(default=False)
-
-    # Actividad familiar / preferencias para mascota
-    ACTIVIDAD_CHOICES = [
-        ('baja', 'Baja'),
-        ('media', 'Media'),
-        ('alta', 'Alta')
-    ]
-    nivel_actividad_familiar = models.CharField(max_length=10, choices=ACTIVIDAD_CHOICES, blank=True, null=True)
-
-    TAMANO_CHOICES = [
-        ('pequeno', 'Pequeño'),
-        ('mediano', 'Mediano'),
-        ('grande', 'Grande'),
-    ]
-    preferencias_tamano = MultiSelectField(choices=TAMANO_CHOICES, blank=True)
-
-    EDAD_CHOICES = [
-        ('cachorro', 'Cachorro'),
-        ('joven', 'Joven'),
-        ('adulto', 'Adulto'),
-        ('senior', 'Senior'),
-    ]
-    preferencias_edad = MultiSelectField(choices=EDAD_CHOICES, blank=True)
-
-    SEXO_CHOICES = [
-        ('macho', 'Macho'),
-        ('hembra', 'Hembra'),
-    ]
-    preferencias_sexo = MultiSelectField(choices=SEXO_CHOICES, blank=True)
-
-    # Campos específicos
-    deporte_ofrecible = models.CharField(
-        max_length=200,
-        blank=True,
-        null=True,
-        help_text="Deportes/actividades que se le pueden ofrecer (solo para perros)"
+    # Preferències de mascota
+    preferencias_especie = MultiSelectField(
+        choices=ESPECIE_CHOICES, 
+        blank=True, 
+        verbose_name="Especie(s) Preferida(s)",
+        help_text="Selecciona si prefieres perro, gato o ambos"
     )
-    tiempo_en_casa_para_gatos = models.CharField(
-        max_length=100,
+    preferencias_tamano = MultiSelectField(choices=TAMANO_CHOICES, blank=True, verbose_name="Tamaño(s) Preferido(s)")
+    preferencias_edad = MultiSelectField(choices=EDAD_CHOICES, blank=True, verbose_name="Edad(es) Preferida(s)")
+    preferencias_sexo = MultiSelectField(choices=SEXO_CHOICES, blank=True, verbose_name="Sexo Preferido")
+    preferencias_convivencia = MultiSelectField(
+        choices=APTO_CON_CHOICES, 
+        max_length=200, 
         blank=True,
-        null=True,
-        help_text="Tiempo que pasa en casa (útil para gatos)"
+        verbose_name="Apto para Convivir con (Búsqueda)"
+    )
+    preferencias_estado_basico = MultiSelectField(
+        choices=ESTADO_LEGAL_SALUD_CHOICES, 
+        max_length=100, 
+        blank=True,
+        verbose_name="Estado de Salud/Legal Mínimo"
+    )
+    acepta_condicion_especial = models.BooleanField(
+        default=False,
+        verbose_name="¿Acepta mascotas con condiciones o necesidades especiales?",
+        help_text="Marque 'Sí' si está dispuesto a adoptar una mascota que requiera cuidados extra (medicación, dieta especial, o condición crónica)."
     )
 
     class Meta:
@@ -136,8 +104,7 @@ class PerfilProtectora(models.Model):
         ('fundacion', 'Fundación'),
     ]
     tipo_entidad_juridica = models.CharField(max_length=20, choices=ENTIDAD_CHOICES, blank=True, null=True)
-    
-    
+     
     # Direcciones
     direccion_juridica = models.TextField(blank=True, null=True)
     calle_juridica = models.CharField(max_length=200, blank=True, null=True)

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   List,
@@ -12,11 +13,12 @@ import {
   Chip
 } from '@mui/material';
 import PetsIcon from '@mui/icons-material/Pets';
-import api from '../../api/client';
+import api from '../../../../../frontend/src/api/client';
 import { useColors } from '../../hooks/useColors';
 import { useAuthContext } from '../../context/AuthProvider';
 
 export default function ChatMiniList({ maxHeight = 400, onSelectChat }) {
+  const { t } = useTranslation();
   const { user } = useAuthContext();
   const { colors } = useColors();
   const [chats, setChats] = useState([]);
@@ -47,10 +49,10 @@ export default function ChatMiniList({ maxHeight = 400, onSelectChat }) {
   };
 
   return (
-    <Box sx={{ width: 260, maxHeight, overflowY: 'auto', bgcolor: colors.lightColor, borderRadius: 2, boxShadow: 2 }}>
-      <Box sx={{ p: 2, borderBottom: `1px solid ${colors.orange}` }}>
+    <Box sx={{ width: '100%', height: maxHeight || '500px', minHeight: maxHeight || '500px', overflowY: 'auto', bgcolor: colors.lightColor, borderRadius: 2, boxShadow: 2, display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ p: 2, borderBottom: `1px solid ${colors.orange}`, flexShrink: 0 }}>
         <Typography variant="h6" fontWeight="bold" color={colors.orange}>
-          Xats
+          {t('chatComponent.chatsListTitle')}
         </Typography>
       </Box>
       {loading ? (
@@ -61,7 +63,7 @@ export default function ChatMiniList({ maxHeight = 400, onSelectChat }) {
         <Box sx={{ p: 3, textAlign: 'center' }}>
           <PetsIcon sx={{ fontSize: 40, color: colors.orange, opacity: 0.5, mb: 1 }} />
           <Typography variant="body2" color="text.secondary">
-            No tens xats encara
+            {t('chatComponent.noChatsYet')}
           </Typography>
         </Box>
       ) : (
@@ -69,7 +71,7 @@ export default function ChatMiniList({ maxHeight = 400, onSelectChat }) {
           {chats.map((chat, idx) => {
             const lastMessage = chat.ultimo_mensaje;
             return (
-              <Box key={chat.id}>
+              <Box key={chat.id} >
                 <ListItem disablePadding>
                   <ListItemButton
                     onClick={() => handleChatClick(chat.id)}
@@ -85,18 +87,18 @@ export default function ChatMiniList({ maxHeight = 400, onSelectChat }) {
                       </Avatar>
                     </ListItemAvatar>
                     <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <Typography variant="body2" fontWeight="bold" noWrap>
+                      <Typography variant="body2" fontWeight="500" fontSize="18px" noWrap color={colors.textDark}>
                         {chat.mascota_nombre}
                       </Typography>
-                      <Typography variant="caption" color="text.secondary" noWrap>
-                        {lastMessage ? `${lastMessage.remitente}: ${lastMessage.contenido}` : 'Nou xat'}
+                      <Typography variant="caption" color="text.secondary" noWrap sx={{fontSize: '14px'}}>
+                        {lastMessage ? `${lastMessage.remitente}: ${lastMessage.contenido}` : t('chatComponent.newChat')}
                       </Typography>
                     </Box>
                     {chat.num_mensajes > 0 && (
                       <Chip
                         label={chat.num_mensajes}
                         size="small"
-                        sx={{ bgcolor: colors.lightColor, color: colors.darkOrange,  minWidth: 24 }}
+                        sx={{ bgcolor: colors.blue, color: colors.lightOrange,  minWidth: 28, height: 28, fontWeight: 'bold' }}
                       />
                     )}
                   </ListItemButton>
