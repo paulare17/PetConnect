@@ -497,5 +497,24 @@
     "specialNeeds": "⚠️ Necessitats especials",
     "consultShelter": "Consultar amb la protectora",
     "viewFullProfile": "Veure perfil complet"
+  },
+  "petCardExtended": {
+    "dog": "Gos",
+    "cat": "Gat",
+    "breedNotSpecified": "Raça no especificada",
+    "year": "any",
+    "years": "anys",
+    "location": "Ubicació",
+    "character": "Caràcter",
+    "healthStatus": "Estat de salut",
+    "vaccinated": "Vacunat",
+    "sterilized": "Esterilitzat",
+    "dewormed": "Desparasitat",
+    "microchip": "Microxip",
+    "specialNeeds": "⚠️ Necessitats especials",
+    "consultShelter": "Consultar amb la protectora",
+    "noDescription": "Sense descripció disponible",
+    "showMore": "Mostrar més",
+    "viewMore": "Veure més"
   }
 }

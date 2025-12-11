@@ -497,5 +497,24 @@
     "specialNeeds": "⚠️ Special Needs",
     "consultShelter": "Consult with shelter",
     "viewFullProfile": "View full profile"
+  },
+  "petCardExtended": {
+    "dog": "Dog",
+    "cat": "Cat",
+    "breedNotSpecified": "Breed not specified",
+    "year": "year",
+    "years": "years",
+    "location": "Location",
+    "character": "Character",
+    "healthStatus": "Health Status",
+    "vaccinated": "Vaccinated",
+    "sterilized": "Sterilized",
+    "dewormed": "Dewormed",
+    "microchip": "Microchip",
+    "specialNeeds": "⚠️ Special Needs",
+    "consultShelter": "Consult with shelter",
+    "noDescription": "No description available",
+    "showMore": "Show more",
+    "viewMore": "View more"
   }
 }

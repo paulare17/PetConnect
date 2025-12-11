@@ -497,5 +497,24 @@
     "specialNeeds": "⚠️ Necesidades especiales",
     "consultShelter": "Consultar con la protectora",
     "viewFullProfile": "Ver perfil completo"
+  },
+  "petCardExtended": {
+    "dog": "Perro",
+    "cat": "Gato",
+    "breedNotSpecified": "Raza no especificada",
+    "year": "año",
+    "years": "años",
+    "location": "Ubicación",
+    "character": "Carácter",
+    "healthStatus": "Estado de salud",
+    "vaccinated": "Vacunado",
+    "sterilized": "Esterilizado",
+    "dewormed": "Desparasitado",
+    "microchip": "Microchip",
+    "specialNeeds": "⚠️ Necesidades especiales",
+    "consultShelter": "Consultar con la protectora",
+    "noDescription": "Sin descripción disponible",
+    "showMore": "Mostrar más",
+    "viewMore": "Ver más"
   }
 }
