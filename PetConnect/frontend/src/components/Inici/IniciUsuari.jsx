@@ -256,7 +256,7 @@ function IniciUsuari() {
           route="/inici-usuari-pettinder" 
           labelKey="iniciUsuari.petTinderButton" 
         />
-        <Box sx={{ textAlign: "center", mb: 4 }}>
+        <Box sx={{ textAlign: "center", mb: 4, py: { xs: 1, md: 4 }, position: "relative" }}>
           <Typography
             variant="h3"
             component="h1"
@@ -266,13 +266,21 @@ function IniciUsuari() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              gap: 2,
+              gap: { xs: 1, md: 2 },
+              fontSize: { xs: "1.75rem", sm: "2.5rem", md: "3rem" },
             }}
           >
-            <PetsIcon sx={{ fontSize: 48 }} />
+            <PetsIcon sx={{ fontSize: { xs: 32, md: 48 } }} />
             {t('iniciUsuari.title')}
           </Typography>
-          <Typography variant="h6" sx={{ color: colors.darkBlue }}>
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              color: colors.darkBlue,
+              fontSize: { xs: "0.9rem", md: "1.25rem" },
+              px: { xs: 2, md: 0 },
+            }}
+          >
             {t('iniciUsuari.subtitle')}
           </Typography>
         </Box>
@@ -284,7 +292,7 @@ function IniciUsuari() {
             sx={{
               p: 3,
               flex: 1,
-              backgroundColor: "white",
+              backgroundColor: colors.lightColor,
               borderRadius: 2,
             }}
           >

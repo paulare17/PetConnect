@@ -25,6 +25,8 @@ import {
   IconButton,
   Chip,
   CardMedia,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import MaleIcon from "@mui/icons-material/Male";
@@ -41,6 +43,8 @@ import PreviewDialog from "../MostraMascotes/PreviewDialog.jsx";
 const AddAnimalForm = () => {
   const { t } = useTranslation();
   const { colors } = useColors();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [previewUrls, setPreviewUrls] = useState(["", "", ""]);
   // Totes les races de gos del backend
   const RAZAS_PERRO = [
@@ -442,40 +446,42 @@ const AddAnimalForm = () => {
 
   return (
     <Box
-      //   className="no-scroll-form"
       sx={{
         backgroundColor: colors.background,
-        padding: 3,
-        minHeight: "calc(100vh - 90px)",
-        // minHeight: "100vh",
+        padding: { xs: 2, md: 3 },
+        minHeight: { xs: "auto", md: "calc(100vh - 90px)" },
         width: "100%",
         justifyContent: "center",
         transition: "background-color 0.3s ease",
+        overflow: "visible",
       }}
       >
       <Grid
         container
-        spacing={4}
+        spacing={{ xs: 3, md: 4 }}
         sx={{
-          minHeight: "100vh",
+          minHeight: { xs: "auto", md: "100vh" },
           alignItems: "flex-start",
           justifyContent: "center",
-          flexWrap: "nowrap",
+          flexWrap: { xs: "wrap", md: "nowrap" },
           borderRadius: 5,
+          flexDirection: { xs: "column", md: "row" },
+          overflow: { xs: "visible", md: "auto" },
         }}
         >
-        {/* esquerra: Formulari */}
+        {/* Formulari - sempre primer */}
         <Grid
           size={{ xs: 12, md: 6.5 }}
           sx={{
-
             borderRadius: 5,
             display: "flex",
             justifyContent: "center",
             alignItems: "flex-start",
-            maxHeight: "600px",
-            overflowY: "auto", // ⬅️ CANVI: scroll només aquí
-            paddingRight: 1,
+            maxHeight: { xs: "none", md: "80vh" },
+            overflowY: { xs: "visible", md: "auto" },
+            paddingRight: { xs: 0, md: 1 },
+            order: { xs: 1, md: 1 },
+            width: "100%",
           }}
         >
           <Card
@@ -494,10 +500,28 @@ const AddAnimalForm = () => {
                 component="h1"
                 gutterBottom
                 align="center"
-                sx={{ mb: 3, color: colors.darkBlue }}
+                sx={{ 
+                  mb: 1, 
+                  color: colors.darkBlue,
+                  fontSize: { xs: "1.5rem", sm: "2rem", md: "2.125rem" },
+                }}
               >
                 {t("addAnimalForm.title")}
               </Typography>
+              {/* Label explicatiu per mòbil */}
+              {isMobile && (
+                <Typography
+                  variant="body2"
+                  align="center"
+                  sx={{ 
+                    mb: 3, 
+                    color: colors.orange,
+                    fontStyle: "italic",
+                  }}
+                >
+                  {t("addAnimalForm.mobilePreviewHint")}
+                </Typography>
+              )}
               <Box component="form" onSubmit={handleSubmit}>
                 <Grid container spacing={3}>
                   <Grid size={{ xs: 12, sm: 6 }}>
@@ -1078,22 +1102,26 @@ const AddAnimalForm = () => {
             </CardContent>
           </Card>
         </Grid>
-        {/* dreta: CardPet sticky */}
+        {/* Preview - a sota en mòbil, a la dreta en desktop */}
         <Grid
           size={{ xs: 12, md: 5 }}
           sx={{
             display: "flex",
-            justifyContent: "flex-start",
+            justifyContent: "center",
             alignItems: "flex-start",
-            height: "60vh",
+            height: { xs: "auto", md: "auto" },
             position: "relative",
+            order: { xs: 2, md: 2 },
+            mt: { xs: 2, md: 0 },
+            pb: { xs: 4, md: 0 },
+            width: "100%",
           }}
         >
           <Box
             sx={{
-              position: "sticky",
+              position: { xs: "relative", md: "sticky" },
               width: "100%",
-              maxWidth: 800,
+              maxWidth: { xs: 400, md: 800 },
               zIndex: 2,
             }}
           >
@@ -1102,13 +1130,13 @@ const AddAnimalForm = () => {
                 borderRadius: 5,
                 width: "100%",
                 m: 0,
-                p: 5,
+                p: { xs: 2, md: 5 },
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
               }}
             >
-              <CardContent sx={{}}>
+              <CardContent>
                 <Typography variant="h5" sx={{ mb: 2, maxHeight: "550px" }}>
                   {t("addAnimalForm.previewTitle")}
                 </Typography>

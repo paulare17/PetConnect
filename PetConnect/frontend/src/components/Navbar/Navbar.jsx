@@ -68,9 +68,9 @@ function ResponsiveAppBar() {
     if (setting === "Perfil") {
       if (user?.role === ROLES.PROTECTORA) navigate("/perfil-protectora");
       else if (user?.role === ROLES.USUARIO) navigate("/perfil-usuari");
-      else if (user?.role === ROLES.ADMIN) navigate("/admin");
     } else if (setting === "Inici") {
-      navigate("/");
+      if (user?.role === ROLES.PROTECTORA) navigate("/inici-protectora");
+      else if (user?.role === ROLES.USUARIO) navigate("/inici-usuari-galeria");
     } else if (setting === "Sortir") {
       logout();
       navigate("/");

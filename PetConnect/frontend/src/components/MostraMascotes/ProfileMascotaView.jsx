@@ -10,6 +10,8 @@ import {
   Card,
   CardMedia,
   IconButton,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
@@ -69,6 +71,8 @@ function ProfileMascotaView({ animal, showAdoptButton = true }) {
   const { t } = useTranslation();
   const { colors } = useColors();
   const { user } = useAuthContext();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [favorit, setFavorit] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [alerta, setAlerta] = useState(null);
@@ -162,8 +166,21 @@ function ProfileMascotaView({ animal, showAdoptButton = true }) {
   };
 
   return (
-    <Box sx={{ py: 2 , width: '1000px', justifyContent: 'center', display: 'flex' }}>
-      <Paper elevation={4} sx={{ p: 4, borderRadius: 5, background: colors.lightColor, position: 'relative' }}>
+    <Box sx={{ 
+      py: { xs: 1, md: 2 }, 
+      width: { xs: '100%', md: '1000px' }, 
+      maxWidth: '100%',
+      justifyContent: 'center', 
+      display: 'flex',
+      px: { xs: 1, md: 0 },
+    }}>
+      <Paper elevation={4} sx={{ 
+        p: { xs: 2, sm: 3, md: 4 }, 
+        borderRadius: { xs: 3, md: 5 }, 
+        background: colors.lightColor, 
+        position: 'relative',
+        width: '100%',
+      }}>
         {/* Notificació visual d'alerta - només per usuaris */}
         {alerta && !isProtectora && (
           <Box sx={{ position: 'absolute', top: 70, right: 16, zIndex: 10, minWidth: 300 }}>
@@ -186,14 +203,29 @@ function ProfileMascotaView({ animal, showAdoptButton = true }) {
         )}
         
         {/* Capçalera amb imatge i nom */}
-        <Grid container spacing={4} alignItems="center">
+        <Grid container spacing={{ xs: 2, md: 4 }} alignItems="center">
           <Grid item xs={12} md={5}>
-            <Card sx={{ boxShadow: 3, borderRadius: 3, display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: 300, position: 'relative' }}>
+            <Card sx={{ 
+              boxShadow: 3, 
+              borderRadius: 3, 
+              display: 'flex', 
+              justifyContent: 'center', 
+              alignItems: 'center', 
+              width: '100%', 
+              height: { xs: 250, sm: 300 }, 
+              position: 'relative' 
+            }}>
               <CardMedia
                 component="img"
                 image={images[currentImageIndex]}
                 alt={`${animal.nombre} - ${currentImageIndex + 1}`}
-                sx={{ objectFit: 'cover', objectPosition: 'center center', width: '100%', height: 300, borderRadius: 3 }}
+                sx={{ 
+                  objectFit: 'cover', 
+                  objectPosition: 'center center', 
+                  width: '100%', 
+                  height: { xs: 250, sm: 300 }, 
+                  borderRadius: 3 
+                }}
               />
               
               {/* Controls del carrussel - només si hi ha més d'una imatge */}
@@ -202,9 +234,10 @@ function ProfileMascotaView({ animal, showAdoptButton = true }) {
                   {/* Fletxa esquerra */}
                   <IconButton
                     onClick={handlePrevImage}
+                    size={isMobile ? "small" : "medium"}
                     sx={{
                       position: 'absolute',
-                      left: 8,
+                      left: { xs: 4, md: 8 },
                       top: '50%',
                       transform: 'translateY(-50%)',
                       backgroundColor: 'rgba(255, 255, 255, 0.8)',
@@ -212,15 +245,16 @@ function ProfileMascotaView({ animal, showAdoptButton = true }) {
                       zIndex: 1
                     }}
                   >
-                    <ChevronLeftIcon />
+                    <ChevronLeftIcon fontSize={isMobile ? "small" : "medium"} />
                   </IconButton>
                   
                   {/* Fletxa dreta */}
                   <IconButton
                     onClick={handleNextImage}
+                    size={isMobile ? "small" : "medium"}
                     sx={{
                       position: 'absolute',
-                      right: 8,
+                      right: { xs: 4, md: 8 },
                       top: '50%',
                       transform: 'translateY(-50%)',
                       backgroundColor: 'rgba(255, 255, 255, 0.8)',
@@ -228,7 +262,7 @@ function ProfileMascotaView({ animal, showAdoptButton = true }) {
                       zIndex: 1
                     }}
                   >
-                    <ChevronRightIcon />
+                    <ChevronRightIcon fontSize={isMobile ? "small" : "medium"} />
                   </IconButton>
                   
                   {/* Indicadors (dots) */}
@@ -267,32 +301,72 @@ function ProfileMascotaView({ animal, showAdoptButton = true }) {
             </Card>
           </Grid>
           <Grid item xs={12} md={7}>
-            <Typography variant="h2" sx={{ color: colors.textDark, mb: 2 }}>
+            <Typography 
+              variant="h2" 
+              sx={{ 
+                color: colors.textDark, 
+                mb: 2,
+                fontSize: { xs: '1.75rem', sm: '2.5rem', md: '3rem' },
+                textAlign: { xs: 'center', md: 'left' },
+              }}
+            >
               {animal.nombre}
             </Typography>
             {/* Quadre lila per característiques destacades */}
-            <Box sx={{ border: `3px solid ${colors.darkPurple}`, borderRadius: 2, p: 2, mb: 2, background: colors.purple, width: '100%' }}>
+            <Box sx={{ 
+              border: `3px solid ${colors.darkPurple}`, 
+              borderRadius: 2, 
+              p: { xs: 1.5, md: 2 }, 
+              mb: 2, 
+              background: colors.purple, 
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: { xs: 'center', md: 'flex-start' },
+            }}>
               <Chip 
                 label={raza || t('profileMascota.breedNotSpecified')} 
-                sx={{ backgroundColor: colors.lightPurple, color: colors.textDark, fontWeight: 'bold', mb: 1 }} 
+                sx={{ 
+                  backgroundColor: colors.lightPurple, 
+                  color: colors.textDark, 
+                  fontWeight: 'bold', 
+                  mb: 1,
+                  fontSize: { xs: '0.75rem', md: '0.8125rem' },
+                }} 
               />
-              <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 1, mb: 1 }}>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                flexWrap: 'wrap', 
+                gap: { xs: 0.5, md: 1 }, 
+                mb: 1,
+                justifyContent: { xs: 'center', md: 'flex-start' },
+              }}>
                 <Chip 
                   icon={generoLower === 'macho' ? <MaleIcon /> : <FemaleIcon />}
                   label={generoLower === 'macho' ? t('profileMascota.male') : t('profileMascota.female')}
                   sx={{ 
                     backgroundColor: colors.darkPurple, 
                     color: 'white',
+                    fontSize: { xs: '0.7rem', md: '0.8125rem' },
                     '& .MuiChip-icon': { color: generoLower === 'macho' ? colors.blue : 'pink' }
                   }} 
                 />
                 <Chip 
                   label={`${animal.edad} ${animal.edad !== 1 ? t('profileMascota.years') : t('profileMascota.year')}`}
-                  sx={{ backgroundColor: colors.darkPurple, color: 'white' }} 
+                  sx={{ 
+                    backgroundColor: colors.darkPurple, 
+                    color: 'white',
+                    fontSize: { xs: '0.7rem', md: '0.8125rem' },
+                  }} 
                 />
                 <Chip 
                   label={tamanoDisplay || t('profileMascota.sizeNotSpecified')}
-                  sx={{ backgroundColor: colors.darkPurple, color: 'white' }} 
+                  sx={{ 
+                    backgroundColor: colors.darkPurple, 
+                    color: 'white',
+                    fontSize: { xs: '0.7rem', md: '0.8125rem' },
+                  }} 
                 />
               </Box>
               <Chip
@@ -304,8 +378,16 @@ function ProfileMascotaView({ animal, showAdoptButton = true }) {
         </Grid>
 
         {/* Descripció llarga estil blog */}
-        <Box sx={{ mt: 4, mb: 2 }}>
-          <Typography variant="body1" sx={{ color: colors.black, fontSize: '1.1rem', mb: 2 }}>
+        <Box sx={{ mt: { xs: 2, md: 4 }, mb: 2 }}>
+          <Typography 
+            variant="body1" 
+            sx={{ 
+              color: colors.textDark, 
+              fontSize: { xs: '0.95rem', md: '1.1rem' }, 
+              mb: 2,
+              textAlign: { xs: 'justify', md: 'left' },
+            }}
+          >
             {animal.descripcion || t('profileMascota.noDescription')}
           </Typography>
           <Divider sx={{ my: 2 }} />
@@ -337,8 +419,15 @@ function ProfileMascotaView({ animal, showAdoptButton = true }) {
 
         {/* Dades de la protectora */}
         {(animal.protectora || animal.protectora_nombre) && (
-          <Box sx={{ mt: 4 }}>
-            <Typography variant="h6" sx={{ color: colors.orange, mb: 1 }}>
+          <Box sx={{ mt: { xs: 2, md: 4 } }}>
+            <Typography 
+              variant="h6" 
+              sx={{ 
+                color: colors.orange, 
+                mb: 1,
+                fontSize: { xs: '1rem', md: '1.25rem' },
+              }}
+            >
               {t('profileMascota.shelterInCharge')}
             </Typography>
             <Typography variant="body2"><strong>{t('profileMascota.name')}</strong> {animal.protectora_nombre || animal.protectora?.nombre || animal.protectora}</Typography>
@@ -347,8 +436,19 @@ function ProfileMascotaView({ animal, showAdoptButton = true }) {
         )}
 
         {showAdoptButton && (
-          <Box sx={{ textAlign: 'center', mt: 6 }}>
-            <Button variant="contained" sx={{ backgroundColor: colors.orange, color: 'white', px: 6, py: 2, fontSize: '1.2rem', '&:hover': { backgroundColor: colors.darkOrange } }}>
+          <Box sx={{ textAlign: 'center', mt: { xs: 3, md: 6 } }}>
+            <Button 
+              variant="contained" 
+              sx={{ 
+                backgroundColor: colors.orange, 
+                color: 'white', 
+                px: { xs: 3, md: 6 }, 
+                py: { xs: 1.5, md: 2 }, 
+                fontSize: { xs: '1rem', md: '1.2rem' }, 
+                '&:hover': { backgroundColor: colors.darkOrange },
+                width: { xs: '100%', sm: 'auto' },
+              }}
+            >
               {t('profileMascota.requestAdoption')}
             </Button>
           </Box>

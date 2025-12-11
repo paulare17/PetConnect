@@ -25,8 +25,9 @@ function PetTinderButton({ route, labelKey, icon: CustomIcon }) {
       onClick={() => navigate(route)}
       sx={{
         position: "fixed",
-        top: { xs: 120, sm: 125 },
-        right: { xs: 16, sm: 60 },
+        top: { xs: 90, sm: 125 },
+        left: { xs: 16, sm: "auto" },
+        right: { xs: "auto", sm: 60 },
         backgroundColor: colors.blue,
         color: "white",
         px: { xs: 2.5, sm: 4 },

@@ -268,6 +268,7 @@
     "addAnimal": "Add Animal",
     "cancel": "Cancel",
     "previewTitle": "Preview of Your Ad:",
+    "mobilePreviewHint": "Below the form you can see how your pet's card will look",
     "clickToViewFullProfile": "Click on the card to see how the full profile will look",
     "fullPreview": "Full Preview",
     "previewDialogTitle": "Profile Preview",
@@ -287,6 +288,7 @@
   },
   "chatComponent": {
     "title": "My Chats",
+    "chat": "Chat",
     "chatsListTitle": "Chats",
     "connected": "Connected",
     "disconnected": "Disconnected",
@@ -460,6 +462,7 @@
   },
   "iniciProtectora": {
     "addAnimalsButton": "Add your animals",
+    "accessChatsButton": "Access your chats",
     "yourAdoptions": "Your adoptions",
     "loading": "Loading...",
     "errorLoading": "Error loading your pets",

@@ -15,6 +15,8 @@ import {
   Card,
   CardMedia,
   IconButton,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
@@ -77,6 +79,8 @@ function ProfileAnimal() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuthContext();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [animal, setAnimal] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -196,9 +200,16 @@ function ProfileAnimal() {
   const aptoCon = animal.apto_con || [];
 
   return (
-    <Box sx={{ background: colors.background, minHeight: '100vh', py: 6 }}>
-      <Container maxWidth="md">
-        <Paper elevation={4} sx={{ p: 4, borderRadius: 5, background: colors.lightColor, maxWidth: 900, mx: 'auto', position: 'relative' }}>
+    <Box sx={{ background: colors.background, minHeight: '100vh', py: { xs: 2, md: 6 } }}>
+      <Container maxWidth="md" sx={{ px: { xs: 1, sm: 2, md: 3 } }}>
+        <Paper elevation={4} sx={{ 
+          p: { xs: 2, sm: 3, md: 4 }, 
+          borderRadius: { xs: 3, md: 5 }, 
+          background: colors.lightColor, 
+          maxWidth: 900, 
+          mx: 'auto', 
+          position: 'relative' 
+        }}>
           {/* Notificació visual d'alerta - només per usuaris */}
           {alerta && !isProtectora && (
             <Alert severity={alerta.type} sx={{ mb: 3 }}>
@@ -214,50 +225,111 @@ function ProfileAnimal() {
           {!isProtectora && (
             <IconButton
               onClick={togglePreferit}
-              sx={{ position: 'absolute', top: 32, right: 32, zIndex: 2, background: 'none' }}
+              sx={{ 
+                position: 'absolute', 
+                top: { xs: 12, md: 32 }, 
+                right: { xs: 12, md: 32 }, 
+                zIndex: 2, 
+                background: 'none' 
+              }}
             >
-              {preferit ? <FavoriteIcon sx={{ color: 'red', fontSize: 36 }} /> : <FavoriteBorderIcon sx={{ color: colors.orange, fontSize: 36 }} />}
+              {preferit ? <FavoriteIcon sx={{ color: 'red', fontSize: { xs: 28, md: 36 } }} /> : <FavoriteBorderIcon sx={{ color: colors.orange, fontSize: { xs: 28, md: 36 } }} />}
             </IconButton>
           )}
           {/* Capçalera amb imatge i nom */}
-          <Grid container spacing={4} alignItems="center">
+          <Grid container spacing={{ xs: 2, md: 4 }} alignItems="center">
             <Grid item xs={12} md={5}>
-              <Card sx={{ boxShadow: 3, borderRadius: 3,  display: 'flex', justifyContent: 'center', alignItems: 'center', width: 300, height: 300, }}>
+              <Card sx={{ 
+                boxShadow: 3, 
+                borderRadius: 3, 
+                display: 'flex', 
+                justifyContent: 'center', 
+                alignItems: 'center', 
+                width: { xs: '100%', md: 300 }, 
+                height: { xs: 250, md: 300 },
+                mx: 'auto',
+              }}>
                 <CardMedia
                   component="img"
                   image={imageSrc}
                   alt={animal.nombre}
-                  sx={{ objectFit: 'cover', objectPosition: 'center center', width: 300, height: 300, borderRadius: 3, mt: 2, mb: 2 }}
+                  sx={{ 
+                    objectFit: 'cover', 
+                    objectPosition: 'center center', 
+                    width: '100%', 
+                    height: { xs: 250, md: 300 }, 
+                    borderRadius: 3,
+                  }}
                 />
               </Card>
             </Grid>
             <Grid item xs={12} md={7}>
-              <Typography variant="h2" sx={{ color: colors.textDark, mb: 2 }}>
+              <Typography 
+                variant="h2" 
+                sx={{ 
+                  color: colors.textDark, 
+                  mb: 2,
+                  fontSize: { xs: '1.75rem', sm: '2.5rem', md: '3rem' },
+                  textAlign: { xs: 'center', md: 'left' },
+                }}
+              >
                 {animal.nombre}
               </Typography>
               {/* Quadre lila per característiques destacades */}
-              <Box sx={{ border: `3px solid ${colors.darkPurple}`, borderRadius: 2, p: 2, mb: 2, background: colors.purple, width: '400px' }}>
+              <Box sx={{ 
+                border: `3px solid ${colors.darkPurple}`, 
+                borderRadius: 2, 
+                p: { xs: 1.5, md: 2 }, 
+                mb: 2, 
+                background: colors.purple, 
+                width: { xs: '100%', md: '400px' },
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: { xs: 'center', md: 'flex-start' },
+              }}>
                 <Chip 
                   label={raza || t('profileMascota.breedNotSpecified')} 
-                  sx={{ backgroundColor: colors.lightPurple, color: colors.textDark, fontWeight: 'bold', mb: 1 }} 
+                  sx={{ 
+                    backgroundColor: colors.lightPurple, 
+                    color: colors.textDark, 
+                    fontWeight: 'bold', 
+                    mb: 1,
+                    fontSize: { xs: '0.75rem', md: '0.875rem' },
+                  }} 
                 />
-                <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 1, mb: 1 }}>
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  flexWrap: 'wrap', 
+                  gap: { xs: 0.5, md: 1 }, 
+                  mb: 1,
+                  justifyContent: { xs: 'center', md: 'flex-start' },
+                }}>
                   <Chip 
                     icon={generoLower === 'macho' ? <MaleIcon /> : <FemaleIcon />}
                     label={generoLower === 'macho' ? t('profileMascota.male') : t('profileMascota.female')}
                     sx={{ 
                       backgroundColor: colors.darkPurple, 
                       color: 'white',
+                      fontSize: { xs: '0.7rem', md: '0.875rem' },
                       '& .MuiChip-icon': { color: generoLower === 'macho' ? colors.blue : 'pink' }
                     }} 
                   />
                   <Chip 
                     label={`${animal.edad} ${animal.edad !== 1 ? t('profileMascota.years') : t('profileMascota.year')}`}
-                    sx={{ backgroundColor: colors.darkPurple, color: 'white' }} 
+                    sx={{ 
+                      backgroundColor: colors.darkPurple, 
+                      color: 'white',
+                      fontSize: { xs: '0.7rem', md: '0.875rem' },
+                    }} 
                   />
                   <Chip 
                     label={tamanoDisplay || t('profileMascota.sizeNotSpecified')}
-                    sx={{ backgroundColor: colors.darkPurple, color: 'white' }} 
+                    sx={{ 
+                      backgroundColor: colors.darkPurple, 
+                      color: 'white',
+                      fontSize: { xs: '0.7rem', md: '0.875rem' },
+                    }} 
                   />
                 </Box>
                 <Chip
@@ -269,8 +341,16 @@ function ProfileAnimal() {
           </Grid>
 
           {/* Descripció llarga estil blog */}
-          <Box sx={{ mt: 4, mb: 2 }}>
-            <Typography variant="body1" sx={{ color: colors.black, fontSize: '1.1rem', mb: 2 }}>
+          <Box sx={{ mt: { xs: 2, md: 4 }, mb: 2 }}>
+            <Typography 
+              variant="body1" 
+              sx={{ 
+                color: colors.black, 
+                fontSize: { xs: '0.95rem', md: '1.1rem' }, 
+                mb: 2,
+                textAlign: { xs: 'justify', md: 'left' },
+              }}
+            >
               {animal.descripcion || t('profileMascota.noDescription')}
             </Typography>
             <Divider sx={{ my: 2 }} />
@@ -302,8 +382,15 @@ function ProfileAnimal() {
 
           {/* Dades de la protectora */}
           {(animal.protectora || animal.protectora_nombre) && (
-            <Box sx={{ mt: 4 }}>
-              <Typography variant="h6" sx={{ color: colors.orange, mb: 1 }}>
+            <Box sx={{ mt: { xs: 2, md: 4 } }}>
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  color: colors.orange, 
+                  mb: 1,
+                  fontSize: { xs: '1rem', md: '1.25rem' },
+                }}
+              >
                 {t('profileMascota.shelterInCharge')}
               </Typography>
               <Typography variant="body2"><strong>{t('profileMascota.name')}</strong> {animal.protectora_nombre || animal.protectora?.nombre || animal.protectora}</Typography>
@@ -311,7 +398,7 @@ function ProfileAnimal() {
             </Box>
           )}
 
-          <Box sx={{ textAlign: 'center', mt: 6 }}>
+          <Box sx={{ textAlign: 'center', mt: { xs: 3, md: 6 } }}>
             {user?.role === ROLES.PROTECTORA ? (
               <Button 
                 variant="contained" 
@@ -333,9 +420,10 @@ function ProfileAnimal() {
                 sx={{ 
                   backgroundColor: animal.adoptado ? colors.purple : colors.green, 
                   color: 'white', 
-                  px: 6, 
-                  py: 2, 
-                  fontSize: '1.2rem', 
+                  px: { xs: 3, md: 6 }, 
+                  py: { xs: 1.5, md: 2 }, 
+                  fontSize: { xs: '1rem', md: '1.2rem' }, 
+                  width: { xs: '100%', sm: 'auto' },
                   '&:hover': { 
                     backgroundColor: animal.adoptado ? colors.darkPurple : colors.darkGreen 
                   },
@@ -357,9 +445,10 @@ function ProfileAnimal() {
                 sx={{ 
                   backgroundColor: colors.orange, 
                   color: 'white', 
-                  px: 6, 
-                  py: 2, 
-                  fontSize: '1.2rem', 
+                  px: { xs: 3, md: 6 }, 
+                  py: { xs: 1.5, md: 2 }, 
+                  fontSize: { xs: '1rem', md: '1.2rem' }, 
+                  width: { xs: '100%', sm: 'auto' },
                   '&:hover': { backgroundColor: colors.darkOrange } 
                 }}
                 onClick={async () => {
@@ -386,15 +475,26 @@ function ProfileAnimal() {
         </Paper>
 
         {/* Galeria d'altres animals (slider/carousel) */}
-        <Box sx={{ mt: 6, mb: 2 }}>
-          <Typography variant="h5" sx={{ color: colors.orange, mb: 2, textAlign: 'center' }}>
+        <Box sx={{ mt: { xs: 4, md: 6 }, mb: 2 }}>
+          <Typography variant="h5" sx={{ color: colors.orange, mb: 2, textAlign: 'center', fontSize: { xs: '1.25rem', md: '1.5rem' } }}>
             {t('profileMascota.otherAnimals')}
           </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
-            <IconButton onClick={() => setGaleriaIndex(i => Math.max(i - 1, 0))} disabled={galeriaIndex === 0}>
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            gap: { xs: 1, md: 2 },
+            flexWrap: { xs: 'wrap', md: 'nowrap' },
+            px: { xs: 1, md: 0 },
+          }}>
+            <IconButton 
+              onClick={() => setGaleriaIndex(i => Math.max(i - 1, 0))} 
+              disabled={galeriaIndex === 0}
+              sx={{ display: { xs: 'none', md: 'flex' } }}
+            >
               <ArrowBackIosIcon />
             </IconButton>
-            {altres.slice(galeriaIndex, galeriaIndex + 4).map((a, index) => {
+            {altres.slice(galeriaIndex, galeriaIndex + (isMobile ? 2 : 4)).map((a, index) => {
               const aEspecieLower = (a.especie || '').toLowerCase();
               const aGeneroLower = (a.genero || '').toLowerCase();
               const cardColor = aEspecieLower === 'perro' ? colors.background : colors.backgroundBlue;
@@ -406,11 +506,11 @@ function ProfileAnimal() {
                 <Card 
                   key={a.id} 
                   sx={{ 
-                    width: 200, 
+                    width: { xs: 150, sm: 180, md: 200 }, 
                     backgroundColor: cardColor, 
                     borderRadius: 2, 
                     boxShadow: 2, 
-                    mx: 1, 
+                    mx: { xs: 0.5, md: 1 }, 
                     overflow: 'hidden',
                     transition: 'all 0.3s ease-in-out',
                     opacity: 1,
@@ -438,31 +538,39 @@ function ProfileAnimal() {
                   <Box sx={{ position: 'relative' }}>
                     <CardMedia
                       component="img"
-                      height="140"
+                      sx={{ height: { xs: 100, sm: 120, md: 140 }, objectFit: 'cover', objectPosition: 'center center' }}
                       image={a.foto || `https://via.placeholder.com/200x140?text=${t('profileMascota.noImage')}`}
                       alt={a.nombre}
-                      sx={{ objectFit: 'cover', objectPosition: 'center center' }}
                     />
                     {/* Chip d'espècie */}
                     <Chip
-                      icon={<PetsIcon />}
+                      icon={<PetsIcon sx={{ fontSize: { xs: 14, md: 18 } }} />}
                       label={aEspecieLower === 'perro' ? t('profileMascota.dog') : t('profileMascota.cat')}
                       size="small"
-                      sx={{ position: 'absolute', bottom: 8, left: 8, backgroundColor: iconColor, color: 'white', fontWeight: 'bold' }}
+                      sx={{ 
+                        position: 'absolute', 
+                        bottom: 8, 
+                        left: 8, 
+                        backgroundColor: iconColor, 
+                        color: 'white', 
+                        fontWeight: 'bold',
+                        fontSize: { xs: '0.65rem', md: '0.75rem' },
+                        '& .MuiChip-icon': { color: 'white' },
+                      }}
                     />
                   </Box>
                   {/* Contingut */}
-                  <Box sx={{ p: 1.5 }}>
-                    <Typography variant="subtitle1" sx={{ color: colors.textDark, fontWeight: 'bold', textAlign: 'center' }}>
+                  <Box sx={{ p: { xs: 1, md: 1.5 } }}>
+                    <Typography variant="subtitle1" sx={{ color: colors.textDark, fontWeight: 'bold', textAlign: 'center', fontSize: { xs: '0.85rem', md: '1rem' } }}>
                       {a.nombre}
                     </Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
                       {aGeneroLower === 'macho' ? (
-                        <MaleIcon sx={{ color: colors.blue, fontSize: 18 }} />
+                        <MaleIcon sx={{ color: colors.blue, fontSize: { xs: 14, md: 18 } }} />
                       ) : (
-                        <FemaleIcon sx={{ color: 'pink', fontSize: 18 }} />
+                        <FemaleIcon sx={{ color: 'pink', fontSize: { xs: 14, md: 18 } }} />
                       )}
-                      <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.8rem' }}>
+                      <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: { xs: '0.7rem', md: '0.8rem' } }}>
                         {aRaza || t('profileMascota.breedNotSpecified')}
                       </Typography>
                     </Box>
@@ -470,7 +578,11 @@ function ProfileAnimal() {
                 </Card>
               );
             })}
-            <IconButton onClick={() => setGaleriaIndex(i => Math.min(i + 1, Math.max(altres.length - 4, 0)))} disabled={galeriaIndex >= Math.max(altres.length - 4, 0)}>
+            <IconButton 
+              onClick={() => setGaleriaIndex(i => Math.min(i + 1, Math.max(altres.length - (isMobile ? 2 : 4), 0)))} 
+              disabled={galeriaIndex >= Math.max(altres.length - (isMobile ? 2 : 4), 0)}
+              sx={{ display: { xs: 'none', md: 'flex' } }}
+            >
               <ArrowForwardIosIcon />
             </IconButton>
           </Box>
