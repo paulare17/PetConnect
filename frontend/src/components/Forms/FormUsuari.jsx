@@ -90,6 +90,13 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
     preferencias_sexo: [],
     deporte_ofrecible: "",
     tiempo_en_casa_para_gatos: "",
+    // Nous camps de situació personal
+    tiene_perros: false,
+    tiene_gatos: false,
+    tiene_otros_animales: false,
+    es_primerizo: true,
+    tiene_licencia_ppp: false,
+    codigo_postal: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -560,18 +567,96 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
 
             <Divider sx={{ my: 3 }} />
 
-            {/* Experiència amb Animals */}
+            {/* Situació Personal - Animals a casa */}
             <Typography
               variant="h6"
               sx={{ mb: 2, color: colors.blue, fontWeight: "bold" }}
             >
               <Pets sx={{ mr: 1, verticalAlign: "middle" }} />
+              {t('formUsuari.currentSituation')}
+            </Typography>
+
+            <Grid container spacing={3} sx={{ mb: 4 }}>
+              <Grid size={{ xs: 12 }}>
+                <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                  {t('formUsuari.petsAtHome')}
+                </Typography>
+                <FormGroup row>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={formData.tiene_perros}
+                        onChange={() => handleCheckboxChange("tiene_perros")}
+                        sx={{ color: colors.blue }}
+                      />
+                    }
+                    label={t('formUsuari.hasDogs')}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={formData.tiene_gatos}
+                        onChange={() => handleCheckboxChange("tiene_gatos")}
+                        sx={{ color: colors.blue }}
+                      />
+                    }
+                    label={t('formUsuari.hasCats')}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={formData.tiene_otros_animales}
+                        onChange={() => handleCheckboxChange("tiene_otros_animales")}
+                        sx={{ color: colors.blue }}
+                      />
+                    }
+                    label={t('formUsuari.hasOtherAnimals')}
+                  />
+                </FormGroup>
+              </Grid>
+
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  fullWidth
+                  name="codigo_postal"
+                  label={t('formUsuari.postalCode')}
+                  value={formData.codigo_postal}
+                  onChange={handleInputChange}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <LocationOn sx={{ color: colors.orange }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+            </Grid>
+
+            <Divider sx={{ my: 3 }} />
+
+            {/* Experiència amb Animals */}
+            <Typography
+              variant="h6"
+              sx={{ mb: 2, color: colors.blue, fontWeight: "bold" }}
+            >
+              <VolunteerActivism sx={{ mr: 1, verticalAlign: "middle" }} />
               {t('formUsuari.experienceInfo')}
             </Typography>
 
             <Grid container spacing={3} sx={{ mb: 4 }}>
               <Grid size={{ xs: 12 }}>
                 <FormGroup row>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={formData.es_primerizo}
+                        onChange={() => handleCheckboxChange("es_primerizo")}
+                        sx={{ color: colors.blue }}
+                      />
+                    }
+                    label={t('formUsuari.isFirstTime')}
+                  />
                   <FormControlLabel
                     control={
                       <Checkbox
@@ -585,22 +670,12 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={formData.mascota_previa}
-                        onChange={() => handleCheckboxChange("mascota_previa")}
+                        checked={formData.tiene_licencia_ppp}
+                        onChange={() => handleCheckboxChange("tiene_licencia_ppp")}
                         sx={{ color: colors.blue }}
                       />
                     }
-                    label={t('formUsuari.currentlyHasPets')}
-                  />
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={formData.mascota_previa}
-                        onChange={() => handleCheckboxChange("mascota_previa")}
-                        sx={{ color: colors.blue }}
-                      />
-                    }
-                    label={t('formUsuari.neverHadPets')}
+                    label={t('formUsuari.hasPPPLicense')}
                   />
                 </FormGroup>
               </Grid>

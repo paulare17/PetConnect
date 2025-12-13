@@ -33,9 +33,10 @@ class ChatSerializer(serializers.ModelSerializer):
     mascota_nombre = serializers.CharField(source='mascota.nombre', read_only=True)
     mascota_foto = serializers.ImageField(source='mascota.foto_principal', read_only=True)
     
-    # Campos calculados
+    # Camps calculats
     ultimo_mensaje = serializers.SerializerMethodField()
     num_mensajes = serializers.SerializerMethodField()
+    num_no_llegits = serializers.SerializerMethodField()
     tiene_mensajes = serializers.SerializerMethodField()
     protectora_info = serializers.SerializerMethodField()
 
@@ -46,7 +47,7 @@ class ChatSerializer(serializers.ModelSerializer):
             'id', 'mascota', 'mascota_nombre', 'mascota_foto',
             'adoptante', 'adoptante_username', 
             'protectora', 'protectora_username', 
-            'num_mensajes', 'tiene_mensajes',
+            'num_mensajes', 'num_no_llegits', 'tiene_mensajes',
             'activo', 'ultimo_mensaje', 'fecha_creacion', 'protectora_info'
         ]
         read_only_fields = fields # Todo en el listado de chats es de solo lectura
@@ -55,6 +56,14 @@ class ChatSerializer(serializers.ModelSerializer):
         """Retorna la cantidad total de mensajes en el chat."""
         # obj.mensajes hace referencia al related_name del ForeignKey en Mensaje
         return obj.mensajes.count()
+    
+    def get_num_no_llegits(self, obj):
+        """Retorna el nombre de missatges no llegits per l'usuari actual."""
+        request = self.context.get('request')
+        if not request or not request.user:
+            return 0
+        # Missatges no llegits són els que NO ha enviat l'usuari actual i no estan marcats com llegits
+        return obj.mensajes.filter(leido=False).exclude(remitente=request.user).count()
     
     def get_tiene_mensajes(self, obj):
         """Retorna True si el chat tiene al menos un mensaje."""

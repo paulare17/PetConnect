@@ -60,16 +60,38 @@ class ChatViewSet(viewsets.GenericViewSet):
     # 2. VER MENSAJES DE UN CHAT ESPECÍFICO (Detalle)
     # GET /api/chat/chats/{pk}/
     def retrieve(self, request, pk=None):
-        """ Retorna todos los mensajes de un chat específico. """
+        """ Retorna todos los mensajes de un chat específico y marca como leídos los del otro usuario. """
         
         # Obtener el chat y asegurar que el usuario autenticado tiene acceso
-        chat = get_object_or_404(self.get_queryset(), pk=pk)
+        # Usar Chat.objects.all() en lugar de get_queryset() para permitir acceso a chats nuevos sin mensajes
+        user = self.request.user
+        chat = get_object_or_404(
+            Chat.objects.filter(Q(adoptante=user) | Q(protectora=user)),
+            pk=pk
+        )
+        
+        # Marcar com a llegits tots els missatges que NO són de l'usuari actual
+        chat.mensajes.filter(leido=False).exclude(remitente=user).update(leido=True)
         
         # Obtenemos todos los mensajes y los ordenamos por antigüedad
         mensajes = chat.mensajes.all().order_by('fecha_envio')
         
         # Usamos MensajeSerializer
         serializer = MensajeSerializer(mensajes, many=True, context={'request': request})
+        return Response(serializer.data)
+    
+    # 2.1 OBTENER INFORMACIÓN DE UN CHAT ESPECÍFICO
+    # GET /api/chat/chats/{pk}/info/
+    @action(detail=True, methods=['get'])
+    def info(self, request, pk=None):
+        """ Retorna la información de un chat específico (sin mensajes). """
+        user = self.request.user
+        # Permitir acceso a todos los chats donde el usuario participa, incluso sin mensajes
+        chat = get_object_or_404(
+            Chat.objects.filter(Q(adoptante=user) | Q(protectora=user)),
+            pk=pk
+        )
+        serializer = ChatSerializer(chat)
         return Response(serializer.data)
 
     # 3. OBTENER O CREAR CHAT PARA UNA MASCOTA
@@ -115,9 +137,12 @@ class ChatViewSet(viewsets.GenericViewSet):
     def enviar_mensaje(self, request, pk=None):
         """ Permite a un participante del chat enviar un nuevo mensaje. """
         
-        # 1. Obtener el chat y asegurar acceso
-        chat = get_object_or_404(self.get_queryset(), pk=pk)
+        # 1. Obtener el chat y asegurar acceso - usar filtro directo para permitir chats sin mensajes
         user = request.user
+        chat = get_object_or_404(
+            Chat.objects.filter(Q(adoptante=user) | Q(protectora=user)),
+            pk=pk
+        )
         
         # 2. Verificar que el usuario sea un participante válido
         es_adoptante = chat.adoptante == user

@@ -43,6 +43,26 @@ export const tipoViviendaOptions = [
   { value: "finca", label: "Finca/Casa rural" },
 ];
 
+// Opcions de compatibilitat de mascotes (per protectores)
+export const aptoNinosOptions = [
+  { value: "APTO_NINOS", label: "Apto para niños" },
+  { value: "NO_APTO_NINOS", label: "No apto para niños" },
+  { value: "INDIFERENTE_NINOS", label: "Indiferente" },
+];
+
+export const necesitaCompaniaAnimalOptions = [
+  { value: "PUEDE_SOLO", label: "Puede estar solo" },
+  { value: "NECESITA_COMPANIA", label: "Necesita compañía animal" },
+  { value: "INDIFERENTE_COMPANIA", label: "Indiferente" },
+];
+
+export const nivelExperienciaOptions = [
+  { value: "PRIMERIZOS", label: "Apto para primerizos" },
+  { value: "EXPERIENCIA", label: "Requiere experiencia previa" },
+  { value: "LICENCIA_PPP", label: "Requiere licencia PPP" },
+  { value: "INDIFERENTE_EXP", label: "Indiferente" },
+];
+
 // Protectora-specific options
 export const tipusAnimalsOptions = [
   { value: "gats", label: "Gats" },
@@ -83,6 +103,9 @@ export default {
   edadOptions,
   sexoOptions,
   tipoViviendaOptions,
+  aptoNinosOptions,
+  necesitaCompaniaAnimalOptions,
+  nivelExperienciaOptions,
   labelForValue,
   labelsForValues,
 };

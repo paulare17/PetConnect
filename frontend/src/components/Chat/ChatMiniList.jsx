@@ -94,9 +94,9 @@ export default function ChatMiniList({ maxHeight = 400, onSelectChat }) {
                         {lastMessage ? `${lastMessage.remitente}: ${lastMessage.contenido}` : t('chatComponent.newChat')}
                       </Typography>
                     </Box>
-                    {chat.num_mensajes > 0 && (
+                    {chat.num_no_llegits > 0 && (
                       <Chip
-                        label={chat.num_mensajes}
+                        label={chat.num_no_llegits}
                         size="small"
                         sx={{ bgcolor: colors.blue, color: colors.lightOrange,  minWidth: 28, height: 28, fontWeight: 'bold' }}
                       />

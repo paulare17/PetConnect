@@ -152,6 +152,51 @@ class Mascota(models.Model):
         verbose_name="Color y Patrón de Pelaje del Perro"
     )
 
+    # ============================================
+    # NOUS CAMPS SEPARATS PER A MATCHING
+    # ============================================
+    
+    NINOS_CHOICES = [
+        ('APTO_NINOS', 'Apto para convivir con niños'),
+        ('NO_APTO_NINOS', 'Solo adultos / No apto para niños'),
+        ('INDIFERENTE_NINOS', 'Indiferente / Sin preferencia'),
+    ]
+    
+    apto_ninos = models.CharField(
+        max_length=20,
+        choices=NINOS_CHOICES,
+        default='INDIFERENTE_NINOS',
+        verbose_name="Compatibilidad con niños"
+    )
+
+    COMPANIA_ANIMAL_CHOICES = [
+        ('PUEDE_SOLO', 'Puede vivir solo (sin otros animales)'),
+        ('NECESITA_COMPANIA', 'Necesita compañía de otro animal'),
+        ('INDIFERENTE_COMPANIA', 'Indiferente / Se adapta'),
+    ]
+    
+    necesita_compania_animal = models.CharField(
+        max_length=25,
+        choices=COMPANIA_ANIMAL_CHOICES,
+        default='INDIFERENTE_COMPANIA',
+        verbose_name="Necesidad de compañía animal"
+    )
+
+    NIVEL_EXPERIENCIA_CHOICES = [
+        ('PRIMERIZOS', 'Apto para dueños primerizos'),
+        ('EXPERIENCIA', 'Requiere dueños con experiencia'),
+        ('LICENCIA_PPP', 'Requiere licencia PPP'),
+        ('INDIFERENTE_EXP', 'Indiferente / Sin requisito especial'),
+    ]
+    
+    nivel_experiencia = models.CharField(
+        max_length=20,
+        choices=NIVEL_EXPERIENCIA_CHOICES,
+        default='INDIFERENTE_EXP',
+        verbose_name="Nivel de experiencia requerido"
+    )
+
+    # LEGACY: Mantenim per compatibilitat (es pot eliminar després de migrar dades)
     APTO_CON_CHOICES = [
         # Enfoque en Niños/Adultos
         ('NINOS', 'Apto para convivir con niños'),
@@ -173,7 +218,7 @@ class Mascota(models.Model):
         choices=APTO_CON_CHOICES, 
         max_length=150, 
         blank=True,
-        verbose_name="Apto para Convivir con"
+        verbose_name="[LEGACY] Apto para Convivir con"
     )
 
     CONDICION_ESPECIAL_GATO_CHOICES = [

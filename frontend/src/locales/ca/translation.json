@@ -128,7 +128,15 @@
     "saveButton": "Desar Perfil",
     "savingButton": "Desant...",
     "cancelButton": "Cancel·lar",
-    "createError": "Error en crear el perfil. Intenta-ho de nou."
+    "createError": "Error en crear el perfil. Intenta-ho de nou.",
+    "currentSituation": "Situació Actual",
+    "petsAtHome": "Mascotes a casa",
+    "hasDogs": "Tinc gossos",
+    "hasCats": "Tinc gats",
+    "hasOtherAnimals": "Tinc altres animals",
+    "postalCode": "Codi postal",
+    "isFirstTime": "Sóc primerenc amb mascotes",
+    "hasPPPLicense": "Tinc llicència PPP"
   },
   "formProtectora": {
     "title": "Perfil de Protectora",
@@ -284,7 +292,21 @@
     "errorGenerating": "Error",
     "manualDescription": "Pots escriure la descripció manualment.",
     "successCreated": "Mascota creada correctament!",
-    "errorCreating": "Error creant mascota."
+    "errorCreating": "Error creant mascota.",
+    "compatibilitySection": "Compatibilitat per al matching",
+    "suitableForChildren": "Apte per a nens?",
+    "yesChildren": "Sí, apte per a nens",
+    "noChildren": "No apte per a nens",
+    "indifferentChildren": "Indiferent",
+    "needsAnimalCompany": "Necessita companyia animal?",
+    "canBeAlone": "Pot estar sol",
+    "needsCompany": "Necessita companyia animal",
+    "indifferentCompany": "Indiferent",
+    "experienceRequired": "Experiència requerida",
+    "suitableForBeginners": "Apte per a primerencs",
+    "requiresExperience": "Requereix experiència prèvia",
+    "requiresPPP": "Requereix llicència PPP",
+    "indifferentExperience": "Indiferent"
   },
   "chatComponent": {
     "title": "Els meus xats",
