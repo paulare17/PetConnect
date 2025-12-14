@@ -35,8 +35,8 @@ urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     # Rutes de PetTinder
-    path('api/pettinder/next/', get_next_card, name='pettinder-next'),
-    path('api/pettinder/action/', swipe_action, name='pettinder-action'),
+    path('api/petmatch/next/', get_next_card, name='petmatch-next'),
+    path('api/petmatch/action/', swipe_action, name='petmatch-action'),
 ]
 
 # Servir arxius media en desenvolupament (fotos de mascotes)

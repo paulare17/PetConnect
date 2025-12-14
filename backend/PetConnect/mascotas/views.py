@@ -47,7 +47,7 @@ class MascotaPagination(PageNumberPagination):
 @permission_classes([permissions.IsAuthenticated])
 def get_next_card(request):
     """
-    [GET] /api/pettinder/next/
+    [GET] /api/petmatch/next/
     Retorna la següent Mascota que l'usuari NO ha swipejat.
     """
     user = request.user
@@ -78,7 +78,7 @@ def get_next_card(request):
 @permission_classes([permissions.IsAuthenticated])
 def swipe_action(request):
     """
-    [POST] /api/pettinder/action/
+    [POST] /api/petmatch/action/
     Registra l'acció (Like 'L' o Dislike 'D') d'un usuari sobre una mascota.
     Espera JSON: { "mascota_id": 123, "action": "like" } o { "mascota_id": 123, "action": "dislike" }
     """

@@ -33,6 +33,7 @@
   "menu": {
     "profile": "Perfil",
     "home": "Inicio",
+    "favorites": "Favoritos",
     "logout": "Salir"
   },
   "loginPage": {
@@ -438,7 +439,7 @@
     "checking": "Comprobando perfil de usuario..."
   },
   "iniciUsuari": {
-    "petTinderButton": "PetTinder",
+    "petTinderButton": "PetMatch",
     "title": "Galería de Animales Disponibles",
     "subtitle": "¡Encuentra tu compañero perfecto!",
     "filterSpecies": "Especie",
@@ -533,7 +534,7 @@
     "cat": "Gato"
   },
   "petTinder": {
-    "title": "PetTinder",
+    "title": "PetMatch",
     "subtitle": "¡Encuentra tu compañero perfecto!",
     "actionLike": "Me gusta",
     "actionDislike": "No me gusta",

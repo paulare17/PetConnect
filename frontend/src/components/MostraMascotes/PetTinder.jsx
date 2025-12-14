@@ -45,7 +45,7 @@ function PetTinder() {
   // Fallback al sistema antic si la IA falla
   const fetchNextAnimalFallback = useCallback(() => {
     api
-      .get("/pettinder/next/")
+      .get("/petmatch/next/")
       .then((response) => {
         if (response.data.id) {
           setAnimal(response.data);
@@ -118,7 +118,7 @@ function PetTinder() {
     };
 
     api
-      .post("/pettinder/action/", actionData)
+      .post("/petmatch/action/", actionData)
       .then((response) => {
         setMessage(
           `${t('petTinder.action')} ${

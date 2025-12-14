@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next";
  * Componente reutilizable para botones sticky de navegación PetTinder
  * 
  * Props:
- * - route: string - Ruta a la que navegar (ej: "/inici-usuari-pettinder")
+ * - route: string - Ruta a la que navegar (ej: "/inici-usuari-petmatch")
  * - labelKey: string - Clave de traducción para el label (ej: "iniciUsuari.petTinderButton")
  * - icon: ReactElement - (opcional) Icono personalizado. Por defecto: PetsIcon
  */

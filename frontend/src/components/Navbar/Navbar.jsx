@@ -670,7 +670,7 @@ function ResponsiveAppBar() {
               },
             }}
           >
-            <Typography sx={{ fontSize: "0.95rem" }}>Preferits</Typography>
+            <Typography sx={{ fontSize: "0.95rem" }}>{t('menu.favorites')}</Typography>
           </MenuItem>
         )}
 

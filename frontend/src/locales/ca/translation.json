@@ -33,6 +33,7 @@
   "menu": {
     "profile": "Perfil",
     "home": "Inici",
+    "favorites": "Preferits",
     "logout": "Sortir"
   },
   "loginPage": {
@@ -438,7 +439,7 @@
     "checking": "Comprovant perfil d'usuari..."
   },
   "iniciUsuari": {
-    "petTinderButton": "PetTinder",
+    "petTinderButton": "PetMatch",
     "title": "Galeria d'Animals Disponibles",
     "subtitle": "Troba el teu company perfecte!",
     "filterSpecies": "Espècie",
@@ -533,7 +534,7 @@
     "cat": "Gat"
   },
   "petTinder": {
-    "title": "PetTinder",
+    "title": "PetMatch",
     "subtitle": "Troba el teu company perfecte!",
     "actionLike": "M'agrada",
     "actionDislike": "No m'agrada",

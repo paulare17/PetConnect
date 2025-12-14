@@ -253,7 +253,7 @@ function IniciUsuari() {
       <Container maxWidth="xl">
         {/* Capçalera */}
         <PetTinderButton 
-          route="/inici-usuari-pettinder" 
+          route="/inici-usuari-petmatch" 
           labelKey="iniciUsuari.petTinderButton" 
         />
         <Box sx={{ textAlign: "center", mb: 4, py: { xs: 1, md: 4 }, position: "relative" }}>
