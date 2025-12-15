@@ -183,10 +183,6 @@ const AddAnimalForm = () => {
     descripcion: "",
     adoptado: false,
     oculto: false,
-    // Nous camps de compatibilitat
-    apto_ninos: "INDIFERENTE_NINOS",
-    necesita_compania_animal: "INDIFERENTE_COMPANIA",
-    nivel_experiencia: "INDIFERENTE_EXP",
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -264,21 +260,39 @@ const AddAnimalForm = () => {
         : (formData.raza_gato || formData.raza || '');
 
       // Preparar los datos para enviar a la IA MODULAR
-      // Enviem TOTES les dades reals de l'animal
+      // Normalizamos los valores a lo que espera el backend
+      const especieNorm = (formData.especie || '').toString().toLowerCase(); // 'perro' | 'gato'
+      const sexoNorm = (formData.genero || '').toString().toLowerCase(); // 'macho' | 'hembra'
+      const tamanoNorm = (formData.tamaño || '').toString().toLowerCase(); // 'pequeño' | 'mediano' | 'grande' | 'gigante'
+      const edadNorm = formData.edad !== '' && formData.edad !== null && formData.edad !== undefined
+        ? parseInt(formData.edad, 10)
+        : null;
+
+      // Convivencia con niños: asegurar booleano o cadena vacía
+      const convNinosNorm = typeof formData.convivencia_ninos === 'boolean'
+        ? formData.convivencia_ninos
+        : formData.convivencia_ninos === 'true'
+          ? true
+          : formData.convivencia_ninos === 'false'
+            ? false
+            : '';
+
+      // Convivencia con animales: IA entiende sí/no; mapeamos opciones a 'si' | 'no' | ''
+      let convAnimalesNorm = '';
+      if (formData.convivencia_animales === 'no') convAnimalesNorm = 'no';
+      else if (formData.convivencia_animales === 'misma_especie' || formData.convivencia_animales === 'cualquier_especie') convAnimalesNorm = 'si';
+
       const dataForIA = {
-        nombre: formData.nombre || "Mascota",
-        especie: formData.especie,
-        sexo: formData.genero,
-        edad: formData.edad ? parseInt(formData.edad, 10) : null,
-        tamano: formData.tamaño || "",
+        nombre: formData.nombre || 'Mascota',
+        especie: especieNorm,
+        sexo: sexoNorm,
+        edad: edadNorm,
+        tamano: tamanoNorm,
         raza: razaActual,
-        // Caràcter - enviem l'array unit per comes
-        caracter_necesidad: Array.isArray(formData.caracter) ? formData.caracter.join(', ') : "",
-        // Convivència
-        convivencia_ninos: formData.convivencia_ninos || "",
-        convivencia_animales: formData.convivencia_animales || "",
-        // Història
-        historia_breve: formData.descripcion_necesidades || "",
+        caracter_necesidad: Array.isArray(formData.caracter) ? formData.caracter.join(', ') : '',
+        convivencia_ninos: convNinosNorm,
+        convivencia_animales: convAnimalesNorm,
+        historia_breve: formData.descripcion_necesidades || '',
       };
 
       console.log("📤 Enviando datos a IA:", dataForIA);
@@ -351,22 +365,22 @@ const AddAnimalForm = () => {
       }
 
       // Camps que necessiten conversió a majúscules per al backend
-      const upperCaseFields = ['especie', 'genero', 'raza_perro', 'raza_gato', 'tamano', 'caracter_perro', 'caracter_gato'];
+      const upperCaseFields = ['especie', 'genero', 'raza_perro', 'raza_gato', 'caracter_perro', 'caracter_gato'];
       
       // Camps que NO s'han d'enviar al backend (no existeixen al model)
-      const excludeFields = ['raza', 'tamaño', 'caracter', 'convivencia_ninos', 'convivencia_animales', 'color', 'desparasitado', 'esterilizado', 'con_microchip', 'vacunado', 'necesidades_especiales', 'descripcion_necesidades'];
+      const excludeFields = ['raza', 'tamaño', 'tamano', 'caracter', 'convivencia_ninos', 'convivencia_animales', 'color', 'desparasitado', 'esterilizado', 'con_microchip', 'vacunado', 'necesidades_especiales', 'descripcion_necesidades'];
 
-      // Construir array estado_legal_salud
+      // Construir array estado_legal_salud - enviar como valores separados
       const estadoLegalSalud = [];
       if (formData.desparasitado) estadoLegalSalud.push('DESPARASITADO');
       if (formData.esterilizado) estadoLegalSalud.push('ESTERILIZADO');
       if (formData.vacunado) estadoLegalSalud.push('VACUNADO');
       if (formData.con_microchip) estadoLegalSalud.push('MICROCHIP');
       
-      // Afegir estado_legal_salud al FormData
-      if (estadoLegalSalud.length > 0) {
-        formDataToSend.append('estado_legal_salud', estadoLegalSalud.join(','));
-      }
+      // Afegir estado_legal_salud al FormData como valores separados (no joinados)
+      estadoLegalSalud.forEach(valor => {
+        formDataToSend.append('estado_legal_salud', valor);
+      });
 
       // Afegir caràcter com a array (multiselect)
       if (formData.caracter && formData.caracter.length > 0) {
@@ -384,14 +398,19 @@ const AddAnimalForm = () => {
 
       // Afegir tots els camps del formulari
       Object.keys(formData).forEach((key) => {
+        // Procesar tamaño especialmente
+        if (key === "tamaño" && formData[key]) {
+          // 1. Convertir a mayúsculas
+          let valueToSend = formData[key].toUpperCase().replace(/\s+/g, '_');
+          // 2. Normalizar acentos: NFD descompone caracteres con acento, luego elimina marcas diacríticas
+          valueToSend = valueToSend.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+          // 3. Enviar como 'tamano' (sin acento)
+          formDataToSend.append('tamano', valueToSend);
+          return; // Saltar al siguiente campo
+        }
+
         // Saltar camps que no existeixen al backend
         if (excludeFields.includes(key)) {
-          // Processar camps especials
-          if (key === "tamaño" && formData[key]) {
-            const valueToSend = formData[key].toUpperCase().replace(/\s+/g, '_');
-            formDataToSend.append('tamano', valueToSend);
-          }
-          // El caràcter ja s'ha processat abans
           return; // Saltar al següent camp
         }
         
@@ -929,94 +948,7 @@ const AddAnimalForm = () => {
                     </FormControl>
                   </Grid>
 
-                  {/* Secció de Compatibilitat per al matching IA */}
-                  <Grid size={{ xs: 12 }}>
-                    <Divider sx={{ my: 2 }} />
-                    <Typography
-                      variant="body2"
-                      sx={{ mb: 2, fontWeight: "bold" }}
-                    >
-                      {t("addAnimalForm.compatibilitySection")}
-                    </Typography>
-                  </Grid>
-
-                  <Grid size={{ xs: 12, sm: 4 }}>
-                    <FormControl fullWidth variant="outlined">
-                      <InputLabel>
-                        {t("addAnimalForm.suitableForChildren")}
-                      </InputLabel>
-                      <Select
-                        name="apto_ninos"
-                        value={formData.apto_ninos}
-                        onChange={handleInputChange}
-                        MenuProps={{ disableScrollLock: true }}
-                        label={t("addAnimalForm.suitableForChildren")}
-                      >
-                        <MenuItem value="APTO_NINOS">
-                          {t("addAnimalForm.yesChildren")}
-                        </MenuItem>
-                        <MenuItem value="NO_APTO_NINOS">
-                          {t("addAnimalForm.noChildren")}
-                        </MenuItem>
-                        <MenuItem value="INDIFERENTE_NINOS">
-                          {t("addAnimalForm.indifferentChildren")}
-                        </MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>
-
-                  <Grid size={{ xs: 12, sm: 4 }}>
-                    <FormControl fullWidth variant="outlined">
-                      <InputLabel>
-                        {t("addAnimalForm.needsAnimalCompany")}
-                      </InputLabel>
-                      <Select
-                        name="necesita_compania_animal"
-                        value={formData.necesita_compania_animal}
-                        onChange={handleInputChange}
-                        MenuProps={{ disableScrollLock: true }}
-                        label={t("addAnimalForm.needsAnimalCompany")}
-                      >
-                        <MenuItem value="PUEDE_SOLO">
-                          {t("addAnimalForm.canBeAlone")}
-                        </MenuItem>
-                        <MenuItem value="NECESITA_COMPANIA">
-                          {t("addAnimalForm.needsCompany")}
-                        </MenuItem>
-                        <MenuItem value="INDIFERENTE_COMPANIA">
-                          {t("addAnimalForm.indifferentCompany")}
-                        </MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>
-
-                  <Grid size={{ xs: 12, sm: 4 }}>
-                    <FormControl fullWidth variant="outlined">
-                      <InputLabel>
-                        {t("addAnimalForm.experienceRequired")}
-                      </InputLabel>
-                      <Select
-                        name="nivel_experiencia"
-                        value={formData.nivel_experiencia}
-                        onChange={handleInputChange}
-                        MenuProps={{ disableScrollLock: true }}
-                        label={t("addAnimalForm.experienceRequired")}
-                      >
-                        <MenuItem value="PRIMERIZOS">
-                          {t("addAnimalForm.suitableForBeginners")}
-                        </MenuItem>
-                        <MenuItem value="EXPERIENCIA">
-                          {t("addAnimalForm.requiresExperience")}
-                        </MenuItem>
-                        <MenuItem value="LICENCIA_PPP">
-                          {t("addAnimalForm.requiresPPP")}
-                        </MenuItem>
-                        <MenuItem value="INDIFERENTE_EXP">
-                          {t("addAnimalForm.indifferentExperience")}
-                        </MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>
+                  {/* Se ha eliminado la sección de compatibilidad (apto_ninos, necesita_compania_animal, nivel_experiencia) */}
 
                   <Grid size={{ xs: 12 }}>
                     <Typography
