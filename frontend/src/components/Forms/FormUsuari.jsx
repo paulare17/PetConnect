@@ -141,8 +141,6 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
     if (!formData.telefono.trim()) newErrors.telefono = t('formUsuari.phoneRequired');
     if (!formData.fecha_nacimiento)
       newErrors.fecha_nacimiento = t('formUsuari.birthdateRequired');
-    if (!formData.descripcion.trim())
-      newErrors.descripcion = t('formUsuari.descriptionRequired');
     if (!formData.genero) newErrors.genero = t('formUsuari.genderRequired');
     if (!formData.tipo_vivienda)
       newErrors.tipo_vivienda = t('formUsuari.housingTypeRequired');
@@ -362,7 +360,6 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
 
               <Grid size={{ xs: 12 }}>
                 <TextField
-                  required
                   fullWidth
                   multiline
                   rows={4}
