@@ -123,9 +123,6 @@ export default function FormProtectora() {
     // Validacions camps de protectora
     if (!formData.telefono.trim()) newErrors.telefono = t('formProtectora.phoneRequired');
 
-    if (!formData.descripcion.trim())
-      newErrors.descripcion = t('formProtectora.descriptionRequired');
-
     // Validació URL web (opcional però si s'omple ha de ser vàlida)
     if (formData.web && !/^https?:\/\/.+/.test(formData.web))
       newErrors.web =
@@ -377,6 +374,18 @@ export default function FormProtectora() {
                   </Select>
                 </FormControl>
               </Grid>
+
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  fullWidth
+                  name="ano_fundacion"
+                  label={t('formProtectora.foundationYear')}
+                  type="number"
+                  value={formData.ano_fundacion}
+                  onChange={handleInputChange}
+                  inputProps={{ min: 1900, max: new Date().getFullYear() }}
+                />
+              </Grid>
             </Grid>
 
             <Divider sx={{ my: 3 }} />
@@ -534,31 +543,6 @@ export default function FormProtectora() {
 
             <Divider sx={{ my: 3 }} />
 
-            {/* =============== INFORMACIÓ ORGANITZATIVA =============== */}
-            <Typography
-              variant="h6"
-              sx={{ mb: 2, color: colors.blue, fontWeight: "bold" }}
-            >
-              <Business sx={{ mr: 1, verticalAlign: "middle" }} />
-              {t('formProtectora.organizationInfo')}
-            </Typography>
-
-            <Grid container spacing={3} sx={{ mb: 4 }}>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField
-                  fullWidth
-                  name="ano_fundacion"
-                  label={t('formProtectora.foundationYear')}
-                  type="number"
-                  value={formData.ano_fundacion}
-                  onChange={handleInputChange}
-                  inputProps={{ min: 1900, max: new Date().getFullYear() }}
-                />
-              </Grid>
-            </Grid>
-
-            <Divider sx={{ my: 3 }} />
-
             {/* =============== DESCRIPCIÓ I SERVEIS =============== */}
             <Typography
               variant="h6"
@@ -569,7 +553,6 @@ export default function FormProtectora() {
             </Typography>
 
             <TextField
-              required
               fullWidth
               multiline
               rows={4}
