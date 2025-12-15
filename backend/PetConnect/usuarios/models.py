@@ -10,6 +10,9 @@ from mascotas.constants import (
     APTO_CON_CHOICES,
     ESTADO_LEGAL_SALUD_CHOICES,
     ESPECIE_CHOICES,
+    NINOS_CHOICES,
+    COMPANIA_ANIMAL_CHOICES,
+    NIVEL_EXPERIENCIA_CHOICES,
 )
 
 
@@ -55,7 +58,56 @@ class PerfilUsuario(models.Model):
     ]
     genero = models.CharField(max_length=1, choices=GENERO_CHOICES, blank=True, null=True)
 
-    # Preferències de mascota
+    # ============================================
+    # SITUACIÓ PERSONAL DE L'USUARI (per matching)
+    # ============================================
+    
+    # Composició de la llar
+    tiene_ninos = models.BooleanField(
+        default=False,
+        verbose_name="¿Tiene niños en casa?",
+        help_text="Marque si hay menores de edad en el hogar"
+    )
+    tiene_perros = models.BooleanField(
+        default=False,
+        verbose_name="¿Tiene perros actualmente?",
+        help_text="Marque si ya tiene perros en casa"
+    )
+    tiene_gatos = models.BooleanField(
+        default=False,
+        verbose_name="¿Tiene gatos actualmente?",
+        help_text="Marque si ya tiene gatos en casa"
+    )
+    tiene_otros_animales = models.BooleanField(
+        default=False,
+        verbose_name="¿Tiene otros animales?",
+        help_text="Conejos, pájaros, roedores, etc."
+    )
+    
+    # Experiència
+    es_primerizo = models.BooleanField(
+        default=True,
+        verbose_name="¿Es su primera mascota?",
+        help_text="Marque si nunca ha tenido mascotas antes"
+    )
+    tiene_licencia_ppp = models.BooleanField(
+        default=False,
+        verbose_name="¿Tiene licencia PPP?",
+        help_text="Licencia para Perros Potencialmente Peligrosos"
+    )
+    
+    # Ubicació per proximitat geogràfica
+    codigo_postal = models.CharField(
+        max_length=10, 
+        blank=True, 
+        null=True,
+        verbose_name="Código Postal",
+        help_text="Para buscar mascotas cercanas"
+    )
+
+    # ============================================
+    # PREFERÈNCIES DE MASCOTA (filtres opcionals)
+    # ============================================
     preferencias_especie = MultiSelectField(
         choices=ESPECIE_CHOICES, 
         blank=True, 
@@ -65,11 +117,13 @@ class PerfilUsuario(models.Model):
     preferencias_tamano = MultiSelectField(choices=TAMANO_CHOICES, blank=True, verbose_name="Tamaño(s) Preferido(s)")
     preferencias_edad = MultiSelectField(choices=EDAD_CHOICES, blank=True, verbose_name="Edad(es) Preferida(s)")
     preferencias_sexo = MultiSelectField(choices=SEXO_CHOICES, blank=True, verbose_name="Sexo Preferido")
+    
+    # LEGACY: Ja no s'usa per matching, es calcula automàticament amb els camps de situació personal
     preferencias_convivencia = MultiSelectField(
         choices=APTO_CON_CHOICES, 
         max_length=200, 
         blank=True,
-        verbose_name="Apto para Convivir con (Búsqueda)"
+        verbose_name="[LEGACY] Apto para Convivir con (Búsqueda)"
     )
     preferencias_estado_basico = MultiSelectField(
         choices=ESTADO_LEGAL_SALUD_CHOICES, 

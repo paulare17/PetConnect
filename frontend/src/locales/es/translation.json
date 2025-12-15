@@ -129,7 +129,15 @@
     "saveButton": "Guardar Perfil",
     "savingButton": "Guardando...",
     "cancelButton": "Cancelar",
-    "createError": "Error al crear el perfil. Inténtalo de nuevo."
+    "createError": "Error al crear el perfil. Inténtalo de nuevo.",
+    "currentSituation": "Situación Actual",
+    "petsAtHome": "Mascotas en casa",
+    "hasDogs": "Tengo perros",
+    "hasCats": "Tengo gatos",
+    "hasOtherAnimals": "Tengo otros animales",
+    "postalCode": "Código postal",
+    "isFirstTime": "Soy primerizo con mascotas",
+    "hasPPPLicense": "Tengo licencia PPP"
   },
   "formProtectora": {
     "title": "Perfil de Protectora",
@@ -285,7 +293,21 @@
     "errorGenerating": "Error",
     "manualDescription": "Puedes escribir la descripción manualmente.",
     "successCreated": "Mascota creada correctamente!",
-    "errorCreating": "Error creando mascota."
+    "errorCreating": "Error creando mascota.",
+    "compatibilitySection": "Compatibilidad para el matching",
+    "suitableForChildren": "¿Apto para niños?",
+    "yesChildren": "Sí, apto para niños",
+    "noChildren": "No apto para niños",
+    "indifferentChildren": "Indiferente",
+    "needsAnimalCompany": "¿Necesita compañía animal?",
+    "canBeAlone": "Puede estar solo",
+    "needsCompany": "Necesita compañía animal",
+    "indifferentCompany": "Indiferente",
+    "experienceRequired": "Experiencia requerida",
+    "suitableForBeginners": "Apto para primerizos",
+    "requiresExperience": "Requiere experiencia previa",
+    "requiresPPP": "Requiere licencia PPP",
+    "indifferentExperience": "Indiferente"
   },
   "chatComponent": {
     "title": "Mis chats",
@@ -417,7 +439,7 @@
     "checking": "Comprobando perfil de usuario..."
   },
   "iniciUsuari": {
-    "petTinderButton": "PetTinder",
+    "petTinderButton": "PetMatch",
     "title": "Galería de Animales Disponibles",
     "subtitle": "¡Encuentra tu compañero perfecto!",
     "filterSpecies": "Especie",
@@ -512,7 +534,7 @@
     "cat": "Gato"
   },
   "petTinder": {
-    "title": "PetTinder",
+    "title": "PetMatch",
     "subtitle": "¡Encuentra tu compañero perfecto!",
     "actionLike": "Me gusta",
     "actionDislike": "No me gusta",

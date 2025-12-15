@@ -183,6 +183,10 @@ const AddAnimalForm = () => {
     descripcion: "",
     adoptado: false,
     oculto: false,
+    // Nous camps de compatibilitat
+    apto_ninos: "INDIFERENTE_NINOS",
+    necesita_compania_animal: "INDIFERENTE_COMPANIA",
+    nivel_experiencia: "INDIFERENTE_EXP",
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -924,6 +928,96 @@ const AddAnimalForm = () => {
                       </Select>
                     </FormControl>
                   </Grid>
+
+                  {/* Secció de Compatibilitat per al matching IA */}
+                  <Grid size={{ xs: 12 }}>
+                    <Divider sx={{ my: 2 }} />
+                    <Typography
+                      variant="body2"
+                      sx={{ mb: 2, fontWeight: "bold" }}
+                    >
+                      {t("addAnimalForm.compatibilitySection")}
+                    </Typography>
+                  </Grid>
+
+                  <Grid size={{ xs: 12, sm: 4 }}>
+                    <FormControl fullWidth variant="outlined">
+                      <InputLabel>
+                        {t("addAnimalForm.suitableForChildren")}
+                      </InputLabel>
+                      <Select
+                        name="apto_ninos"
+                        value={formData.apto_ninos}
+                        onChange={handleInputChange}
+                        MenuProps={{ disableScrollLock: true }}
+                        label={t("addAnimalForm.suitableForChildren")}
+                      >
+                        <MenuItem value="APTO_NINOS">
+                          {t("addAnimalForm.yesChildren")}
+                        </MenuItem>
+                        <MenuItem value="NO_APTO_NINOS">
+                          {t("addAnimalForm.noChildren")}
+                        </MenuItem>
+                        <MenuItem value="INDIFERENTE_NINOS">
+                          {t("addAnimalForm.indifferentChildren")}
+                        </MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+
+                  <Grid size={{ xs: 12, sm: 4 }}>
+                    <FormControl fullWidth variant="outlined">
+                      <InputLabel>
+                        {t("addAnimalForm.needsAnimalCompany")}
+                      </InputLabel>
+                      <Select
+                        name="necesita_compania_animal"
+                        value={formData.necesita_compania_animal}
+                        onChange={handleInputChange}
+                        MenuProps={{ disableScrollLock: true }}
+                        label={t("addAnimalForm.needsAnimalCompany")}
+                      >
+                        <MenuItem value="PUEDE_SOLO">
+                          {t("addAnimalForm.canBeAlone")}
+                        </MenuItem>
+                        <MenuItem value="NECESITA_COMPANIA">
+                          {t("addAnimalForm.needsCompany")}
+                        </MenuItem>
+                        <MenuItem value="INDIFERENTE_COMPANIA">
+                          {t("addAnimalForm.indifferentCompany")}
+                        </MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+
+                  <Grid size={{ xs: 12, sm: 4 }}>
+                    <FormControl fullWidth variant="outlined">
+                      <InputLabel>
+                        {t("addAnimalForm.experienceRequired")}
+                      </InputLabel>
+                      <Select
+                        name="nivel_experiencia"
+                        value={formData.nivel_experiencia}
+                        onChange={handleInputChange}
+                        MenuProps={{ disableScrollLock: true }}
+                        label={t("addAnimalForm.experienceRequired")}
+                      >
+                        <MenuItem value="PRIMERIZOS">
+                          {t("addAnimalForm.suitableForBeginners")}
+                        </MenuItem>
+                        <MenuItem value="EXPERIENCIA">
+                          {t("addAnimalForm.requiresExperience")}
+                        </MenuItem>
+                        <MenuItem value="LICENCIA_PPP">
+                          {t("addAnimalForm.requiresPPP")}
+                        </MenuItem>
+                        <MenuItem value="INDIFERENTE_EXP">
+                          {t("addAnimalForm.indifferentExperience")}
+                        </MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+
                   <Grid size={{ xs: 12 }}>
                     <Typography
                       variant="body2"

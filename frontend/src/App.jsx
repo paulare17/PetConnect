@@ -95,7 +95,7 @@ function AppContent() {
             <IniciUsuari />
           </UsuarioRoute>
         } />
-        <Route path="/inici-usuari-pettinder" element={
+        <Route path="/inici-usuari-petmatch" element={
           <UsuarioRoute>
             <PetTinder />
           </UsuarioRoute>

@@ -359,15 +359,23 @@ def generar_biografia_modular(datos):
     
     # 4. CONVIVENCIA (si hay datos)
     frases_convivencia = []
-    if convivencia_ninos:
-        conv_ninos = convivencia_ninos.lower()
+    if convivencia_ninos is not None and convivencia_ninos != '':
+        # Convertir a string si és bool
+        if isinstance(convivencia_ninos, bool):
+            conv_ninos = 'si' if convivencia_ninos else 'no'
+        else:
+            conv_ninos = str(convivencia_ninos).lower()
         if conv_ninos in ['si', 'sí', 'yes', 'true']:
             frases_convivencia.append(random.choice(CONVIVENCIA['ninos_si']))
         elif conv_ninos in ['no', 'false']:
             frases_convivencia.append(random.choice(CONVIVENCIA['ninos_no']))
     
-    if convivencia_animales:
-        conv_animales = convivencia_animales.lower()
+    if convivencia_animales is not None and convivencia_animales != '':
+        # Convertir a string si és bool
+        if isinstance(convivencia_animales, bool):
+            conv_animales = 'si' if convivencia_animales else 'no'
+        else:
+            conv_animales = str(convivencia_animales).lower()
         if conv_animales in ['si', 'sí', 'yes', 'true']:
             frases_convivencia.append(random.choice(CONVIVENCIA['animales_si']))
         elif conv_animales in ['no', 'false']:
@@ -413,7 +421,8 @@ def simular_generacion_ia(datos):
 def obtenir_preferencies_explicites(usuario):
     """
     Obté les preferències explícites del perfil de l'usuari.
-    Retorna None si l'usuari no té perfil o no té preferències configurades.
+    Inclou tant preferències de mascota com situació personal (per matching).
+    Retorna None si l'usuari no té perfil.
     """
     try:
         perfil = usuario.perfil_usuario
@@ -421,6 +430,7 @@ def obtenir_preferencies_explicites(usuario):
         return None
     
     preferencies = {
+        # Preferències de mascota (filtres opcionals)
         'especie': list(perfil.preferencias_especie) if perfil.preferencias_especie else [],
         'tamano': list(perfil.preferencias_tamano) if perfil.preferencias_tamano else [],
         'edad': list(perfil.preferencias_edad) if perfil.preferencias_edad else [],
@@ -428,21 +438,18 @@ def obtenir_preferencies_explicites(usuario):
         'convivencia': list(perfil.preferencias_convivencia) if perfil.preferencias_convivencia else [],
         'estado_salud': list(perfil.preferencias_estado_basico) if perfil.preferencias_estado_basico else [],
         'acepta_condicion_especial': perfil.acepta_condicion_especial,
+        
+        # NOUS: Situació personal de l'usuari (per matching automàtic)
+        'tiene_ninos': getattr(perfil, 'tiene_ninos', False),
+        'tiene_perros': getattr(perfil, 'tiene_perros', False),
+        'tiene_gatos': getattr(perfil, 'tiene_gatos', False),
+        'tiene_otros_animales': getattr(perfil, 'tiene_otros_animales', False),
+        'es_primerizo': getattr(perfil, 'es_primerizo', True),
+        'tiene_licencia_ppp': getattr(perfil, 'tiene_licencia_ppp', False),
+        'codigo_postal': getattr(perfil, 'codigo_postal', None),
     }
     
-    # Comprovar si té alguna preferència configurada
-    tiene_preferencias = any([
-        preferencies['especie'],
-        preferencies['tamano'],
-        preferencies['edad'],
-        preferencies['sexo'],
-        preferencies['convivencia'],
-        preferencies['estado_salud'],
-    ])
-    
-    if not tiene_preferencias:
-        return None
-        
+    # Sempre retornem preferències si té perfil (la situació personal sempre és rellevant)
     return preferencies
 
 
@@ -506,56 +513,122 @@ def obtenir_preferencies_implicites(usuario):
 def calcular_score_preferencies_explicites(mascota, pref_explicites):
     """
     Calcula score basat en les preferències explícites de l'usuari (0-1).
+    Inclou matching automàtic segons situació personal.
+    Retorna -1 si la mascota és INCOMPATIBLE (exclusió forçosa).
     """
     if not pref_explicites:
         return 0.0
     
+    # =========================================================
+    # FASE 1: EXCLUSIONS FORÇOSES (retorna -1 si incompatible)
+    # =========================================================
+    
+    # Obtenir nous camps de la mascota
+    mascota_apto_ninos = getattr(mascota, 'apto_ninos', 'INDIFERENTE_NINOS')
+    mascota_compania = getattr(mascota, 'necesita_compania_animal', 'INDIFERENTE_COMPANIA')
+    mascota_experiencia = getattr(mascota, 'nivel_experiencia', 'INDIFERENTE_EXP')
+    
+    # 1. NENS: Si usuari té nens i mascota NO és apta -> EXCLOURE
+    if pref_explicites.get('tiene_ninos', False):
+        if mascota_apto_ninos == 'NO_APTO_NINOS':
+            return -1  # Incompatible
+    
+    # 2. COMPANYIA ANIMAL: Si mascota necessita companyia i usuari no té altres animals -> EXCLOURE
+    if mascota_compania == 'NECESITA_COMPANIA':
+        tiene_animales = (
+            pref_explicites.get('tiene_perros', False) or 
+            pref_explicites.get('tiene_gatos', False) or 
+            pref_explicites.get('tiene_otros_animales', False)
+        )
+        if not tiene_animales:
+            return -1  # Incompatible - la mascota necessita companyia
+    
+    # 3. EXPERIÈNCIA: Si mascota requereix experiència i usuari és primerizo -> EXCLOURE
+    if pref_explicites.get('es_primerizo', True):
+        if mascota_experiencia in ['EXPERIENCIA', 'LICENCIA_PPP']:
+            return -1  # Incompatible
+    
+    # 4. LLICÈNCIA PPP: Si mascota requereix PPP i usuari no la té -> EXCLOURE
+    if mascota_experiencia == 'LICENCIA_PPP':
+        if not pref_explicites.get('tiene_licencia_ppp', False):
+            return -1  # Incompatible
+    
+    # =========================================================
+    # FASE 2: CÀLCUL DE SCORE (preferències opcionals)
+    # =========================================================
+    
     score = 0.0
     total_criteris = 0
     
-    # Espècie (molt important)
-    if pref_explicites['especie']:
-        total_criteris += 2  # Doble pes
+    # Espècie (molt important - doble pes)
+    if pref_explicites.get('especie'):
+        total_criteris += 2
         if mascota.especie in pref_explicites['especie']:
             score += 2
     
     # Tamany
-    if pref_explicites['tamano']:
+    if pref_explicites.get('tamano'):
         total_criteris += 1
         mascota_tamano = getattr(mascota, 'tamano', None)
         if mascota_tamano and mascota_tamano in pref_explicites['tamano']:
             score += 1
     
     # Edat
-    if pref_explicites['edad']:
+    if pref_explicites.get('edad'):
         total_criteris += 1
         mascota_edad = getattr(mascota, 'edad_clasificacion', None)
         if mascota_edad and mascota_edad in pref_explicites['edad']:
             score += 1
     
     # Sexe
-    if pref_explicites['sexo']:
+    if pref_explicites.get('sexo'):
         total_criteris += 1
         if mascota.genero and mascota.genero in pref_explicites['sexo']:
             score += 1
     
-    # Convivència
-    if pref_explicites['convivencia']:
+    # Convivència (legacy camp apto_con)
+    if pref_explicites.get('convivencia'):
         total_criteris += 1
         mascota_apto = getattr(mascota, 'apto_con', None) or []
         if any(apt in pref_explicites['convivencia'] for apt in mascota_apto):
             score += 1
     
     # Estat de salut mínim
-    if pref_explicites['estado_salud']:
+    if pref_explicites.get('estado_salud'):
         total_criteris += 1
         mascota_estado = getattr(mascota, 'estado_legal_salud', None) or []
-        # L'usuari vol que la mascota tingui TOTS els estats requerits
         if all(est in mascota_estado for est in pref_explicites['estado_salud']):
             score += 1
     
-    # Condició especial (penalització si no accepta però la mascota en té)
-    if not pref_explicites['acepta_condicion_especial']:
+    # =========================================================
+    # FASE 3: BONUS per compatibilitat positiva
+    # =========================================================
+    
+    # Bonus si mascota és apta per nens i usuari té nens
+    if pref_explicites.get('tiene_ninos', False) and mascota_apto_ninos == 'APTO_NINOS':
+        score += 0.3
+        total_criteris += 0.3
+    
+    # Bonus si mascota és apta per primerizos i usuari és primerizo
+    if pref_explicites.get('es_primerizo', True) and mascota_experiencia == 'PRIMERIZOS':
+        score += 0.2
+        total_criteris += 0.2
+    
+    # Bonus si usuari té altres animals i mascota s'adapta
+    tiene_animales = (
+        pref_explicites.get('tiene_perros', False) or 
+        pref_explicites.get('tiene_gatos', False)
+    )
+    if tiene_animales and mascota_compania in ['NECESITA_COMPANIA', 'INDIFERENTE_COMPANIA']:
+        score += 0.2
+        total_criteris += 0.2
+    
+    # =========================================================
+    # FASE 4: PENALITZACIONS
+    # =========================================================
+    
+    # Penalització si no accepta condició especial però la mascota en té
+    if not pref_explicites.get('acepta_condicion_especial', False):
         tiene_condicion = False
         if mascota.especie == 'GATO':
             tiene_condicion = bool(getattr(mascota, 'condicion_especial_gato', None))
@@ -563,9 +636,13 @@ def calcular_score_preferencies_explicites(mascota, pref_explicites):
             tiene_condicion = bool(getattr(mascota, 'condicion_especial_perro', None))
         
         if tiene_condicion:
-            score -= 0.5  # Penalització
+            score -= 0.5
     
-    return score / total_criteris if total_criteris > 0 else 0.0
+    # Evitar divisió per zero
+    if total_criteris <= 0:
+        return 0.5  # Score neutre si no hi ha criteris
+    
+    return max(0.0, min(1.0, score / total_criteris))
 
 
 def calcular_score_preferencies_implicites(mascota, pref_implicites):
@@ -674,9 +751,17 @@ def obtenir_recomanacions_ia(usuario, limit=5):
     # Calcular score per cada mascota
     mascotas_con_score = []
     
+    # Obtenir codi postal de l'usuari per proximitat (si existeix)
+    codigo_postal_usuario = pref_explicites.get('codigo_postal') if pref_explicites else None
+    
     for mascota in mascotas_disponibles:
         # Score híbrid
         score_explicites = calcular_score_preferencies_explicites(mascota, pref_explicites) if pref_explicites else 0
+        
+        # Si score_explicites == -1, la mascota és INCOMPATIBLE -> EXCLOURE
+        if score_explicites == -1:
+            continue  # No afegir aquesta mascota a la llista
+        
         score_implicites = calcular_score_preferencies_implicites(mascota, pref_implicites) if pref_implicites else 0
         
         score_base = (weight_explicites * score_explicites) + (weight_implicites * score_implicites)
@@ -688,12 +773,30 @@ def obtenir_recomanacions_ia(usuario, limit=5):
         ).count()
         popularity_bonus = min(0.1, total_likes_mascota * 0.02)  # Max 10%
         
+        # Bonus per proximitat geogràfica (codi postal)
+        proximity_bonus = 0.0
+        if codigo_postal_usuario:
+            # Obtenir codi postal de la protectora
+            try:
+                protectora_perfil = mascota.protectora.perfil_protectora
+                codigo_postal_protectora = getattr(protectora_perfil, 'codigo_postal_refugio', None)
+                
+                if codigo_postal_protectora and codigo_postal_usuario:
+                    # Comparar primers 2 dígits (província a Espanya)
+                    if codigo_postal_usuario[:2] == codigo_postal_protectora[:2]:
+                        proximity_bonus = 0.15  # Mateixa província
+                    # Comparar primers 3 dígits (zona més propera)
+                    elif codigo_postal_usuario[:3] == codigo_postal_protectora[:3]:
+                        proximity_bonus = 0.1
+            except:
+                pass  # Si no es pot obtenir, no afegim bonus
+        
         # Si no hi ha preferències, afegir component aleatori
         if weight_explicites == 0 and weight_implicites == 0:
             import random
             score_base = 0.3 + (random.random() * 0.2)  # Entre 0.3 i 0.5
         
-        final_score = min(1.0, max(0.0, score_base + popularity_bonus))
+        final_score = min(1.0, max(0.0, score_base + popularity_bonus + proximity_bonus))
         
         mascotas_con_score.append({
             'mascota': mascota,

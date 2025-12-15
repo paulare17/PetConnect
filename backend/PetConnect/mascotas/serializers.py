@@ -18,6 +18,11 @@ class MascotaSerializer(serializers.ModelSerializer):
     tamano_display = serializers.CharField(source='get_tamano_display', read_only=True)
     edad_clasificacion_display = serializers.CharField(source='get_edad_clasificacion_display', read_only=True)
     
+    # Nous camps de matching
+    apto_ninos_display = serializers.CharField(source='get_apto_ninos_display', read_only=True)
+    necesita_compania_animal_display = serializers.CharField(source='get_necesita_compania_animal_display', read_only=True)
+    nivel_experiencia_display = serializers.CharField(source='get_nivel_experiencia_display', read_only=True)
+    
     class Meta:
         model = Mascota
         fields = '__all__'
@@ -33,7 +38,10 @@ class MascotaSerializer(serializers.ModelSerializer):
             'raza_perro_display',
             'raza_gato_display',
             'tamano_display',
-            'edad_clasificacion_display'
+            'edad_clasificacion_display',
+            'apto_ninos_display',
+            'necesita_compania_animal_display',
+            'nivel_experiencia_display',
         )
         extra_kwargs = {
             'foto': {'required': True},

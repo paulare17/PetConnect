@@ -36,4 +36,7 @@ urlpatterns = [
     # Alias para compatibilidad con frontend (mismo backend, diferentes URLs)
     path('tinderpet/next/', views.get_next_card, name='api_tinderpet_next'),
     path('tinderpet/action/', views.swipe_action, name='api_tinderpet_action'),
+    # Rutes PetTinder (usades pel component PetTinder.jsx)
+    path('petmatch/next/', views.get_next_card, name='api_petmatch_next'),
+    path('petmatch/action/', views.swipe_action, name='api_petmatch_action'),
 ]

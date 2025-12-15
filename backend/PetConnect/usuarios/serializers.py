@@ -48,6 +48,17 @@ class PerfilUsuarioSerializer(serializers.ModelSerializer):
         model = PerfilUsuario
         fields = '__all__'
         read_only_fields = ('usuario', 'usuario_id', 'username', 'role')
+    
+    def to_representation(self, instance):
+        """Afegeix camps display per als nous camps de matching."""
+        rep = super().to_representation(instance)
+        # Afegir displays llegibles dels nous camps
+        rep['tiene_ninos_display'] = 'Sí' if instance.tiene_ninos else 'No'
+        rep['tiene_perros_display'] = 'Sí' if instance.tiene_perros else 'No'
+        rep['tiene_gatos_display'] = 'Sí' if instance.tiene_gatos else 'No'
+        rep['es_primerizo_display'] = 'Sí' if instance.es_primerizo else 'No'
+        rep['tiene_licencia_ppp_display'] = 'Sí' if instance.tiene_licencia_ppp else 'No'
+        return rep
         
     def create(self, validated_data):
         request = self.context.get('request')

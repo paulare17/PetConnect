@@ -24,6 +24,33 @@ SEXO_CHOICES = [
     ('HEMBRA', 'Hembra'),
 ]
 
+# ============================================
+# NOUS CAMPS SEPARATS PER A MATCHING
+# ============================================
+
+# Desplegable 1: Compatibilitat amb nens (només un)
+NINOS_CHOICES = [
+    ('APTO_NINOS', 'Apto para convivir con niños'),
+    ('NO_APTO_NINOS', 'Solo adultos / No apto para niños'),
+    ('INDIFERENTE_NINOS', 'Indiferente / Sin preferencia'),
+]
+
+# Desplegable 2: Necessita companyia animal (només un)
+COMPANIA_ANIMAL_CHOICES = [
+    ('PUEDE_SOLO', 'Puede vivir solo (sin otros animales)'),
+    ('NECESITA_COMPANIA', 'Necesita compañía de otro animal'),
+    ('INDIFERENTE_COMPANIA', 'Indiferente / Se adapta'),
+]
+
+# Desplegable 3: Nivell d'experiència del propietari (només un)
+NIVEL_EXPERIENCIA_CHOICES = [
+    ('PRIMERIZOS', 'Apto para dueños primerizos'),
+    ('EXPERIENCIA', 'Requiere dueños con experiencia'),
+    ('LICENCIA_PPP', 'Requiere licencia PPP'),
+    ('INDIFERENTE_EXP', 'Indiferente / Sin requisito especial'),
+]
+
+# LEGACY: Mantenim per compatibilitat (es pot eliminar després de migrar)
 APTO_CON_CHOICES = [
     ('NINOS', 'Apto para convivir con niños'),
     ('SIN_NINOS', 'Solo adultos / No apto para niños'),

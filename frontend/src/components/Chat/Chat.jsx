@@ -65,15 +65,11 @@ export default function ChatRoom({ chatId: chatIdProp, onClose, embedded = false
         setLoading(true);
         setError(null);
 
-        // Obtenir informació del chat de la llista
-        const chatListResponse = await api.get('/chat/chats/');
         const effectiveChatId = chatIdProp ?? chatIdParam;
-        const currentChat = chatListResponse.data.find(c => c.id === parseInt(effectiveChatId));
         
-        if (!currentChat) {
-          throw new Error(t('chatComponent.chatNotFound'));
-        }
-        setChatInfo(currentChat);
+        // Obtenir informació del chat directament amb el nou endpoint
+        const chatInfoResponse = await api.get(`/chat/chats/${effectiveChatId}/info/`);
+        setChatInfo(chatInfoResponse.data);
 
         // Obtenir missatges
         const messagesResponse = await api.get(`/chat/chats/${effectiveChatId}/`);
@@ -289,8 +285,8 @@ export default function ChatRoom({ chatId: chatIdProp, onClose, embedded = false
         </Box>
       </Paper>
 
-      {/* Avís de disponibilitat de protectores al començar la conversa */}
-      {showAvailabilityNotice && (
+      {/* Avís de disponibilitat de protectores al començar la conversa - només per usuaris/adoptants */}
+      {showAvailabilityNotice && chatInfo && user && chatInfo.adoptante === user.id && (
         <Alert 
           severity="info" 
           sx={{ mb: 2 }}

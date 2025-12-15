@@ -129,7 +129,15 @@
     "saveButton": "Save Profile",
     "savingButton": "Saving...",
     "cancelButton": "Cancel",
-    "createError": "Error creating profile. Please try again."
+    "createError": "Error creating profile. Please try again.",
+    "currentSituation": "Current Situation",
+    "petsAtHome": "Pets at home",
+    "hasDogs": "I have dogs",
+    "hasCats": "I have cats",
+    "hasOtherAnimals": "I have other animals",
+    "postalCode": "Postal code",
+    "isFirstTime": "I'm a first-time pet owner",
+    "hasPPPLicense": "I have a PPP license"
   },
   "formProtectora": {
     "title": "Shelter Profile",
@@ -285,7 +293,21 @@
     "errorGenerating": "Error",
     "manualDescription": "You can write the description manually.",
     "successCreated": "Pet created successfully!",
-    "errorCreating": "Error creating pet."
+    "errorCreating": "Error creating pet.",
+    "compatibilitySection": "Compatibility for matching",
+    "suitableForChildren": "Suitable for children?",
+    "yesChildren": "Yes, suitable for children",
+    "noChildren": "Not suitable for children",
+    "indifferentChildren": "Indifferent",
+    "needsAnimalCompany": "Needs animal company?",
+    "canBeAlone": "Can be alone",
+    "needsCompany": "Needs animal company",
+    "indifferentCompany": "Indifferent",
+    "experienceRequired": "Experience required",
+    "suitableForBeginners": "Suitable for beginners",
+    "requiresExperience": "Requires previous experience",
+    "requiresPPP": "Requires PPP license",
+    "indifferentExperience": "Indifferent"
   },
   "chatComponent": {
     "title": "My Chats",
@@ -417,7 +439,7 @@
     "checking": "Checking user profile..."
   },
   "iniciUsuari": {
-    "petTinderButton": "PetTinder",
+    "petTinderButton": "PetMatch",
     "title": "Gallery of Available Animals",
     "subtitle": "Find your perfect companion!",
     "filterSpecies": "Species",
@@ -512,7 +534,7 @@
     "cat": "Cat"
   },
   "petTinder": {
-    "title": "PetTinder",
+    "title": "PetMatch",
     "subtitle": "Find your perfect companion!",
     "actionLike": "Like",
     "actionDislike": "Dislike",

@@ -26,6 +26,7 @@ class Mensaje(models.Model):
     remitente = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     contenido = models.TextField()
     fecha_envio = models.DateTimeField(auto_now_add=True)
+    leido = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['fecha_envio']
