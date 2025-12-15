@@ -35,6 +35,7 @@ import {
 import { useColors } from "../../hooks/useColors";
 import { useNavigate } from "react-router-dom";
 import { createUserProfile } from "../../api/client";
+import { useAuthContext } from "../../context/AuthProvider";
 import {
   generoOptions,
   especieOptions,
@@ -71,32 +72,43 @@ export default function FormUsuari({ onProfileCreated, existingProfile }) {
     };
   };
 
-  const [formData, setFormData] = useState(normalizeProfile(existingProfile) || {
-    // Informació bàsica
-    telefono: "",
-    barrio: "",
-    fecha_nacimiento: "",
-    descripcion: "",
-    foto_perfil: null,
-    genero: "",
-    necesidades_especiales: false,
-    especie: [],
-    mascota_previa: false,
-    tipo_vivienda: "",
-    tiene_ninos: false,
-    nivel_actividad_familiar: "",
-    preferencias_tamano: [],
-    preferencias_edad: [],
-    preferencias_sexo: [],
-    deporte_ofrecible: "",
-    tiempo_en_casa_para_gatos: "",
-    // Nous camps de situació personal
-    tiene_perros: false,
-    tiene_gatos: false,
-    tiene_otros_animales: false,
-    es_primerizo: true,
-    tiene_licencia_ppp: false,
-    codigo_postal: "",
+  const [formData, setFormData] = useState(() => {
+    // Si ja existeix un perfil, normalitzar-lo
+    if (existingProfile) {
+      return normalizeProfile(existingProfile);
+    }
+    
+    // Perfil nou: pre-omplir codigo_postal amb el valor guardat a user.city durant el registre
+    const userFromStorage = JSON.parse(localStorage.getItem('user') || '{}');
+    const codigoPostalInicial = userFromStorage?.city || "";
+    
+    return {
+      // Informació bàsica
+      telefono: "",
+      barrio: "",
+      fecha_nacimiento: "",
+      descripcion: "",
+      foto_perfil: null,
+      genero: "",
+      necesidades_especiales: false,
+      especie: [],
+      mascota_previa: false,
+      tipo_vivienda: "",
+      tiene_ninos: false,
+      nivel_actividad_familiar: "",
+      preferencias_tamano: [],
+      preferencias_edad: [],
+      preferencias_sexo: [],
+      deporte_ofrecible: "",
+      tiempo_en_casa_para_gatos: "",
+      // Nous camps de situació personal
+      tiene_perros: false,
+      tiene_gatos: false,
+      tiene_otros_animales: false,
+      es_primerizo: true,
+      tiene_licencia_ppp: false,
+      codigo_postal: codigoPostalInicial,
+    };
   });
 
   const [errors, setErrors] = useState({});
