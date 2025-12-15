@@ -185,6 +185,99 @@ const AddAnimalForm = () => {
     oculto: false,
   };
 
+  /**
+   * Transforma les dades del formulari al format que esperen els components
+   * de visualització (CardPet, CardPetDetail, ProfileMascotaView) i el backend.
+   * 
+   * Mapeig principal:
+   * - tamaño → tamano
+   * - caracter (genèric) → caracter_perro / caracter_gato (segons espècie)
+   * - raza (genèric) → raza_perro / raza_gato (segons espècie) 
+   * - desparasitado, esterilizado, vacunado, con_microchip → estado_legal_salud (array)
+   * - convivencia_ninos, convivencia_animales → apto_con (array)
+   * - necesidades_especiales, descripcion_necesidades → condicion_especial_perro/gato
+   */
+  const transformFormDataToAnimal = (data, urls = previewUrls) => {
+    const especieLower = (data.especie || '').toLowerCase();
+    const isPerro = especieLower === 'perro' || data.especie === 'PERRO';
+    
+    // Construir estado_legal_salud
+    const estadoLegalSalud = [];
+    if (data.desparasitado) estadoLegalSalud.push('DESPARASITADO');
+    if (data.esterilizado) estadoLegalSalud.push('ESTERILIZADO');
+    if (data.vacunado) estadoLegalSalud.push('VACUNADO');
+    if (data.con_microchip) estadoLegalSalud.push('MICROCHIP');
+    
+    // Construir apto_con des de convivència
+    // Valors del formulari: convivencia_ninos: true/false, convivencia_animales: "no"/"misma_especie"/"cualquier_especie"
+    const aptoCon = [];
+    if (data.convivencia_ninos === true) aptoCon.push('NINOS');
+    if (data.convivencia_ninos === false) aptoCon.push('SIN_NINOS');
+    if (data.convivencia_animales === 'misma_especie') {
+      // Mateixa espècie: si és gos, apto amb gossos; si és gat, apto amb gats
+      aptoCon.push(isPerro ? 'PERROS' : 'GATOS');
+    }
+    if (data.convivencia_animales === 'cualquier_especie') {
+      aptoCon.push('PERROS');
+      aptoCon.push('GATOS');
+    }
+    if (data.convivencia_animales === 'no') aptoCon.push('SOLO_EL');
+    
+    // Determinar raça segons espècie
+    const razaValue = data.raza || (isPerro ? data.raza_perro : data.raza_gato) || 'MESTIZO';
+    
+    // Construir objecte transformat
+    // Mapa per convertir mides del formulari a valors del backend
+    const TAMANO_MAP = {
+      'pequeño': 'PEQUENO',
+      'mediano': 'MEDIANO', 
+      'grande': 'GRANDE',
+      'gigante': 'GIGANTE',
+    };
+    
+    const transformed = {
+      // Camps bàsics (sense canvi)
+      nombre: data.nombre,
+      especie: (data.especie || '').toUpperCase(),
+      genero: (data.genero || '').toUpperCase(),
+      edad: data.edad ? parseInt(data.edad, 10) : 0,
+      descripcion: data.descripcion,
+      adoptado: data.adoptado,
+      oculto: data.oculto,
+      
+      // Camps transformats - usar el mapa per convertir la mida
+      tamano: TAMANO_MAP[(data.tamaño || '').toLowerCase()] || 'MEDIANO',
+      tamano_display: data.tamaño, // Per mostrar el valor sense transformar
+      
+      // Raça segons espècie
+      raza_perro: isPerro ? razaValue.toUpperCase() : '',
+      raza_gato: !isPerro ? razaValue.toUpperCase() : '',
+      raza_perro_display: isPerro ? razaValue : '',
+      raza_gato_display: !isPerro ? razaValue : '',
+      
+      // Caràcter segons espècie
+      caracter_perro: isPerro ? (data.caracter || []) : [],
+      caracter_gato: !isPerro ? (data.caracter || []) : [],
+      
+      // Estat legal/salut
+      estado_legal_salud: estadoLegalSalud,
+      
+      // Apto con
+      apto_con: aptoCon,
+      
+      // Condicions especials
+      condicion_especial_perro: isPerro && data.necesidades_especiales ? [data.descripcion_necesidades] : [],
+      condicion_especial_gato: !isPerro && data.necesidades_especiales ? [data.descripcion_necesidades] : [],
+      
+      // Fotos - usar URLs de preview si existeixen
+      foto: urls[0] || (typeof data.foto === "string" ? data.foto : ""),
+      foto2: urls[1] || (typeof data.foto2 === "string" ? data.foto2 : ""),
+      foto3: urls[2] || (typeof data.foto3 === "string" ? data.foto3 : ""),
+    };
+    
+    return transformed;
+  };
+
   const [formData, setFormData] = useState(initialFormData);
   const [submitting, setSubmitting] = useState(false);
   const [generatingDescription, setGeneratingDescription] = useState(false);
@@ -1157,24 +1250,7 @@ const AddAnimalForm = () => {
                   sx={{ cursor: "pointer" }}
                 >
                   <CardPet
-                    animal={{
-                      ...formData,
-                      foto:
-                        previewUrls[0] ||
-                        (typeof formData.foto === "string"
-                          ? formData.foto
-                          : ""),
-                      foto2:
-                        previewUrls[1] ||
-                        (typeof formData.foto2 === "string"
-                          ? formData.foto2
-                          : ""),
-                      foto3:
-                        previewUrls[2] ||
-                        (typeof formData.foto3 === "string"
-                          ? formData.foto3
-                          : ""),
-                    }}
+                    animal={transformFormDataToAnimal(formData)}
                     isFavorito={false}
                     showFavoriteButton={false}
                     onToggleFavorito={() => {}}
@@ -1190,8 +1266,7 @@ const AddAnimalForm = () => {
       <PreviewDialog
         openPreviewDialog={openPreviewDialog}
         setOpenPreviewDialog={setOpenPreviewDialog}
-        formData={formData}
-        previewUrls={previewUrls}
+        animal={transformFormDataToAnimal(formData)}
       />
     </Box>
   );
