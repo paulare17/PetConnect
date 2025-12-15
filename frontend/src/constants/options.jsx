@@ -1,9 +1,9 @@
 
 export const generoOptions = [
-  { value: "M", label: "Masculí" },
-  { value: "F", label: "Femení" },
-  { value: "O", label: "Altres" },
-  { value: "N", label: "Preferisc no dir-ho" },
+  { value: "M", label: "Masculino" },
+  { value: "F", label: "Femenino" },
+  { value: "O", label: "Otros" },
+  { value: "N", label: "Prefiero no decirlo" },
 ];
 
 export const especieOptions = [
