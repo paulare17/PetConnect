@@ -22,7 +22,7 @@ import { useAuthContext } from '../../context/AuthProvider';
 
 const WEBSOCKET_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8080';
 
-export default function ChatRoom({ chatId: chatIdProp, onClose, embedded = false }) {
+export default function ChatRoom({ chatId: chatIdProp, onClose, embedded = false, onRead }) {
   const { t } = useTranslation();
   const { chatId: chatIdParam } = useParams();
   const navigate = useNavigate();
@@ -74,6 +74,10 @@ export default function ChatRoom({ chatId: chatIdProp, onClose, embedded = false
         // Obtenir missatges
         const messagesResponse = await api.get(`/chat/chats/${effectiveChatId}/`);
         setMessages(messagesResponse.data);
+        // Backend marks as read on this GET; notify parent to refresh lists
+        if (typeof onRead === 'function') {
+          onRead();
+        }
       } catch (err) {
         console.error('Error carregant xat:', err);
         setError(err.response?.data?.detail || t('chatComponent.errorLoading'));

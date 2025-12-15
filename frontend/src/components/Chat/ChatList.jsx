@@ -11,6 +11,8 @@ export default function ChatList() {
   // const { t } = useTranslation();
   const { colors } = useColors();
   const [selectedChatId, setSelectedChatId] = useState(null);
+  // Trigger to refresh chat list badges after reads
+  const [refreshKey, setRefreshKey] = useState(0);
   const location = useLocation();
   const isMobile = useMediaQuery('(max-width:600px)');
   const navigate = useNavigate();
@@ -52,6 +54,7 @@ export default function ChatList() {
           <Box sx={{ width: 360, flexShrink: 0, display: 'flex', height: '100%', borderRight: `1px solid ${colors.border}` }}>
             <ChatMiniList 
               maxHeight="100%"
+              refreshKey={refreshKey}
               onSelectChat={(chatId) => setSelectedChatId(chatId)}
             />
           </Box>
@@ -60,7 +63,12 @@ export default function ChatList() {
           <Box sx={{ flexGrow: 1, minWidth: 0, display: 'flex', position: 'relative', height: '100%', p: 1 }}>
             {selectedChatId && (
               <Box sx={{ flexGrow: 1, minWidth: 0, height: '100%', bgcolor: colors.lightColor, overflow: 'hidden', borderRadius: 2 }}>
-                <Chat chatId={selectedChatId} onClose={() => setSelectedChatId(null)} embedded />
+                <Chat 
+                  chatId={selectedChatId}
+                  onClose={() => setSelectedChatId(null)}
+                  embedded
+                  onRead={() => setRefreshKey((k) => k + 1)}
+                />
               </Box>
             )}
           </Box>

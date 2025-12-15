@@ -17,7 +17,7 @@ import api from '../../api/client';
 import { useColors } from '../../hooks/useColors';
 import { useAuthContext } from '../../context/AuthProvider';
 
-export default function ChatMiniList({ maxHeight = 400, onSelectChat }) {
+export default function ChatMiniList({ maxHeight = 400, onSelectChat, refreshKey }) {
   const { t } = useTranslation();
   const { user } = useAuthContext();
   const { colors } = useColors();
@@ -39,7 +39,7 @@ export default function ChatMiniList({ maxHeight = 400, onSelectChat }) {
       }
     };
     if (user) fetchChats();
-  }, [user]);
+  }, [user, refreshKey]);
 
   const handleChatClick = (chatId) => {
     if (onSelectChat) {
