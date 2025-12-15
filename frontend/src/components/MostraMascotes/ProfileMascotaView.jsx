@@ -116,6 +116,17 @@ function ProfileMascotaView({ animal, showAdoptButton = true }) {
 
   if (!animal) return null;
 
+  // Helper para construir URLs correctas para las imágenes
+  const getImageUrl = (url) => {
+    if (!url) return null;
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url; // Ya es una URL absoluta
+    }
+    // Si es una ruta relativa, usar la variable de entorno VITE_API_BASE_URL
+    const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+    return `${apiBase}${url}`;
+  };
+
   // Normalitzar camps del backend (venen en majúscules)
   const especieLower = (animal.especie || '').toLowerCase();
   const generoLower = (animal.genero || '').toLowerCase();
@@ -125,9 +136,9 @@ function ProfileMascotaView({ animal, showAdoptButton = true }) {
   
   // Crear array amb totes les fotos disponibles
   const images = [
-    animal.foto || defaultImage,
-    animal.foto2,
-    animal.foto3
+    getImageUrl(animal.foto) || defaultImage,
+    getImageUrl(animal.foto2),
+    getImageUrl(animal.foto3)
   ].filter(Boolean); // Eliminar valors null/undefined
   
   // Si no hi ha cap foto, afegir la imatge per defecte
@@ -140,7 +151,16 @@ function ProfileMascotaView({ animal, showAdoptButton = true }) {
     ? (animal.raza_perro_display || animal.raza_perro) 
     : (animal.raza_gato_display || animal.raza_gato);
   const tamanoDisplay = animal.tamano_display || animal.tamano;
-  const caracter = especieLower === 'perro' ? animal.caracter_perro : animal.caracter_gato;
+  
+  // Carácter - solo mostrar el de la especie correspondiente
+  let caracter = especieLower === 'perro' ? animal.caracter_perro : animal.caracter_gato;
+  
+  // Convertir a array si es necesario (puede venir como string separado por comas)
+  if (typeof caracter === 'string') {
+    caracter = caracter.split(',').map(c => c.trim()).filter(Boolean);
+  } else if (!Array.isArray(caracter)) {
+    caracter = [];
+  }
   
   // Camps d'estat de salut (ara és un array estado_legal_salud)
   const estadoSalud = animal.estado_legal_salud || [];
@@ -153,8 +173,27 @@ function ProfileMascotaView({ animal, showAdoptButton = true }) {
   const condicionEspecial = especieLower === 'perro' ? animal.condicion_especial_perro : animal.condicion_especial_gato;
   const tieneNecesidadesEspeciales = condicionEspecial && condicionEspecial.length > 0;
   
-  // Apto con (convivència)
-  const aptoCon = animal.apto_con || [];
+  // Compatibilidad (convivencia)
+  const compatibilidad = [];
+  if (animal.convivencia_ninos) {
+    compatibilidad.push(
+      animal.convivencia_ninos === true || animal.convivencia_ninos === 'true' 
+        ? t('profileMascota.goodWithKids') 
+        : animal.convivencia_ninos === false || animal.convivencia_ninos === 'false'
+        ? t('profileMascota.notGoodWithKids')
+        : null
+    );
+  }
+  if (animal.convivencia_animales) {
+    compatibilidad.push(
+      animal.convivencia_animales === 'si' 
+        ? t('profileMascota.goodWithAnimals')
+        : animal.convivencia_animales === 'no'
+        ? t('profileMascota.notGoodWithAnimals')
+        : null
+    );
+  }
+  const compatibilidadText = compatibilidad.filter(Boolean).join(', ') || '-';
 
   // Funcions per navegar pel carrussel
   const handlePrevImage = () => {
@@ -399,7 +438,7 @@ function ProfileMascotaView({ animal, showAdoptButton = true }) {
                   ? caracter.map((c) => t(`character.${CHARACTER_TRANSLATION_MAP[c] || c.toLowerCase()}`)).join(', ')
                   : caracter || '-'}
               </Typography>
-              <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.compatibility')}</strong> {aptoCon.length > 0 ? aptoCon.join(', ') : '-'}</Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.compatibility')}</strong> {compatibilidadText}</Typography>
               <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.dewormed')}</strong> {desparasitado ? t('profileMascota.yes') : t('profileMascota.no')}</Typography>
               <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.sterilized')}</strong> {esterilizado ? t('profileMascota.yes') : t('profileMascota.no')}</Typography>
               <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.microchip')}</strong> {con_microchip ? t('profileMascota.yes') : t('profileMascota.no')}</Typography>

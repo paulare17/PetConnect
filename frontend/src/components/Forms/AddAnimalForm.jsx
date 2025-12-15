@@ -365,10 +365,10 @@ const AddAnimalForm = () => {
       }
 
       // Camps que necessiten conversió a majúscules per al backend
-      const upperCaseFields = ['especie', 'genero', 'raza_perro', 'raza_gato', 'caracter_perro', 'caracter_gato'];
+      const upperCaseFields = ['especie', 'genero', 'raza_perro', 'raza_gato'];
       
       // Camps que NO s'han d'enviar al backend (no existeixen al model)
-      const excludeFields = ['raza', 'tamaño', 'tamano', 'caracter', 'convivencia_ninos', 'convivencia_animales', 'color', 'desparasitado', 'esterilizado', 'con_microchip', 'vacunado', 'necesidades_especiales', 'descripcion_necesidades'];
+      const excludeFields = ['raza', 'tamaño', 'tamano', 'caracter', 'caracter_perro', 'caracter_gato', 'convivencia_ninos', 'convivencia_animales', 'color', 'desparasitado', 'esterilizado', 'con_microchip', 'vacunado', 'necesidades_especiales', 'descripcion_necesidades'];
 
       // Construir array estado_legal_salud - enviar como valores separados
       const estadoLegalSalud = [];
@@ -386,6 +386,18 @@ const AddAnimalForm = () => {
       if (formData.caracter && formData.caracter.length > 0) {
         const backendField = formData.especie === 'PERRO' ? 'caracter_perro' : 'caracter_gato';
         formData.caracter.forEach(c => formDataToSend.append(backendField, c));
+      }
+
+      // Afegir compatibilitat (convivencia)
+      // Normalizar convivencia_ninos: convertir 'true' -> 'si', 'false' -> 'no'
+      if (formData.convivencia_ninos) {
+        const convNinosValue = formData.convivencia_ninos === true || formData.convivencia_ninos === 'true' ? 'si' : 'no';
+        formDataToSend.append('convivencia_ninos', convNinosValue);
+      }
+      // Normalizar convivencia_animales: convertir opciones a 'si' o 'no'
+      if (formData.convivencia_animales) {
+        const convAnimalesValue = formData.convivencia_animales === 'no' ? 'no' : 'si';
+        formDataToSend.append('convivencia_animales', convAnimalesValue);
       }
 
       // Afegir les fotos addicionals (foto2 i foto3)

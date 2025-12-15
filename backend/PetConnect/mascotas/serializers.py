@@ -3,8 +3,32 @@ from .models import Mascota
 from ai_service.views import simular_generacion_ia
 
 
+class MultiSelectFieldSerializer(serializers.Field):
+    """Custom serializer field para MultiSelectField de Django"""
+    
+    def to_representation(self, value):
+        """Convierte el valor almacenado (string) a una lista"""
+        if not value:
+            return []
+        if isinstance(value, list):
+            return value
+        # Si viene como string, dividir por comas
+        return [item.strip() for item in str(value).split(',') if item.strip()]
+    
+    def to_internal_value(self, data):
+        """Procesa múltiples valores del formulario (lista)"""
+        if not data:
+            return ''  # Retornar string vacío si no hay datos
+        if isinstance(data, list):
+            return ','.join([str(item) for item in data if item])  # Convertir lista a string separado por comas
+        return str(data) if data else ''
+
 
 class MascotaSerializer(serializers.ModelSerializer):
+    # Custom fields para MultiSelectField - marcar como required=False
+    estado_legal_salud = MultiSelectFieldSerializer(required=False)
+    caracter_perro = MultiSelectFieldSerializer(required=False)
+    caracter_gato = MultiSelectFieldSerializer(required=False)
     # Campos relacionados con la protectora
     protectora = serializers.PrimaryKeyRelatedField(read_only=True)
     protectora_nombre = serializers.CharField(source='protectora.username', read_only=True)

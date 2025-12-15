@@ -404,6 +404,29 @@ class Mascota(models.Model):
         verbose_name="Estado de Salud y Legal"
     )
 
+    # Campos de compatibilidad/convivencia
+    CONVIVENCIA_CHOICES = [
+        ('', '---'),
+        ('si', 'Sí'),
+        ('no', 'No'),
+    ]
+
+    convivencia_ninos = models.CharField(
+        max_length=10,
+        choices=CONVIVENCIA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Compatible con niños"
+    )
+
+    convivencia_animales = models.CharField(
+        max_length=20,
+        choices=CONVIVENCIA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Compatible con otros animales"
+    )
+
     TAMANO_CHOICES = [
         ('PEQUENO', 'Pequeño (Hasta 10kg)'),
         ('MEDIANO', 'Mediano (10-25kg)'),
