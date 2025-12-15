@@ -20,7 +20,7 @@
   "submit": "Enviar",
   "navbar": {
     "aboutUs": "Sobre nosaltres",
-    "lost": "Perduts",
+    "lost": "Perduts 🔜",
     "contact": "Contacte",
     "adopt": "Adopta",
     "giveAdoption": "Dóna en adopció",
@@ -33,6 +33,7 @@
   "menu": {
     "profile": "Perfil",
     "home": "Inici",
+    "favorites": "Preferits",
     "logout": "Sortir"
   },
   "loginPage": {

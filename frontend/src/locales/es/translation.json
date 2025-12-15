@@ -20,7 +20,7 @@
   "submit": "Enviar",
   "navbar": {
     "aboutUs": "Sobre nosotros",
-    "lost": "Perdidos",
+    "lost": "Perdidos 🔜",
     "contact": "Contacto",
     "adopt": "Adopta",
     "giveAdoption": "Dar en adopción",
@@ -33,6 +33,7 @@
   "menu": {
     "profile": "Perfil",
     "home": "Inicio",
+    "favorites": "Favoritos",
     "logout": "Salir"
   },
   "loginPage": {
