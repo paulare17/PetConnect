@@ -42,19 +42,6 @@ const ENTIDAD_CHOICES = [
   { value: "fundacion", label: "Fundación" },
 ];
 
-const ANIMAL_CHOICES = [
-  { value: "perro", label: "Perro" },
-  { value: "gato", label: "Gato" },
-];
-
-const SERVICIOS_CHOICES = [
-  { value: "recogida", label: "Recogida de animales abandonados" },
-  { value: "alojamiento", label: "Alojamiento" },
-  { value: "esterilizacion", label: "Esterilización" },
-  { value: "localizacion", label: "Localización de propietarios" },
-  { value: "adopcion", label: "Adopción" },
-];
-
 export default function FormProtectora() {
   const navigate = useNavigate();
   const { getMe } = useAuthContext();
@@ -70,20 +57,10 @@ export default function FormProtectora() {
     city: "",
 
     // Informació bàsica (PerfilProtectora)
-    nombre_protectora: "",
     cif: "",
-    num_registro_asociacion: "",
     tipo_entidad_juridica: "",
 
-    // Direcció jurídica
-    direccion_juridica: "",
-    calle_juridica: "",
-    numero_juridica: "",
-    poblacion_juridica: "",
-    codigo_postal_juridica: "",
-
     // Direcció refugi
-    direccion_refugio: "",
     calle_refugio: "",
     numero_refugio: "",
     poblacion_refugio: "",
@@ -94,20 +71,14 @@ export default function FormProtectora() {
     telefono: "",
     telefono_emergencia: "",
 
-    // Informació sobre animals
-    capacidad_maxima_animales: "",
-    tipo_animal: "",
-
     // Informació organitzativa
     ano_fundacion: "",
     nucleo_zoologico: "",
-    ambito_geografico: "",
 
     // Serveis i processos
     requisitos_adopcion: "",
     proceso_adopcion: "",
     descripcion: "",
-    servicios: [],
 
     // Horari (camp de text lliure - s'afegirà al model més endavant)
     horario: "",
@@ -126,15 +97,6 @@ export default function FormProtectora() {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }));
-  };
-
-  const handleCheckboxChange = (name, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: prev[name].includes(value)
-        ? prev[name].filter((item) => item !== value)
-        : [...prev[name], value],
     }));
   };
 
@@ -159,9 +121,6 @@ export default function FormProtectora() {
     if (!formData.city.trim()) newErrors.city = t('formProtectora.cityRequired');
 
     // Validacions camps de protectora
-    if (!formData.nombre_protectora.trim())
-      newErrors.nombre_protectora = t('formProtectora.shelterNameRequired');
-
     if (!formData.telefono.trim()) newErrors.telefono = t('formProtectora.phoneRequired');
 
     if (!formData.descripcion.trim())
@@ -195,16 +154,8 @@ export default function FormProtectora() {
         city: formData.city,
         // Dades específiques de la protectora (segons model PerfilProtectora)
         protectora_data: {
-          nombre_protectora: formData.nombre_protectora,
           cif: formData.cif || null,
-          num_registro_asociacion: formData.num_registro_asociacion || null,
           tipo_entidad_juridica: formData.tipo_entidad_juridica || null,
-          direccion_juridica: formData.direccion_juridica || null,
-          calle_juridica: formData.calle_juridica || null,
-          numero_juridica: formData.numero_juridica || null,
-          poblacion_juridica: formData.poblacion_juridica || null,
-          codigo_postal_juridica: formData.codigo_postal_juridica || null,
-          direccion_refugio: formData.direccion_refugio || null,
           calle_refugio: formData.calle_refugio || null,
           numero_refugio: formData.numero_refugio || null,
           poblacion_refugio: formData.poblacion_refugio || null,
@@ -212,19 +163,13 @@ export default function FormProtectora() {
           web: formData.web || null,
           telefono: formData.telefono || null,
           telefono_emergencia: formData.telefono_emergencia || null,
-          capacidad_maxima_animales: formData.capacidad_maxima_animales
-            ? parseInt(formData.capacidad_maxima_animales)
-            : null,
-          tipo_animal: formData.tipo_animal || null,
           ano_fundacion: formData.ano_fundacion
             ? parseInt(formData.ano_fundacion)
             : null,
           nucleo_zoologico: formData.nucleo_zoologico || null,
-          ambito_geografico: formData.ambito_geografico || null,
           requisitos_adopcion: formData.requisitos_adopcion || null,
           proceso_adopcion: formData.proceso_adopcion || null,
           descripcion: formData.descripcion || null,
-          servicios: formData.servicios,
           // Camps que s'afegiran al model més endavant
           horario: formData.horario || null,
           facebook: formData.facebook || null,
@@ -403,44 +348,12 @@ export default function FormProtectora() {
             <Grid container spacing={3} sx={{ mb: 4 }}>
               <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
-                  required
-                  fullWidth
-                  name="nombre_protectora"
-                  label={t('formProtectora.shelterName')}
-                  value={formData.nombre_protectora}
-                  onChange={handleInputChange}
-                  error={!!errors.nombre_protectora}
-                  helperText={errors.nombre_protectora}
-                  inputProps={{ maxLength: 200 }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Business sx={{ color: colors.orange }} />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField
                   fullWidth
                   name="cif"
                   label={t('formProtectora.cif')}
                   value={formData.cif}
                   onChange={handleInputChange}
                   inputProps={{ maxLength: 20 }}
-                />
-              </Grid>
-
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField
-                  fullWidth
-                  name="num_registro_asociacion"
-                  label={t('formProtectora.registrationNumber')}
-                  value={formData.num_registro_asociacion}
-                  onChange={handleInputChange}
-                  inputProps={{ maxLength: 100 }}
                 />
               </Grid>
 
@@ -539,75 +452,6 @@ export default function FormProtectora() {
 
             <Divider sx={{ my: 3 }} />
 
-            {/* =============== DIRECCIÓ JURÍDICA =============== */}
-            <Typography
-              variant="h6"
-              sx={{ mb: 2, color: colors.blue, fontWeight: "bold" }}
-            >
-              <LocationOn sx={{ mr: 1, verticalAlign: "middle" }} />
-              {t('formProtectora.legalAddress')}
-            </Typography>
-
-            <Grid container spacing={3} sx={{ mb: 4 }}>
-              <Grid size={{ xs: 12 }}>
-                <TextField
-                  fullWidth
-                  multiline
-                  rows={2}
-                  name="direccion_juridica"
-                  label={t('formProtectora.fullLegalAddress')}
-                  value={formData.direccion_juridica}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-
-              <Grid size={{ xs: 12, sm: 4 }}>
-                <TextField
-                  fullWidth
-                  name="calle_juridica"
-                  label={t('formProtectora.street')}
-                  value={formData.calle_juridica}
-                  onChange={handleInputChange}
-                  inputProps={{ maxLength: 200 }}
-                />
-              </Grid>
-
-              <Grid size={{ xs: 12, sm: 2 }}>
-                <TextField
-                  fullWidth
-                  name="numero_juridica"
-                  label={t('formProtectora.number')}
-                  value={formData.numero_juridica}
-                  onChange={handleInputChange}
-                  inputProps={{ maxLength: 10 }}
-                />
-              </Grid>
-
-              <Grid size={{ xs: 12, sm: 3 }}>
-                <TextField
-                  fullWidth
-                  name="poblacion_juridica"
-                  label={t('formProtectora.town')}
-                  value={formData.poblacion_juridica}
-                  onChange={handleInputChange}
-                  inputProps={{ maxLength: 100 }}
-                />
-              </Grid>
-
-              <Grid size={{ xs: 12, sm: 3 }}>
-                <TextField
-                  fullWidth
-                  name="codigo_postal_juridica"
-                  label={t('formProtectora.postalCode')}
-                  value={formData.codigo_postal_juridica}
-                  onChange={handleInputChange}
-                  inputProps={{ maxLength: 10 }}
-                />
-              </Grid>
-            </Grid>
-
-            <Divider sx={{ my: 3 }} />
-
             {/* =============== DIRECCIÓ REFUGI =============== */}
             <Typography
               variant="h6"
@@ -618,18 +462,6 @@ export default function FormProtectora() {
             </Typography>
 
             <Grid container spacing={3} sx={{ mb: 4 }}>
-              <Grid size={{ xs: 12 }}>
-                <TextField
-                  fullWidth
-                  multiline
-                  rows={2}
-                  name="direccion_refugio"
-                  label={t('formProtectora.fullShelterAddress')}
-                  value={formData.direccion_refugio}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-
               <Grid size={{ xs: 12, sm: 4 }}>
                 <TextField
                   fullWidth
@@ -702,64 +534,6 @@ export default function FormProtectora() {
 
             <Divider sx={{ my: 3 }} />
 
-            {/* =============== INFORMACIÓ ANIMALS =============== */}
-            <Typography
-              variant="h6"
-              sx={{ mb: 2, color: colors.blue, fontWeight: "bold" }}
-            >
-              <Pets sx={{ mr: 1, verticalAlign: "middle" }} />
-              {t('formProtectora.animalInfo')}
-            </Typography>
-
-            <Grid container spacing={3} sx={{ mb: 4 }}>
-              <Grid size={{ xs: 12, sm: 4 }}>
-                <FormControl fullWidth>
-                  <InputLabel>{t('formProtectora.animalType')}</InputLabel>
-                  <Select
-                    name="tipo_animal"
-                    value={formData.tipo_animal}
-                    onChange={handleInputChange}
-                    label={t('formProtectora.animalType')}
-                  >
-                    <MenuItem value="">
-                      <em>Selecciona...</em>
-                    </MenuItem>
-                    {ANIMAL_CHOICES.map((opt) => (
-                      <MenuItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-
-              <Grid size={{ xs: 12, sm: 4 }}>
-                <TextField
-                  fullWidth
-                  name="capacidad_maxima_animales"
-                  label={t('formProtectora.maxCapacity')}
-                  type="number"
-                  value={formData.capacidad_maxima_animales}
-                  onChange={handleInputChange}
-                  inputProps={{ min: 0 }}
-                />
-              </Grid>
-
-              <Grid size={{ xs: 12, sm: 4 }}>
-                <TextField
-                  fullWidth
-                  name="nucleo_zoologico"
-                  label={t('formProtectora.zoologicalCore')}
-                  value={formData.nucleo_zoologico}
-                  onChange={handleInputChange}
-                  inputProps={{ maxLength: 50 }}
-                  helperText="Número de registre del nucli zoològic"
-                />
-              </Grid>
-            </Grid>
-
-            <Divider sx={{ my: 3 }} />
-
             {/* =============== INFORMACIÓ ORGANITZATIVA =============== */}
             <Typography
               variant="h6"
@@ -779,17 +553,6 @@ export default function FormProtectora() {
                   value={formData.ano_fundacion}
                   onChange={handleInputChange}
                   inputProps={{ min: 1900, max: new Date().getFullYear() }}
-                />
-              </Grid>
-
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField
-                  fullWidth
-                  name="ambito_geografico"
-                  label={t('formProtectora.geographicScope')}
-                  value={formData.ambito_geografico}
-                  onChange={handleInputChange}
-                  inputProps={{ maxLength: 200 }}
                 />
               </Grid>
             </Grid>
@@ -818,25 +581,6 @@ export default function FormProtectora() {
               helperText={errors.descripcion}
               sx={{ mb: 3 }}
             />
-
-            <Typography variant="body2" sx={{ mb: 2, color: colors.blue }}>
-              {t('formProtectora.services')}
-            </Typography>
-            <FormGroup row sx={{ mb: 4 }}>
-              {SERVICIOS_CHOICES.map((opt) => (
-                <FormControlLabel
-                  key={opt.value}
-                  control={
-                    <Checkbox
-                      checked={formData.servicios.includes(opt.value)}
-                      onChange={() => handleCheckboxChange("servicios", opt.value)}
-                      sx={{ color: colors.blue }}
-                    />
-                  }
-                  label={opt.label}
-                />
-              ))}
-            </FormGroup>
 
             <Grid container spacing={3} sx={{ mb: 4 }}>
               <Grid size={{ xs: 12, sm: 6 }}>

@@ -111,7 +111,7 @@ const ProfilePageProtectora = () => {
               mb: 2,
             }}
           >
-            <GroupIcon /> {profileData.nombreProtectora || "-"}
+            <GroupIcon /> {currentUser?.username || "-"}
           </Typography>
           <Divider sx={{ my: 2 }} />
 

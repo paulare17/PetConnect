@@ -6,11 +6,10 @@ def notificar_por_rol(rol, asunto, mensaje):
     if destinatarios:
         send_mail(asunto, mensaje, 'petconnect.noreply@gmail.com', list(destinatarios))
 
-#revisar lo de "hola protectora"
 def notificar_nueva_solicitud_adopcion(mascota, adoptante, usuario):
     asunto = f"🐕 Nueva solicitud de adopción para {mascota.nombre}"
     mensaje = f"""
-    ¡Hola {usuario.nombre_protectora}! 
+    ¡Hola {usuario.username}! 
     
     Tienes una nueva solicitud de adopción:
     

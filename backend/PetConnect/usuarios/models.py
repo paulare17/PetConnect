@@ -96,7 +96,6 @@ class PerfilProtectora(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name='perfil_protectora')
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='protectora', editable=False)
     # Información básica
-    nombre_protectora = models.CharField(max_length=200, blank=True, null=True)
     cif = models.CharField(max_length=20, unique=True, blank=True, null=True)
     num_registro_asociacion = models.CharField(max_length=100, blank=True, null=True)
     ENTIDAD_CHOICES = [
@@ -158,7 +157,7 @@ class PerfilProtectora(models.Model):
         verbose_name_plural = 'Protectoras'
     
     def __str__(self):
-        return self.nombre_protectora or self.usuario.username
+        return self.usuario.username
         
         
 
