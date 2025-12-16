@@ -4,7 +4,7 @@ import re
 
 
 class UsuarioSerializer(serializers.ModelSerializer):
-    """Serializer básico para Usuario"""
+    # Serializer básico para Usuario
     class Meta:
         model = Usuario
         fields = ('id', 'username', 'email', 'role', 'city', 'date_joined')
@@ -14,7 +14,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
         }
 
 class UsuarioCreateSerializer(serializers.ModelSerializer):
-    """Para crear nuevos usuarios"""
+    # Para crear nuevos usuarios
     password = serializers.CharField(write_only=True, min_length=8)
     
     class Meta:
@@ -39,7 +39,7 @@ class UsuarioCreateSerializer(serializers.ModelSerializer):
         return usuario
 
 class PerfilUsuarioSerializer(serializers.ModelSerializer):
-    """Serializer para perfil de usuario"""
+    # Serializer para perfil de usuario
     usuario = serializers.StringRelatedField(read_only=True)
     usuario_id = serializers.IntegerField(source='usuario.id', read_only=True)
     username = serializers.CharField(source='usuario.username', read_only=True)
@@ -50,7 +50,7 @@ class PerfilUsuarioSerializer(serializers.ModelSerializer):
         read_only_fields = ('usuario', 'usuario_id', 'username', 'role')
     
     def to_representation(self, instance):
-        """Afegeix camps display per als nous camps de matching."""
+        # Añadir campos display para los nuevos campos de matching
         rep = super().to_representation(instance)
         # Afegir displays llegibles dels nous camps
         rep['tiene_ninos_display'] = 'Sí' if instance.tiene_ninos else 'No'
@@ -70,7 +70,7 @@ class PerfilUsuarioSerializer(serializers.ModelSerializer):
         return PerfilUsuario.objects.create(usuario=request.user, role=request.user.role, **validated_data)
 
 class PerfilProtectoraSerializer(serializers.ModelSerializer):
-    """Serializer para perfil de protectora"""
+    # Serializer para perfil de protectora
     usuario = serializers.StringRelatedField(read_only=True)
     usuario_id = serializers.IntegerField(source='usuario.id', read_only=True)
     username = serializers.CharField(source='usuario.username', read_only=True)
@@ -96,7 +96,7 @@ class PerfilProtectoraSerializer(serializers.ModelSerializer):
         return value
 
 class LoginSerializer(serializers.Serializer):
-    """Serializer para login"""
+    # Serializer para login
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)
     

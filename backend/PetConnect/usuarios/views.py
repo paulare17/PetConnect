@@ -14,16 +14,14 @@ from .serializers import (
     LoginSerializer
 )
 
-# ---------------------------------------------
 # ViewSet para Gestión de Usuarios y Autenticación
-# ---------------------------------------------
 
 class UsuarioViewSet(viewsets.ModelViewSet):
-    """ViewSet para gestión de usuarios con JWT"""
+    # ViewSet para gestión de usuarios con JWT
     queryset = Usuario.objects.all()
     
     def get_queryset(self):
-        """Filtrado por rol - admin ve todo, otros solo su usuario"""
+        # Filtrado por rol - admin ve todo, otros solo su usuario
         if not self.request.user.is_authenticated:
             return Usuario.objects.none()
         
@@ -40,7 +38,7 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         return [IsAuthenticated()]
 
     def _get_token_response(self, user):
-        """Genera respuesta estandarizada con tokens JWT"""
+        # Genera respuesta estandarizada con tokens JWT
         refresh = RefreshToken.for_user(user)
         return {
             'access': str(refresh.access_token),
@@ -49,7 +47,7 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         }
 
     def create(self, request, *args, **kwargs):
-        """Registro de usuario con retorno inmediato de tokens"""
+        # Registro de usuario con retorno inmediato de tokens
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
@@ -61,17 +59,17 @@ class UsuarioViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def login(self, request):
-        """Login con email/username y password"""
+        # Login con email/username y password
         serializer = LoginSerializer(data=request.data)
         
         if not serializer.is_valid():
-            # Retorna els errors de validació amb detall
+            # Devuelve los errores de validación con detalle
             return Response(
                 serializer.errors, 
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # L'usuari ja ha estat validat pel serializer
+        # El usuario ya ha sido validado por el serializer
         user = serializer.validated_data.get('user')
         
         if not user:
@@ -84,38 +82,29 @@ class UsuarioViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def me(self, request):
-        """Obtener datos del usuario actual"""
+        #Obtener datos del usuario actual
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
 
     @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
     def logout(self, request):
-        """
-        Logout - el cliente debe eliminar los tokens.
-        """
+        # Logout - el cliente debe eliminar los tokens.
         return Response(
             {'detail': 'Sesión cerrada. Elimina los tokens del cliente.'}, 
             status=status.HTTP_200_OK
         )
 
-# ---------------------------------------------
 # ViewSets para Perfiles (Usuario y Protectora)
-# ---------------------------------------------
 
 class BasePerfilViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet base para perfiles.
-    Requiere que las subclases definan queryset_model, serializer_class y allowed_role.
-    """
+    # Requiere que las subclases definan queryset_model, serializer_class y allowed_role.
     permission_classes = [IsAuthenticated]
     
     queryset = None 
 
     def get_queryset(self):
-        """
-        Filtrado: Admin ve todo; usuarios con el rol adecuado ven su perfil; 
-        otros roles o usuarios sin rol no ven nada.
-        """
+        
+        # Filtrado: Admin ve todo; usuarios con el rol adecuado ven su perfil, otros roles o usuarios sin rol no ven nada        
         user = self.request.user
         
         if not user.is_authenticated:
@@ -132,10 +121,9 @@ class BasePerfilViewSet(viewsets.ModelViewSet):
         return self.queryset_model.objects.none()
 
     def perform_create(self, serializer):
-        """
-        Solo usuarios con el rol específico pueden crear un perfil. 
-        Evita que se creen perfiles duplicados.
-        """
+        
+        # Solo usuarios con el rol específico pueden crear un perfil. 
+        # Evita que se creen perfiles duplicados.
         user = self.request.user
         
         # Asegura que el usuario tenga un rol asignado y que sea el correcto.

@@ -5,7 +5,7 @@ from .views import UsuarioViewSet, PerfilUsuarioViewSet, PerfilProtectoraViewSet
 # Inicializamos el router
 router = DefaultRouter()
 
-# 1. Registramos el ViewSet principal de Usuarios (ya estaba)
+# 1. Registramos el ViewSet principal de Usuarios
 router.register(r'usuarios', UsuarioViewSet, basename='usuario') 
 
 # 2. Registramos el ViewSet de Perfiles de Usuario
@@ -17,7 +17,6 @@ router.register(r'perfil-protectora', PerfilProtectoraViewSet, basename='perfil-
 
 urlpatterns = [
     # Incluimos todas las rutas generadas por el Router
-    # Esto creará rutas como /usuarios/, /perfil-usuario/, /perfil-protectora/
     path('', include(router.urls)),
 ]
 

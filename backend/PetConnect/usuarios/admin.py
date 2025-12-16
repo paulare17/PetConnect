@@ -7,13 +7,13 @@ class UsuarioAdmin(UserAdmin):
     """Admin personalitzat per Usuario que hasheja contrasenyes correctament"""
     model = Usuario
     
-    # Camps a mostrar a la llista d'usuaris
+    # Campos a mostrar en la lista de usuarios
     list_display = ('username', 'email', 'role', 'city', 'is_staff', 'is_active')
     list_filter = ('role', 'is_staff', 'is_active', 'city')
     search_fields = ('username', 'email', 'city')
     ordering = ('username',)
     
-    # Camps al formulari d'edició
+    # Campos en el formulario de edición
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
         ('Informació personal', {'fields': ('email', 'city')}),
@@ -22,7 +22,7 @@ class UsuarioAdmin(UserAdmin):
         ('Dates', {'fields': ('last_login', 'date_joined')}),
     )
     
-    # Camps al formulari de creació (nou usuari)
+    # Campos en el formulario de creación (nuevo usuario)
     add_fieldsets = (
         (None, {
             'classes': ('wide',),

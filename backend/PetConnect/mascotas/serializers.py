@@ -18,7 +18,7 @@ class MascotaSerializer(serializers.ModelSerializer):
     tamano_display = serializers.CharField(source='get_tamano_display', read_only=True)
     edad_clasificacion_display = serializers.CharField(source='get_edad_clasificacion_display', read_only=True)
     
-    # Nous camps de matching
+    # Nuevos campos de matching
     apto_ninos_display = serializers.CharField(source='get_apto_ninos_display', read_only=True)
     necesita_compania_animal_display = serializers.CharField(source='get_necesita_compania_animal_display', read_only=True)
     nivel_experiencia_display = serializers.CharField(source='get_nivel_experiencia_display', read_only=True)
@@ -94,7 +94,6 @@ class MascotaSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
     def to_representation(self, instance):
-        """Oculta los campos irrelevantes según la especie en la representación de salida."""
         rep = super().to_representation(instance)
         especie = rep.get('especie')
         if especie == 'PERRO':

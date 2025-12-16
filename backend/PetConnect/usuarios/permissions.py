@@ -1,18 +1,8 @@
 from rest_framework.permissions import BasePermission
 from django.db import models
 
-#hablar con xavi: qué puede ver la gente? 
-#los usuarios sólo pueden ver su propio usuario
-#los usuarios pueden ver todas las protectoras
-#las protectoras pueden ver todos los usuarios??????
-#las protectoras pueden ver otras protectoras
-#cada uno se edita lo suyo
 
-class UsuarioPermissions(BasePermission):
-    """
-    Permisos personalizados para usuarios según rol
-    """
-    
+class UsuarioPermissions(BasePermission):    
     def has_permission(self, request, view):
         # Registro y login son públicos
         if view.action in ['create', 'login']:
@@ -24,7 +14,7 @@ class UsuarioPermissions(BasePermission):
     def has_object_permission(self, request, view, obj):
         user = request.user
 
-        # soportar que obj sigui un perfil amb .usuario
+        # Soportar que obj sea un perfil con .usuario
         target = getattr(obj, 'usuario', obj)
 
         # Admin puede hacer todo
@@ -62,32 +52,29 @@ class UsuarioPermissions(BasePermission):
         # Admin puede editar cualquiera
         if getattr(user, 'role', None) == 'admin':
             return True
-        # Todos los demás solo pueden editarse a sí mismos
         return target == user
 
 class IsAdmin(BasePermission):
-    """Permiso solo para administradores"""
-    
+
+    # Permiso solo para administradores
     def has_permission(self, request, view):
         return request.user and request.user.is_authenticated and request.user.role == 'admin'
 
 class IsUsuario(BasePermission):
-    """Permiso solo para usuarios"""
-    
+
+    # Permiso solo para usuarios   
     def has_permission(self, request, view):
         return request.user and request.user.is_authenticated and request.user.role == 'usuario'
 
 class IsProtectora(BasePermission):
-    """Permiso solo para protectoras"""
-    
+
+    # Permiso solo para protectoras    
     def has_permission(self, request, view):
         return request.user and request.user.is_authenticated and request.user.role == 'protectora'
 
 class IsOwnerOrReadOnly(BasePermission):
-    """
-    Permiso que permite editar solo al propietario del objeto
-    """
-    
+
+    # Permiso que permite editar solo al propietario del objeto    
     def has_object_permission(self, request, view, obj):
         # Permisos de lectura para cualquier request
         if request.method in ['GET', 'HEAD', 'OPTIONS']:
@@ -98,9 +85,8 @@ class IsOwnerOrReadOnly(BasePermission):
 
 # Funciones de utilidad para filtrar queryset según rol
 def get_queryset_by_role(user, model):
-    """
-    Filtra el queryset según los permisos del usuario
-    """
+
+    # Filtra el queryset según los permisos del usuario
     if not user.is_authenticated:
         return model.objects.none()
     
@@ -110,7 +96,7 @@ def get_queryset_by_role(user, model):
     
     # Usuarios ven:
     elif user.role == 'usuario':
-        # - Él mismo + todas las protectoras
+        # Él mismo + todas las protectoras
         return model.objects.filter(
             models.Q(id=user.id) | 
             models.Q(role='protectora')
@@ -118,7 +104,7 @@ def get_queryset_by_role(user, model):
     
     # Protectoras ven:
     elif user.role == 'protectora':
-        # - Ella misma + otras protectoras + usuarios
+        # Ella misma + otras protectoras + usuarios
         return model.objects.filter(
             models.Q(id=user.id) | 
             models.Q(role='protectora') | 

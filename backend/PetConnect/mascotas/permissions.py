@@ -2,14 +2,6 @@ from rest_framework.permissions import BasePermission
 
 
 class MascotaPermissions(BasePermission):
-    """
-    Permisos personalizados para Mascota siguiendo el patrón de UsuarioPermissions.
-
-    - list/retrieve: público
-    - create: solo protectoras autenticadas
-    - update/delete/ocultar: solo la protectora dueña de la mascota (o admin)
-    """
-
     def has_permission(self, request, view):
         # list y retrieve son públicos
         if view.action in ['list', 'retrieve']:

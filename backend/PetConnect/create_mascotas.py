@@ -1,14 +1,11 @@
 import os
 import django
+from mascotas.models import Mascota
+from usuarios.models import Usuario
 
-# Script per crear mascotes de prova a la base de dades
-
-# Configurar Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'PetConnect.settings')
 django.setup()
 
-from mascotas.models import Mascota
-from usuarios.models import Usuario
 
 # Buscar la protectora1
 try:
@@ -18,7 +15,7 @@ except Usuario.DoesNotExist:
     print("❌ Error: No s'ha trobat l'usuari 'protectora1'")
     exit(1)
 
-# Crear gossos amb els camps actualitzats del model
+# Crear perros con los campos actualizados del modelo
 gossos = [
     {
         'nombre': 'Max',
@@ -108,7 +105,7 @@ gossos = [
     }
 ]
 
-# Crear gats amb els camps actualitzats del model
+# Crear gatos con los campos actualizados del modelo
 gats = [
     {
         'nombre': 'Mimi',
@@ -282,7 +279,7 @@ gats = [
     }
 ]
 
-# Crear les mascotes
+# Crear las mascotas
 print("\n🐕 Creant gossos...")
 for gos_data in gossos:
     try:
@@ -313,7 +310,7 @@ for gat_data in gats:
     except Exception as e:
         print(f"  ❌ Error creant {gat_data['nombre']}: {e}")
 
-# Mostrar resum
+# Mostrar resumen
 total = Mascota.objects.filter(protectora=protectora, adoptado=False, oculto=False).count()
 print(f"\n🎉 Total de mascotes disponibles: {total}")
 print("✨ Ja pots provar el PetTinder!")

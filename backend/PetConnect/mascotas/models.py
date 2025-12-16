@@ -152,10 +152,6 @@ class Mascota(models.Model):
         verbose_name="Color y Patrón de Pelaje del Perro"
     )
 
-    # ============================================
-    # NOUS CAMPS SEPARATS PER A MATCHING
-    # ============================================
-    
     NINOS_CHOICES = [
         ('APTO_NINOS', 'Apto para convivir con niños'),
         ('NO_APTO_NINOS', 'Solo adultos / No apto para niños'),
@@ -196,7 +192,6 @@ class Mascota(models.Model):
         verbose_name="Nivel de experiencia requerido"
     )
 
-    # LEGACY: Mantenim per compatibilitat (es pot eliminar després de migrar dades)
     APTO_CON_CHOICES = [
         # Enfoque en Niños/Adultos
         ('NINOS', 'Apto para convivir con niños'),
@@ -441,7 +436,7 @@ class Mascota(models.Model):
     foto2 = models.ImageField(upload_to='mascotas/', verbose_name="Foto 2", blank=True, null=True)
     foto3 = models.ImageField(upload_to='mascotas/', verbose_name="Foto 3", blank=True, null=True)
     
-    # Descripción/Biografía del animal (puede ser generada por IA)
+    # Descripción/Biografía del animal 
     descripcion = models.TextField(
         blank=True, 
         null=True,
@@ -449,11 +444,11 @@ class Mascota(models.Model):
         help_text="Descripción del animal, puede ser generada automáticamente por IA"
     )
 
-    #estado del perfil
+    # Estado del perfil
     oculto = models.BooleanField(default=False)
     adoptado = models.BooleanField(default=False)
         
-    # Campo crucial: registra cuándo se marcó la adopción
+    # Registra cuándo se marcó la adopción
     fecha_adopcion = models.DateField(
             null=True, 
             blank=True,
@@ -522,7 +517,7 @@ class Interaccion(models.Model):
         db_table = 'interacciones'
         verbose_name = "Interacción"
         verbose_name_plural = "Interacciones"
-        unique_together = ('usuario', 'mascota')  # Un usuari només pot tenir una interacció per mascota
+        unique_together = ('usuario', 'mascota')  
         ordering = ['-fecha']
     
     def __str__(self):

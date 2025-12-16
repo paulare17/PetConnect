@@ -1,4 +1,3 @@
-# Vista per obtenir mascotes preferides
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -41,7 +40,7 @@ from rest_framework.permissions import IsAuthenticated
 class MascotaPagination(PageNumberPagination):
     page_size = 12
 
-# --- VISTAS DEL SWIPE (FUNCIONALIDAD TINDER) ---
+# VISTAS DEL SWIPE (FUNCIONALIDAD TINDER) 
 
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
@@ -93,7 +92,7 @@ def swipe_action(request):
 
         mascota = get_object_or_404(Mascota, id=mascota_id)
 
-        # Registra o actualitza la interacció (gestiona la restricció d'unicitat)
+        # Registra o actualiza la interacción (gestiona la restricción de unicidad)
         interaccion, created = Interaccion.objects.update_or_create(
             usuario=user,
             mascota=mascota,
@@ -103,7 +102,7 @@ def swipe_action(request):
         is_like = (action_str == 'like')
         chat_id = None
         if is_like:
-            # Comprova si ja existeix el xat, si no el crea
+            # Comprueba si ya existe el chat, si no, lo crea
             chat, chat_created = Chat.objects.get_or_create(
                 mascota=mascota,
                 adoptante=user,
@@ -238,57 +237,5 @@ class MascotaViewSet(viewsets.ModelViewSet):
         mascota.oculto = True
         mascota.save()
         return Response(self.get_serializer(mascota).data, status=status.HTTP_200_OK)
-
-
-# ======================================================================
-# Vista para generar/regenerar descripción con IA
-# ======================================================================
-# from ai_service.description_generator import DescriptionGenerator
-# from rest_framework.decorators import permission_classes
-# from rest_framework.permissions import AllowAny
-
-# @api_view(['POST'])
-# @permission_classes([AllowAny])
-# def generate_description(request):
-#     """
-#     Endpoint para generar una descripción de mascota usando IA.
-#     POST /api/mascotas/generate-description/
-    
-#     Body (JSON):
-#     {
-#         "nombre": "Luna",
-#         "especie": "gato",
-#         "raza_gato": "Siamés",
-#         "edad": 2,
-#         "genero": "hembra",
-#         "tamaño": "mediano",
-#         "caracter": "jugueton",
-#         "convivencia_ninos": true,
-#         "convivencia_animales": "cualquier_especie",
-#         "descripcion_necesidades": ""
-#     }
-    
-#     Response:
-#     {
-#         "descripcion": "¡Conoce a Luna, una preciosa gato Siamés!..."
-#     }
-#     """
-#     try:
-#         print("📥 Datos recibidos en generate_description:", request.data)
-#         generator = DescriptionGenerator()
-#         descripcion = generator.generate_description(request.data)
-#         print("✅ Descripción generada:", descripcion[:100] + "...")
-#         return Response({
-#             "descripcion": descripcion,
-#             "success": True
-#         }, status=status.HTTP_200_OK)
-#     except Exception as e:
-#         print("❌ Error en generate_description:", str(e))
-#         import traceback
-#         traceback.print_exc()
-#         return Response({
-#             "error": str(e),
-#             "success": False
-#         }, status=status.HTTP_400_BAD_REQUEST)
 
 

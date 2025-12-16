@@ -58,11 +58,8 @@ class PerfilUsuario(models.Model):
     ]
     genero = models.CharField(max_length=1, choices=GENERO_CHOICES, blank=True, null=True)
 
-    # ============================================
-    # SITUACIÓ PERSONAL DE L'USUARI (per matching)
-    # ============================================
-    
-    # Composició de la llar
+
+    # Composición del hogar
     tiene_ninos = models.BooleanField(
         default=False,
         verbose_name="¿Tiene niños en casa?",
@@ -84,7 +81,7 @@ class PerfilUsuario(models.Model):
         help_text="Conejos, pájaros, roedores, etc."
     )
     
-    # Experiència
+    # Experiencia con mascotas
     es_primerizo = models.BooleanField(
         default=True,
         verbose_name="¿Es su primera mascota?",
@@ -96,7 +93,7 @@ class PerfilUsuario(models.Model):
         help_text="Licencia para Perros Potencialmente Peligrosos"
     )
     
-    # Ubicació per proximitat geogràfica
+    # Ubicacion detallada
     codigo_postal = models.CharField(
         max_length=10, 
         blank=True, 
@@ -105,9 +102,7 @@ class PerfilUsuario(models.Model):
         help_text="Para buscar mascotas cercanas"
     )
 
-    # ============================================
-    # PREFERÈNCIES DE MASCOTA (filtres opcionals)
-    # ============================================
+    # Preferencias de adopción
     preferencias_especie = MultiSelectField(
         choices=ESPECIE_CHOICES, 
         blank=True, 
@@ -118,7 +113,7 @@ class PerfilUsuario(models.Model):
     preferencias_edad = MultiSelectField(choices=EDAD_CHOICES, blank=True, verbose_name="Edad(es) Preferida(s)")
     preferencias_sexo = MultiSelectField(choices=SEXO_CHOICES, blank=True, verbose_name="Sexo Preferido")
     
-    # LEGACY: Ja no s'usa per matching, es calcula automàticament amb els camps de situació personal
+    # Ya no se usa para matching, se calcula automáticamente con los campos de situación personal
     preferencias_convivencia = MultiSelectField(
         choices=APTO_CON_CHOICES, 
         max_length=200, 
@@ -217,10 +212,8 @@ class PerfilProtectora(models.Model):
 
 @receiver(post_save, sender=Usuario)
 def create_or_sync_profile(sender, instance, created, **kwargs):
-    """
-    Crear el perfil adequat en crear l'usuari i sincronitzar 'role' en actualitzacions.
-    """
-    # Crear el perfil corresponent al role en la creació
+    
+    # Crear el perfil correspondiente al rol en la creación
     if created:
         if instance.role == 'protectora':
             PerfilProtectora.objects.get_or_create(usuario=instance, defaults={'role': instance.role})
@@ -228,7 +221,7 @@ def create_or_sync_profile(sender, instance, created, **kwargs):
             PerfilUsuario.objects.get_or_create(usuario=instance, defaults={'role': instance.role})
         return
 
-    # Sync roles si ja existeixen perfils
+    # Sincronizar roles si ya existen perfiles
     if hasattr(instance, 'perfil_usuario'):
         p = instance.perfil_usuario
         if p.role != instance.role:
