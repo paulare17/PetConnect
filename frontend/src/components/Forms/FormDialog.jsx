@@ -18,7 +18,7 @@ import { useAuthContext } from "../../context/AuthProvider.jsx";
 export default function FormDialog() {
   const { t } = useTranslation();
   const [open, setOpen] = React.useState(true); // Sempre obert quan es carrega el component
-  const [ubicacion, setUbicacion] = React.useState("");
+  const [codigoPostal, setCodigoPostal] = React.useState("");
   const navigate = useNavigate();
   const { getMe } = useAuthContext();
 
@@ -35,7 +35,7 @@ export default function FormDialog() {
       username: formData.get("user"),
       email: formData.get("email"),
       password: formData.get("password"),
-      city: formData.get("ciutat"),
+      city: formData.get("codigoPostal"),
       // Rol per defecte: usuari (adoptant)
       role: ROLES.USUARIO,
     };
@@ -81,24 +81,16 @@ export default function FormDialog() {
               const data = await response.json();
               const address = data.address;
               
-              // Prioritzem ciutat, poble o barri
-              const location = address.city || 
-                             address.town || 
-                             address.village || 
-                             address.suburb || 
-                             address.municipality ||
-                             address.county ||
-                             `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-              
-              setUbicacion(location);
+              // Obtenim el codi postal de la resposta
+              const postcode = address.postcode || "";
+              setCodigoPostal(postcode);
             } else {
-              // Si falla l'API, mostrem coordenades
-              setUbicacion(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+              // Si falla l'API, deixem el camp buit
+              console.warn("No s'ha pogut obtenir el codi postal");
             }
           } catch (error) {
             console.error("Error obtenint adreça:", error);
-            // Si falla, mostrem coordenades
-            setUbicacion(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+            alert(t('formDialog.locationError'));
           }
         },
         (error) => {
@@ -155,19 +147,22 @@ export default function FormDialog() {
             <TextField
               required
               margin="dense"
-              id="ciutat"
-              name="ciutat"
-              label={t('formDialog.city')}
+              id="codigoPostal"
+              name="codigoPostal"
+              label={t('formDialog.postalCode')}
               type="text"
               fullWidth
               variant="standard"
-              value={ubicacion}
-              onChange={(e) => setUbicacion(e.target.value)}
+              value={codigoPostal}
+              onChange={(e) => setCodigoPostal(e.target.value)}
+              placeholder="08001"
+              inputProps={{ maxLength: 10 }}
               InputProps={{
                 endAdornment: (
                   <IconButton
                     onClick={handleGetLocation}
                     size="small"
+                    title={t('formDialog.detectLocation')}
                     sx={{
                       color: colors.blue,
                       "&:hover": {
