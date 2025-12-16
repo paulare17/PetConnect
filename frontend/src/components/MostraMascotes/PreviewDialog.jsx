@@ -14,7 +14,16 @@ import ProfileMascotaView from "./ProfileMascotaView.jsx";
 import CardPetDetail from "./CardPetDetail.jsx";
 import { useColors } from '../../hooks/useColors.jsx';
 
-export default function PreviewDialog({ openPreviewDialog, setOpenPreviewDialog, formData, previewUrls }) {
+/**
+ * PreviewDialog - Mostra una previsualització de l'animal en dos formats:
+ * - ProfileMascotaView: Vista completa del perfil
+ * - CardPetDetail: Vista estil "Tinder"
+ * 
+ * @param {boolean} openPreviewDialog - Controla si el diàleg està obert
+ * @param {function} setOpenPreviewDialog - Funció per obrir/tancar el diàleg
+ * @param {object} animal - Dades de l'animal ja transformades al format del backend
+ */
+export default function PreviewDialog({ openPreviewDialog, setOpenPreviewDialog, animal }) {
   const { t } = useTranslation();
   const { colors } = useColors();
 
@@ -83,12 +92,7 @@ export default function PreviewDialog({ openPreviewDialog, setOpenPreviewDialog,
                   {t('addAnimalForm.fullProfileView')}
                 </Typography>
                 <ProfileMascotaView 
-                  animal={{
-                    ...formData,
-                    foto: previewUrls[0] || (typeof formData.foto === "string" ? formData.foto : ""),
-                    foto2: previewUrls[1] || (typeof formData.foto2 === "string" ? formData.foto2 : ""),
-                    foto3: previewUrls[2] || (typeof formData.foto3 === "string" ? formData.foto3 : "")
-                  }}
+                  animal={animal}
                   showAdoptButton={false}
                 />
               </Box>
@@ -106,15 +110,10 @@ export default function PreviewDialog({ openPreviewDialog, setOpenPreviewDialog,
                 <Typography variant="h5" sx={{ mb: 3, color: colors.purple, textAlign: 'center', fontWeight: 'bold' }}>
                   {t('addAnimalForm.tinderProfileView')}
                 </Typography>
-                {/* Vista estil CardPet */}
+                {/* Vista estil CardPetDetail */}
                 <Box sx={{ display: 'flex', justifyContent: 'center', pointerEvents: 'none' }}>
                   <CardPetDetail 
-                    animal={{
-                      ...formData,
-                      foto: previewUrls[0] || (typeof formData.foto === "string" ? formData.foto : ""),
-                      foto2: previewUrls[1] || (typeof formData.foto2 === "string" ? formData.foto2 : ""),
-                      foto3: previewUrls[2] || (typeof formData.foto3 === "string" ? formData.foto3 : "")
-                    }} 
+                    animal={animal} 
                     isFavorito={false} 
                     onToggleFavorito={() => {}} 
                   />
