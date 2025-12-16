@@ -566,6 +566,7 @@
     "color": "Color",
     "weight": "Pes",
     "character": "Caràcter",
+    "size": "Mida",
     "withChildren": "Amb nens",
     "yes": "Sí",
     "no": "No",
@@ -629,6 +630,12 @@
     "ragdoll": "Ragdoll",
     "oriental": "Oriental",
     "abyssinian": "Abissini"
+  },
+  "sizes": {
+    "small": "Petit",
+    "medium": "Mitjà",
+    "large": "Gran",
+    "giant": "Gegant"
   },
   "character": {
     "affectionate": "Afectuós",

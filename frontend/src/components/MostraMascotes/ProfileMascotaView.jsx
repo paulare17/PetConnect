@@ -22,47 +22,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useTranslation } from 'react-i18next';
 import { useAuthContext } from '../../context/AuthProvider';
 import { ROLES } from '../../constants/roles';
-// Mapeig de caràcters backend -> clau traducció
-const CHARACTER_TRANSLATION_MAP = {
-  CARINOSO: 'affectionate',
-  FALDERO: 'lapDog',
-  DEPENDIENTE: 'dependent',
-  DUO_INSEPARABLE: 'inseparableDuo',
-  TIMIDO: 'shy',
-  MIEDOSO: 'fearful',
-  JUGUETON: 'playful',
-  ACTIVO_ENERGICO: 'activeEnergetic',
-  TRANQUILO: 'calm',
-  TRABAJADOR: 'hardWorking',
-  SOCIABLE: 'sociable',
-  PROTECTOR_GUARDIAN: 'protectiveGuardian',
-  DOMINANTE_PERROS: 'dominantWithDogs',
-  REACTIVO: 'reactive',
-  LIDERAZGO: 'leadership',
-  DESCONFIADO_EXTRANOS: 'distrustfulOfStrangers',
-  OBEDIENTE: 'obedient',
-  OLAFATEADOR: 'sniffer',
-  LADRADOR: 'barker',
-  ESCAPISTA: 'escapist',
-  EXCAVADOR: 'digger',
-  GLOTON: 'glutton',
-  CABEZOTA: 'stubborn',
-  INTELIGENTE: 'intelligent',
-  SENSIBLE: 'sensitive',
-  LEAL: 'loyal',
-  INDEPENDIENTE: 'independent',
-  ASUSTADIZO: 'skittish',
-  JUGUETON_INTENSO: 'intenselyPlayful',
-  ACTIVO: 'active',
-  CAZADOR: 'hunter',
-  AFECTIVO_CONOCIDOS: 'affectionateWithFamiliar',
-  TERRITORIAL: 'territorial',
-  SEMIFERAL: 'semiFeral',
-  OBSERVADOR: 'observer',
-  ADAPTABLE: 'adaptable',
-  DIVA: 'diva',
-  LIMPIO: 'clean'
-};
+import { CHARACTER_TRANSLATION_MAP } from '../../utils/transformAnimalData';
 import { useColors } from '../../hooks/useColors';
 import gatDefecte from '../../assets/gat_defecte.png';
 import gosDefecte from '../../assets/gos_defecte.png';
@@ -399,7 +359,8 @@ function ProfileMascotaView({ animal, showAdoptButton = true }) {
                   ? caracter.map((c) => t(`character.${CHARACTER_TRANSLATION_MAP[c] || c.toLowerCase()}`)).join(', ')
                   : caracter || '-'}
               </Typography>
-              <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.compatibility')}</strong> {aptoCon.length > 0 ? aptoCon.join(', ') : '-'}</Typography>
+              {/* comentada para implementación futura */}
+              {/* <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.compatibility')}</strong> {aptoCon.length > 0 ? aptoCon.join(', ') : '-'}</Typography> */}
               <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.dewormed')}</strong> {desparasitado ? t('profileMascota.yes') : t('profileMascota.no')}</Typography>
               <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.sterilized')}</strong> {esterilizado ? t('profileMascota.yes') : t('profileMascota.no')}</Typography>
               <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.microchip')}</strong> {con_microchip ? t('profileMascota.yes') : t('profileMascota.no')}</Typography>

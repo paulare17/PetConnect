@@ -566,6 +566,7 @@
     "color": "Color",
     "weight": "Weight",
     "character": "Character",
+    "size": "Size",
     "withChildren": "With children",
     "yes": "Yes",
     "no": "No",
@@ -629,6 +630,12 @@
     "ragdoll": "Ragdoll",
     "oriental": "Oriental",
     "abyssinian": "Abyssinian"
+  },
+  "sizes": {
+    "small": "Small",
+    "medium": "Medium",
+    "large": "Large",
+    "giant": "Giant"
   },
   "character": {
     "affectionate": "Affectionate",

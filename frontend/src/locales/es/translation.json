@@ -631,6 +631,12 @@
     "oriental": "Oriental",
     "abyssinian": "Abisinio"
   },
+  "sizes": {
+    "small": "Pequeño",
+    "medium": "Mediano",
+    "large": "Grande",
+    "giant": "Gigante"
+  },
   "character": {
     "affectionate": "Cariñoso",
     "lapDog": "Faldero",

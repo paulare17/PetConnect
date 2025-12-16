@@ -13,49 +13,9 @@ import FemaleIcon from '@mui/icons-material/Female';
 import PetsIcon from '@mui/icons-material/Pets';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { useColors } from '../../hooks/useColors';
+import { CHARACTER_TRANSLATION_MAP } from '../../utils/transformAnimalData';
 
 function CardPetDetail({ animal }) {
-            // Mapeig de caràcters backend -> clau traducció
-            const CHARACTER_TRANSLATION_MAP = {
-                CARINOSO: 'affectionate',
-                FALDERO: 'lapDog',
-                DEPENDIENTE: 'dependent',
-                DUO_INSEPARABLE: 'inseparableDuo',
-                TIMIDO: 'shy',
-                MIEDOSO: 'fearful',
-                JUGUETON: 'playful',
-                ACTIVO_ENERGICO: 'activeEnergetic',
-                TRANQUILO: 'calm',
-                TRABAJADOR: 'hardWorking',
-                SOCIABLE: 'sociable',
-                PROTECTOR_GUARDIAN: 'protectiveGuardian',
-                DOMINANTE_PERROS: 'dominantWithDogs',
-                REACTIVO: 'reactive',
-                LIDERAZGO: 'leadership',
-                DESCONFIADO_EXTRANOS: 'distrustfulOfStrangers',
-                OBEDIENTE: 'obedient',
-                OLAFATEADOR: 'sniffer',
-                LADRADOR: 'barker',
-                ESCAPISTA: 'escapist',
-                EXCAVADOR: 'digger',
-                GLOTON: 'glutton',
-                CABEZOTA: 'stubborn',
-                INTELIGENTE: 'intelligent',
-                SENSIBLE: 'sensitive',
-                LEAL: 'loyal',
-                INDEPENDIENTE: 'independent',
-                ASUSTADIZO: 'skittish',
-                JUGUETON_INTENSO: 'intenselyPlayful',
-                ACTIVO: 'active',
-                CAZADOR: 'hunter',
-                AFECTIVO_CONOCIDOS: 'affectionateWithFamiliar',
-                TERRITORIAL: 'territorial',
-                SEMIFERAL: 'semiFeral',
-                OBSERVADOR: 'observer',
-                ADAPTABLE: 'adaptable',
-                DIVA: 'diva',
-                LIMPIO: 'clean'
-            };
     const { t } = useTranslation();
     const { colors } = useColors();
     if (!animal || animal.message) {
