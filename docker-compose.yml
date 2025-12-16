@@ -17,7 +17,7 @@ services:
       DJANGO_DEBUG: "True"
       DJANGO_ALLOWED_HOSTS: "*"
       DATABASE_URL: postgresql://petconnect:petconnect@db:5432/petconnect
-      CORS_ALLOWED_ORIGINS: http://localhost:4173,http://localhost:3000,http://localhost:8081,http://localhost:5173
+      CORS_ALLOWED_ORIGINS: http://localhost:3000,http://localhost:4173,http://localhost:8081,http://localhost:5173
     depends_on:
       - db
     ports:
@@ -27,7 +27,7 @@ services:
     build: ./backend/chat-server
     environment:
       PORT: 8080
-      CORS_ALLOWED_ORIGINS: http://localhost:4173,http://localhost:3000,http://localhost:5173
+      CORS_ALLOWED_ORIGINS: http://localhost:3000,http://localhost:4173,http://localhost:5173
     depends_on:
       - backend
     ports:
@@ -43,7 +43,7 @@ services:
       - backend
       - chat-server
     ports:
-      - "4173:80"
+      - "3000:80"
 
 volumes:
   db-data:
