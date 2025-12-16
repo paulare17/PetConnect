@@ -17,7 +17,7 @@ import SendIcon from '@mui/icons-material/Send';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PetsIcon from '@mui/icons-material/Pets';
 import api from '../../api/client';
-import { colors } from '../../constants/colors';
+import { useColors } from '../../hooks/useColors';
 import { useAuthContext } from '../../context/AuthProvider';
 
 const WEBSOCKET_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8080';
@@ -27,6 +27,7 @@ export default function ChatRoom({ chatId: chatIdProp, onClose, embedded = false
   const { chatId: chatIdParam } = useParams();
   const navigate = useNavigate();
   const { user } = useAuthContext();
+  const { colors: themeColors } = useColors();
   
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
@@ -234,7 +235,7 @@ export default function ChatRoom({ chatId: chatIdProp, onClose, embedded = false
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight={embedded ? '100%' : '80vh'}>
-        <CircularProgress sx={{ color: colors.orange }} />
+        <CircularProgress sx={{ color: themeColors.orange }} />
       </Box>
     );
   }
@@ -258,19 +259,22 @@ export default function ChatRoom({ chatId: chatIdProp, onClose, embedded = false
       height: embedded ? '100%' : 'calc(100vh - 100px)', 
       maxWidth: embedded ? '100%' : 1000, 
       mx: embedded ? 0 : 'auto', 
-      p: embedded ? 0 : 2,
+      p: embedded ? 1 : 2,
       display: 'flex',
-      flexDirection: 'column'
+      flexDirection: 'column',
+      backgroundColor: themeColors.lightColor,
+      borderRadius: embedded ? 2 : 0,
+      boxShadow: embedded ? 2 : 0,
     }}>
       {/* Header */}
-      <Paper elevation={2} sx={{ p: 2, mb: 2, backgroundColor: colors.lightColor }}>
+      <Paper elevation={2} sx={{ p: 2, mb: 2, backgroundColor: themeColors.background }}>
         <Box display="flex" alignItems="center" gap={2}>
           <IconButton onClick={() => {
             if (onClose) onClose(); else navigate('/chats');
-          }} sx={{ color: colors.orange }}>
+          }} sx={{ color: themeColors.orange }}>
             <ArrowBackIcon />
           </IconButton>
-          <Avatar sx={{ bgcolor: colors.orange }}>
+          <Avatar sx={{ bgcolor: themeColors.orange }}>
             <PetsIcon />
           </Avatar>
           <Box flex={1}>
@@ -281,11 +285,17 @@ export default function ChatRoom({ chatId: chatIdProp, onClose, embedded = false
               {otherUser}
             </Typography>
           </Box>
-          {wsConnected ? (
-            <Chip label={t('chatComponent.connected')} color="success" size="small" />
-          ) : (
-            <Chip label={t('chatComponent.disconnected')} color="default" size="small" />
-          )}
+          <Box
+            sx={{
+              width: 12,
+              height: 12,
+              borderRadius: '50%',
+              backgroundColor: wsConnected ? '#4caf50' : '#9e9e9e',
+              boxShadow: wsConnected ? '0 0 6px #4caf50' : 'none',
+              mr: 1
+            }}
+            title={wsConnected ? t('chatComponent.connected') : t('chatComponent.disconnected')}
+          />
         </Box>
       </Paper>
 
@@ -374,8 +384,8 @@ export default function ChatRoom({ chatId: chatIdProp, onClose, embedded = false
                       maxWidth: '70%',
                       p: 1.5,
                       borderRadius: 2,
-                      backgroundColor: isMyMessage ? colors.orange : 'white',
-                      color: isMyMessage ? 'white' : 'black',
+                      backgroundColor: isMyMessage ? themeColors.orange : themeColors.lightColor,
+                      color: isMyMessage ? 'white' : themeColors.textDark,
                       boxShadow: 1
                     }}
                   >
@@ -432,7 +442,7 @@ export default function ChatRoom({ chatId: chatIdProp, onClose, embedded = false
             sx={{
               '& .MuiOutlinedInput-root': {
                 '&.Mui-focused fieldset': {
-                  borderColor: colors.orange,
+                  borderColor: themeColors.orange,
                 }
               }
             }}
@@ -441,9 +451,9 @@ export default function ChatRoom({ chatId: chatIdProp, onClose, embedded = false
             onClick={sendMessage} 
             disabled={!newMessage.trim()}
             sx={{ 
-              backgroundColor: colors.orange,
+              backgroundColor: themeColors.orange,
               color: 'white',
-              '&:hover': { backgroundColor: colors.darkOrange },
+              '&:hover': { backgroundColor: themeColors.darkOrange },
               '&:disabled': { backgroundColor: '#ccc' }
             }}
           >

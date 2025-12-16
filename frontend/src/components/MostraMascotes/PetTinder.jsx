@@ -387,7 +387,7 @@ function PetTinder() {
         }}
       >
         {/* Panell esquerre: mini llista o xat inline */}
-        <Box sx={{ height: 600 }}>
+        <Box sx={{ height: 480 }}>
           {selectedChatId ? (
             <Chat
               chatId={selectedChatId}
@@ -395,7 +395,7 @@ function PetTinder() {
               embedded
             />
           ) : (
-            <ChatMiniList maxHeight={600} onSelectChat={setSelectedChatId} />
+            <ChatMiniList height={480} onSelectChat={setSelectedChatId} />
           )}
         </Box>
 

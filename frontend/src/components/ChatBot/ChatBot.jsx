@@ -20,8 +20,10 @@ import {
   Person as PersonIcon
 } from '@mui/icons-material';
 import { useColors } from '../../hooks/useColors';
+import { useTranslation } from 'react-i18next';
+import { useAuthContext } from '../../context/AuthProvider';
 
-const STORAGE_KEY = 'petconnect_chatbot_messages';
+const STORAGE_KEY_PREFIX = 'petconnect_chatbot_messages_';
 
 const defaultMessage = {
   id: 1,
@@ -30,10 +32,12 @@ const defaultMessage = {
   timestamp: new Date().toISOString()
 };
 
-// Funció per carregar missatges del localStorage
-const loadMessagesFromStorage = () => {
+// Funció per carregar missatges del localStorage (amb userId)
+const loadMessagesFromStorage = (userId) => {
+  if (!userId) return [{ ...defaultMessage, timestamp: new Date(defaultMessage.timestamp) }];
+  
   try {
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const saved = localStorage.getItem(STORAGE_KEY_PREFIX + userId);
     if (saved) {
       const parsed = JSON.parse(saved);
       // Convertir les dates string a objectes Date
@@ -48,15 +52,17 @@ const loadMessagesFromStorage = () => {
   return [{ ...defaultMessage, timestamp: new Date(defaultMessage.timestamp) }];
 };
 
-// Funció per guardar missatges al localStorage
-const saveMessagesToStorage = (messages) => {
+// Funció per guardar missatges al localStorage (amb userId)
+const saveMessagesToStorage = (messages, userId) => {
+  if (!userId) return;
+  
   try {
     // Convertir les dates a ISO string per a serialització
     const toSave = messages.map(msg => ({
       ...msg,
       timestamp: msg.timestamp instanceof Date ? msg.timestamp.toISOString() : msg.timestamp
     }));
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+    localStorage.setItem(STORAGE_KEY_PREFIX + userId, JSON.stringify(toSave));
   } catch (error) {
     console.error('Error saving chat messages:', error);
   }
@@ -64,12 +70,36 @@ const saveMessagesToStorage = (messages) => {
 
 const ChatbotWidget = () => {
   const { colors, isDarkMode } = useColors();
+  const { t } = useTranslation();
+  const { user } = useAuthContext();
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState(loadMessagesFromStorage);
+  
+  const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+
+  // Carregar missatges quan l'usuari canvia
+  useEffect(() => {
+    if (user?.id) {
+      const saved = loadMessagesFromStorage(user.id);
+      // Si només hi ha el missatge per defecte, actualitzar-lo amb la traducció actual
+      if (saved.length === 1 && saved[0].id === 1) {
+        setMessages([{ ...saved[0], text: t('chatbot.welcomeMessage') }]);
+      } else {
+        setMessages(saved);
+      }
+    } else {
+      // Usuari no autenticat, mostrar missatge de benvinguda
+      setMessages([{ 
+        id: 1, 
+        text: t('chatbot.welcomeMessage'), 
+        sender: 'bot', 
+        timestamp: new Date() 
+      }]);
+    }
+  }, [user?.id, t]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -81,8 +111,10 @@ const ChatbotWidget = () => {
 
   // Guardar missatges al localStorage quan canvien
   useEffect(() => {
-    saveMessagesToStorage(messages);
-  }, [messages]);
+    if (user?.id && messages.length > 0) {
+      saveMessagesToStorage(messages, user.id);
+    }
+  }, [messages, user?.id]);
 
   useEffect(() => {
     if (isOpen && inputRef.current) {
@@ -127,7 +159,7 @@ const ChatbotWidget = () => {
 
       const botMessage = {
         id: messages.length + 2,
-        text: data.respuesta || 'Ho sento, no he pogut processar la teva petició.',
+        text: data.respuesta || t('chatbot.errorProcessing'),
         sender: 'bot',
         timestamp: new Date()
       };
@@ -137,7 +169,7 @@ const ChatbotWidget = () => {
       console.error('Error:', error);
       const errorMessage = {
         id: messages.length + 2,
-        text: 'Ho sento, hi ha hagut un error. Si us plau, torna-ho a intentar.',
+        text: t('chatbot.errorGeneral'),
         sender: 'bot',
         timestamp: new Date()
       };
@@ -206,10 +238,10 @@ const ChatbotWidget = () => {
               </Avatar>
               <Box>
                 <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                  Assistent Virtual
+                  {t('chatbot.title')}
                 </Typography>
                 <Typography variant="caption" sx={{ opacity: 0.9 }}>
-                  En línia
+                  {t('chatbot.online')}
                 </Typography>
               </Box>
             </Box>
@@ -322,7 +354,7 @@ const ChatbotWidget = () => {
                 fullWidth
                 multiline
                 maxRows={3}
-                placeholder="Escriu el teu missatge..."
+                placeholder={t('chatbot.placeholder')}
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}

@@ -270,8 +270,8 @@ export default function IniciProtectora() {
                         onSelectChat={(chatId) => setSelectedChatId(chatId)}
                       />
                     </Box>
-                    {/* Columna xat */}
-                    <Box sx={{ flexGrow:1, minWidth:320, display:'flex', position:'relative', minHeight:535 }}>
+                    {/* Columna xat (amplada fixa) */}
+                    <Box sx={{ width:350, flexShrink:0, display:'flex', position:'relative', minHeight:535 }}>
                       <Box sx={{
                         position:'absolute',
                         inset:0,

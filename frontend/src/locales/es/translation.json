@@ -22,6 +22,7 @@
     "aboutUs": "Sobre nosotros",
     "lost": "Perdidos 🔜",
     "contact": "Contacto",
+    "favorites": "Favoritos",
     "adopt": "Adopta",
     "giveAdoption": "Dar en adopción",
     "chat": "Chatear",
@@ -677,5 +678,13 @@
     "noFavorites": "Aún no tienes ningún animal favorito.",
     "loading": "Cargando favoritos...",
     "errorLoading": "No se pudieron cargar los favoritos."
+  },
+  "chatbot": {
+    "welcomeMessage": "¡Hola! Soy tu asistente virtual. ¿Cómo puedo ayudarte hoy?",
+    "title": "Asistente Virtual",
+    "online": "En línea",
+    "placeholder": "Escribe tu mensaje...",
+    "errorProcessing": "Lo siento, no he podido procesar tu petición.",
+    "errorGeneral": "Lo siento, ha habido un error. Por favor, inténtalo de nuevo."
   }
 }

@@ -88,6 +88,8 @@ function ResponsiveAppBar() {
       }
     } else if (pageKey === "chat") {
       navigate("/chats");
+    } else if (pageKey === "favorites") {
+      navigate("/favoritos");
     } else {
       //  afegir més rutes aquí
       navigate("/");
@@ -97,16 +99,13 @@ function ResponsiveAppBar() {
   // Determinar les pàgines dinàmicament segons el rol
   const dynamicPages = user?.role === ROLES.PROTECTORA 
     ? [
-        { key: "aboutUs", label: t('navbar.aboutUs') },
         { key: "lost", label: t('navbar.lost') },
-        { key: "contact", label: t('navbar.contact') },
         { key: "giveAdoption", label: t('navbar.giveAdoption') },
         { key: "chat", label: t('navbar.chat') }
       ]
-    : [
-        { key: "aboutUs", label: t('navbar.aboutUs') },
+      : [
         { key: "lost", label: t('navbar.lost') },
-        { key: "contact", label: t('navbar.contact') },
+        { key: "favorites", label: t('navbar.favorites') },
         { key: "adopt", label: t('navbar.adopt') },
         { key: "chat", label: t('navbar.chat') }
       ];

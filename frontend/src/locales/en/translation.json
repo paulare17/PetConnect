@@ -22,6 +22,7 @@
     "aboutUs": "About us",
     "lost": "Lost 🔜",
     "contact": "Contact",
+    "favorites": "Favorites",
     "adopt": "Adopt",
     "giveAdoption": "Give for adoption",
     "chat": "Chat",
@@ -676,5 +677,13 @@
     "noFavorites": "You don't have any favorite animals yet.",
     "loading": "Loading favorites...",
     "errorLoading": "Could not load favorites."
+  },
+  "chatbot": {
+    "welcomeMessage": "Hello! I'm your virtual assistant. How can I help you today?",
+    "title": "Virtual Assistant",
+    "online": "Online",
+    "placeholder": "Type your message...",
+    "errorProcessing": "Sorry, I couldn't process your request.",
+    "errorGeneral": "Sorry, there was an error. Please try again."
   }
 }

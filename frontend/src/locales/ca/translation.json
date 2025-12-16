@@ -22,6 +22,7 @@
     "aboutUs": "Sobre nosaltres",
     "lost": "Perduts 🔜",
     "contact": "Contacte",
+    "favorites": "Preferits",
     "adopt": "Adopta",
     "giveAdoption": "Dóna en adopció",
     "chat": "Xateja",
@@ -676,5 +677,13 @@
     "noFavorites": "Encara no tens cap animal preferit.",
     "loading": "Carregant preferits...",
     "errorLoading": "No s'han pogut carregar els preferits."
+  },
+  "chatbot": {
+    "welcomeMessage": "Hola! Sóc el teu assistent virtual. Com et puc ajudar avui?",
+    "title": "Assistent Virtual",
+    "online": "En línia",
+    "placeholder": "Escriu el teu missatge...",
+    "errorProcessing": "Ho sento, no he pogut processar la teva petició.",
+    "errorGeneral": "Ho sento, hi ha hagut un error. Si us plau, torna-ho a intentar."
   }
 }
