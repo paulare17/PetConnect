@@ -25,7 +25,11 @@ import MaleIcon from '@mui/icons-material/Male';
 import FemaleIcon from '@mui/icons-material/Female';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useTranslation } from 'react-i18next';
+import gatDefecte from "../../assets/gat_defecte.png";
+import gosDefecte from "../../assets/gos_defecte.png";
 import { useColors } from '../../hooks/useColors';
 import api from '../../api/client';
 import { useAuthContext } from '../../context/AuthProvider';
@@ -90,6 +94,7 @@ function ProfileAnimal() {
   const [updatingAdoption, setUpdatingAdoption] = useState(false);
   const [startingChat, setStartingChat] = useState(false);
   const [alerta, setAlerta] = useState(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
   // Verificar si l'usuari és protectora
   const isProtectora = user?.role === ROLES.PROTECTORA;
@@ -177,8 +182,29 @@ function ProfileAnimal() {
   const especieLower = (animal.especie || '').toLowerCase();
   const generoLower = (animal.genero || '').toLowerCase();
   
-  // Imatge principal
-  const imageSrc = animal.foto || `https://via.placeholder.com/400x300?text=${t('profileMascota.noImage')}`;
+  // Determinar imatge per defecte segons espècie
+  const defaultImage = especieLower === 'perro' ? gosDefecte : gatDefecte;
+  
+  // Crear array amb totes les fotos disponibles
+  const images = [
+    animal.foto || defaultImage,
+    animal.foto2,
+    animal.foto3
+  ].filter(Boolean); // Eliminar valors null/undefined
+  
+  // Si no hi ha cap foto, afegir la imatge per defecte
+  if (images.length === 0) {
+    images.push(defaultImage);
+  }
+  
+  // Funcions per navegar pel carrussel
+  const handlePrevImage = () => {
+    setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+  };
+
+  const handleNextImage = () => {
+    setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+  };
   const raza = especieLower === 'perro' 
     ? (animal.raza_perro_display || animal.raza_perro) 
     : (animal.raza_gato_display || animal.raza_gato);
@@ -248,11 +274,12 @@ function ProfileAnimal() {
                 width: { xs: '100%', md: 300 }, 
                 height: { xs: 250, md: 300 },
                 mx: 'auto',
+                position: 'relative',
               }}>
                 <CardMedia
                   component="img"
-                  image={imageSrc}
-                  alt={animal.nombre}
+                  image={images[currentImageIndex]}
+                  alt={`${animal.nombre} - ${currentImageIndex + 1}`}
                   sx={{ 
                     objectFit: 'cover', 
                     objectPosition: 'center center', 
@@ -261,6 +288,77 @@ function ProfileAnimal() {
                     borderRadius: 3,
                   }}
                 />
+                
+                {/* Controls del carrussel - només si hi ha més d'una imatge */}
+                {images.length > 1 && (
+                  <>
+                    {/* Fletxa esquerra */}
+                    <IconButton
+                      onClick={handlePrevImage}
+                      size={isMobile ? "small" : "medium"}
+                      sx={{
+                        position: 'absolute',
+                        left: { xs: 4, md: 8 },
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                        '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.95)' },
+                        zIndex: 1
+                      }}
+                    >
+                      <ChevronLeftIcon fontSize={isMobile ? "small" : "medium"} />
+                    </IconButton>
+                    
+                    {/* Fletxa dreta */}
+                    <IconButton
+                      onClick={handleNextImage}
+                      size={isMobile ? "small" : "medium"}
+                      sx={{
+                        position: 'absolute',
+                        right: { xs: 4, md: 8 },
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                        '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.95)' },
+                        zIndex: 1
+                      }}
+                    >
+                      <ChevronRightIcon fontSize={isMobile ? "small" : "medium"} />
+                    </IconButton>
+                    
+                    {/* Indicadors (dots) */}
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        bottom: 8,
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        display: 'flex',
+                        gap: 0.5,
+                        zIndex: 1
+                      }}
+                    >
+                      {images.map((_, index) => (
+                        <Box
+                          key={index}
+                          onClick={() => setCurrentImageIndex(index)}
+                          sx={{
+                            width: 8,
+                            height: 8,
+                            borderRadius: '50%',
+                            backgroundColor: index === currentImageIndex ? 'white' : 'rgba(255, 255, 255, 0.5)',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s',
+                            '&:hover': {
+                              backgroundColor: 'white',
+                              transform: 'scale(1.2)'
+                            }
+                          }}
+                        />
+                      ))}
+                    </Box>
+                  </>
+                )}
               </Card>
             </Grid>
             <Grid item xs={12} md={7}>
