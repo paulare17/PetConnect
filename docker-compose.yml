@@ -22,6 +22,8 @@ services:
       - db
     ports:
       - "8000:8000"
+    volumes:
+      - media-data:/app/PetConnect/media
 
   chat-server:
     build: ./backend/chat-server
@@ -47,3 +49,4 @@ services:
 
 volumes:
   db-data:
+  media-data:
