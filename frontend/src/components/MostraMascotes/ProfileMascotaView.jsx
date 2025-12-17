@@ -79,6 +79,17 @@ function ProfileMascotaView({ animal, showAdoptButton = true }) {
   // Normalitzar camps del backend (venen en majúscules)
   const especieLower = (animal.especie || '').toLowerCase();
   const generoLower = (animal.genero || '').toLowerCase();
+
+  // Helpers per a valors de visualització quan venen directament del formulari
+  const mapTamanoToDisplay = (tam) => {
+    const map = {
+      PEQUENO: 'pequeño',
+      MEDIANO: 'mediano',
+      GRANDE: 'grande',
+      GIGANTE: 'gigante',
+    };
+    return map[tam] || tam;
+  };
   
   // Determinar imatge per defecte segons espècie
   const defaultImage = especieLower === 'perro' ? gosDefecte : gatDefecte;
@@ -96,22 +107,38 @@ function ProfileMascotaView({ animal, showAdoptButton = true }) {
   }
   
   // Raça i altres camps segons espècie
-  const raza = especieLower === 'perro' 
-    ? (animal.raza_perro_display || animal.raza_perro) 
-    : (animal.raza_gato_display || animal.raza_gato);
-  const tamanoDisplay = animal.tamano_display || animal.tamano;
-  const caracter = especieLower === 'perro' ? animal.caracter_perro : animal.caracter_gato;
+  const raza = especieLower === 'perro'
+    ? (animal.raza_perro_display || animal.raza_perro || animal.raza)
+    : (animal.raza_gato_display || animal.raza_gato || animal.raza);
+  const tamanoDisplay = animal.tamano_display || mapTamanoToDisplay(animal.tamano) || animal.tamaño;
+  const caracter = (especieLower === 'perro'
+    ? (animal.caracter_perro || [])
+    : (animal.caracter_gato || []))
+    // Fallback si ve directament del formulari amb camp genèric
+    || animal.caracter;
   
   // Camps d'estat de salut (ara és un array estado_legal_salud)
-  const estadoSalud = animal.estado_legal_salud || [];
+  // Estat de salut: pot venir com a array o deduir-se des de flags de formulari
+  const estadoSalud = Array.isArray(animal.estado_legal_salud) ? animal.estado_legal_salud : [];
+  if (!estadoSalud.length) {
+    if (animal.desparasitado) estadoSalud.push('DESPARASITADO');
+    if (animal.esterilizado) estadoSalud.push('ESTERILIZADO');
+    if (animal.vacunado) estadoSalud.push('VACUNADO');
+    if (animal.con_microchip) estadoSalud.push('MICROCHIP');
+  }
   const vacunado = estadoSalud.includes('VACUNADO');
   const esterilizado = estadoSalud.includes('ESTERILIZADO');
   const desparasitado = estadoSalud.includes('DESPARASITADO');
   const con_microchip = estadoSalud.includes('MICROCHIP');
   
   // Condicions especials segons espècie
-  const condicionEspecial = especieLower === 'perro' ? animal.condicion_especial_perro : animal.condicion_especial_gato;
-  const tieneNecesidadesEspeciales = condicionEspecial && condicionEspecial.length > 0;
+  const condicionEspecial = especieLower === 'perro' 
+    ? (animal.condicion_especial_perro || []) 
+    : (animal.condicion_especial_gato || []);
+  // Fallback simple des de descripció si ve del formulari
+  const condicionEspecialTexto = Array.isArray(condicionEspecial) ? condicionEspecial.join(', ') : condicionEspecial;
+  const condicionTiene = condicionEspecial && (Array.isArray(condicionEspecial) ? condicionEspecial.length > 0 : !!condicionEspecial);
+  const tieneNecesidadesEspeciales = condicionTiene;
   
   // Apto con (convivència)
   const aptoCon = animal.apto_con || [];
@@ -369,7 +396,7 @@ function ProfileMascotaView({ animal, showAdoptButton = true }) {
             <Grid item xs={12} sm={6}>
               <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.specialNeeds')}</strong> {tieneNecesidadesEspeciales ? t('profileMascota.yes') : t('profileMascota.no')}</Typography>
               {tieneNecesidadesEspeciales && (
-                <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.needsDescription')}</strong> {Array.isArray(condicionEspecial) ? condicionEspecial.join(', ') : condicionEspecial}</Typography>
+                <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.needsDescription')}</strong> {condicionEspecialTexto}</Typography>
               )}
               {animal.protectora_ciudad && (
                 <Typography variant="body2" sx={{ mb: 1 }}><strong>{t('profileMascota.location')}</strong> {animal.protectora_ciudad}</Typography>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import "./no-scroll-form.css";
 import {
@@ -42,6 +43,7 @@ import PreviewDialog from "../MostraMascotes/PreviewDialog.jsx";
 import { transformFormDataToAnimal, TAMANO_MAP } from "../../utils/transformAnimalData.js";
 
 const AddAnimalForm = () => {
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const { colors } = useColors();
   const theme = useTheme();
@@ -260,6 +262,14 @@ const AddAnimalForm = () => {
         ? (formData.raza_perro || formData.raza || '')
         : (formData.raza_gato || formData.raza || '');
 
+      // Normalitzar convivència per a la IA (evitar booleans)
+      const convNinos = formData.convivencia_ninos === true
+        ? "si"
+        : formData.convivencia_ninos === false
+          ? "no"
+          : (typeof formData.convivencia_ninos === 'string' ? formData.convivencia_ninos : "");
+      const convAnimales = typeof formData.convivencia_animales === 'string' ? formData.convivencia_animales : "";
+
       // Preparar los datos para enviar a la IA MODULAR
       // Enviem TOTES les dades reals de l'animal
       const dataForIA = {
@@ -272,8 +282,8 @@ const AddAnimalForm = () => {
         // Caràcter - enviem l'array unit per comes
         caracter_necesidad: Array.isArray(formData.caracter) ? formData.caracter.join(', ') : "",
         // Convivència
-        convivencia_ninos: formData.convivencia_ninos || "",
-        convivencia_animales: formData.convivencia_animales || "",
+        convivencia_ninos: convNinos,
+        convivencia_animales: convAnimales,
         // Història
         historia_breve: formData.descripcion_necesidades || "",
       };
@@ -434,8 +444,14 @@ const AddAnimalForm = () => {
         type: "success",
         message: t("addAnimalForm.successCreated"),
       });
-      setFormData(initialFormData);
-      setPreviewUrls(["", "", ""]);
+      // Redirigir al perfil de la mascota creada si tenemos ID
+      if (res?.data?.id) {
+        navigate(`/mascotes/${res.data.id}`);
+      } else {
+        // Si no hay id en la respuesta, limpiar el formulario
+        setFormData(initialFormData);
+        setPreviewUrls(["", "", ""]);
+      }
     } catch (err) {
       console.error("Error creant mascota:", err);
       const errorMsg =
