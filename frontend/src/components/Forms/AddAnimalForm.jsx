@@ -444,14 +444,9 @@ const AddAnimalForm = () => {
         type: "success",
         message: t("addAnimalForm.successCreated"),
       });
-      // Redirigir al perfil de la mascota creada si tenemos ID
-      if (res?.data?.id) {
-        navigate(`/mascotes/${res.data.id}`);
-      } else {
-        // Si no hay id en la respuesta, limpiar el formulario
-        setFormData(initialFormData);
-        setPreviewUrls(["", "", ""]);
-      }
+      // Limpiar el formulario después de crear la mascota
+      setFormData(initialFormData);
+      setPreviewUrls(["", "", ""]);
     } catch (err) {
       console.error("Error creant mascota:", err);
       const errorMsg =
